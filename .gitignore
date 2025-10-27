@@ -52,7 +52,9 @@ Thumbs.db
 
 # Security - Sensitive files
 CREDENTIALS.md
+SECURE_CREDENTIALS.md
 *CREDENTIALS*
 *PASSWORD*
 *SECRET*
+*SECURE*
 

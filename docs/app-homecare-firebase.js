@@ -72,7 +72,7 @@ const DEFAULT_CARE_TASKS = [
     { id: 506, name: 'Rehabilitation Support', category: 'Specialized Care', common: false }
 ];
 
-// User ID (simple hash of password for single-user system)
+// User ID (demo system - use Firebase Auth in production)
 let userId = null;
 let currentUser = null;
 
@@ -104,7 +104,7 @@ function showSyncStatus(message, type = 'success') {
     }
 }
 
-// Simple hash function for password
+// Demo authentication - use Firebase Auth in production
 function simpleHash(str) {
     let hash = 0;
     for (let i = 0; i < str.length; i++) {

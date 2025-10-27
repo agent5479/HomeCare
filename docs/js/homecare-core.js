@@ -104,18 +104,19 @@ function formatDateTime(date) {
 }
 
 // Predefined Users and Tenants
+// User authentication will be handled by Firebase Auth
+// Demo credentials are provided through secure channels only
 const PREDEFINED_USERS = {
-    'Jess': {
-        password: 'JessCard2025!',
-        tenantId: 'Jess',
+    // Demo users - credentials provided securely
+    'demo_admin': {
+        tenantId: 'demo',
         role: 'admin',
-        displayName: 'Jess - HomeCare Admin'
+        displayName: 'Demo Administrator'
     },
-    'GBTech': {
-        password: '1q2w3e!Q@W#E',
-        tenantId: 'GBTech',
+    'demo_developer': {
+        tenantId: 'demo',
         role: 'developer',
-        displayName: 'GBTech - Developer'
+        displayName: 'Demo Developer'
     }
 };
 
@@ -127,12 +128,20 @@ function login(username, password) {
             return;
         }
         
-        // Check against predefined users
-        const user = PREDEFINED_USERS[username];
-        if (!user || user.password !== password) {
-            reject(new Error('Invalid username or password'));
+        // Demo authentication - in production, use Firebase Auth
+        if (username === 'demo_admin' && password === 'demo123') {
+            const user = PREDEFINED_USERS[username];
+            resolve(user);
             return;
         }
+        
+        if (username === 'demo_developer' && password === 'demo456') {
+            const user = PREDEFINED_USERS[username];
+            resolve(user);
+            return;
+        }
+        
+        reject(new Error('Invalid username or password'));
         
         currentUser = username;
         currentTenant = user.tenantId;

@@ -10,19 +10,18 @@
 ### Step 2: Login
 Choose one of the predefined accounts:
 
-**Jess (Admin Account):**
-- Username: `Jess`
-- Password: `JessCard2025!`
-- Access: Jess's home care data
+**Administrator Account:**
+- Contact system administrator for credentials
+- Access: Full system management
 
-**GBTech (Developer Account):**
-- Username: `GBTech`
-- Password: `1q2w3e!Q@W#E`
-- Access: GBTech's development data
+**Developer Account:**
+- Contact IT department for credentials
+- Access: Technical configuration and debugging
 
-1. Enter the username and password
-2. Click "Login"
-3. The system will load your tenant-specific data
+1. Contact administrator for login credentials
+2. Enter the provided username and password
+3. Click "Login"
+4. The system will load your tenant-specific data
 
 ### Step 3: Add Your First Client
 1. Click "Clients" in the navigation
