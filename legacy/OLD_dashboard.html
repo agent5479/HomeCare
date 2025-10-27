@@ -1,0 +1,327 @@
+{% extends "base.html" %}
+
+{% block title %}Command Center - BeeMarshall{% endblock %}
+
+{% block extra_css %}
+<style>
+.hover-card {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.hover-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    text-decoration: none;
+}
+
+.hover-card:hover .card-body {
+    cursor: pointer;
+}
+
+.dashboard-stat-card {
+    display: block;
+    width: 100%;
+    text-decoration: none;
+}
+
+.dashboard-stat-card:hover {
+    text-decoration: none;
+    color: inherit;
+}
+
+.dashboard-stat-card:hover .card {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+.action-row:hover {
+    background-color: rgba(0,123,255,0.1) !important;
+    transform: scale(1.01);
+    transition: all 0.2s ease-in-out;
+}
+
+.action-row:hover td {
+    border-color: rgba(0,123,255,0.2);
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h1 class="display-5"><i class="bi bi-shield-check"></i> Command Center</h1>
+        <p class="lead text-muted">Welcome back, {{ current_user.username }}! Ready for deployment.</p>
+    </div>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <a href="{{ url_for('sites') }}" class="dashboard-stat-card">
+            <div class="card bg-warning text-dark">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-subtitle mb-2">Total Sites</h6>
+                            <h2 class="card-title mb-0">{{ stats.total_sites }}</h2>
+                        </div>
+                        <i class="bi bi-geo-alt-fill" style="font-size: 3rem; opacity: 0.3;"></i>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-3">
+        <a href="{{ url_for('sites') }}" class="dashboard-stat-card">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-subtitle mb-2">Total Hives</h6>
+                            <h2 class="card-title mb-0">{{ stats.total_hives }}</h2>
+                        </div>
+                        <i class="bi bi-hexagon-fill" style="font-size: 3rem; opacity: 0.3;"></i>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-3">
+        <a href="{{ url_for('actions') }}" class="dashboard-stat-card">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-subtitle mb-2">Total Actions</h6>
+                            <h2 class="card-title mb-0">{{ stats.recent_actions_count }}</h2>
+                        </div>
+                        <i class="bi bi-list-check" style="font-size: 3rem; opacity: 0.3;"></i>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-3">
+        <a href="{{ url_for('disease_report') }}" class="dashboard-stat-card">
+            <div class="card bg-danger text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-subtitle mb-2">Flagged Issues</h6>
+                            <h2 class="card-title mb-0">{{ stats.flagged_issues or 0 }}</h2>
+                        </div>
+                        <i class="bi bi-exclamation-triangle-fill" style="font-size: 3rem; opacity: 0.3;"></i>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+</div>
+
+<!-- Map Section -->
+<div class="row mb-4">
+    <div class="col">
+        <div class="card">
+            <div class="card-header bg-warning">
+                <h5 class="mb-0"><i class="bi bi-map"></i> Hive Site Locations</h5>
+            </div>
+            <div class="card-body p-0">
+                <div id="map" style="height: 400px; width: 100%;"></div>
+            </div>
+            <div class="card-footer">
+                <a href="{{ url_for('add_site') }}" class="btn btn-warning">
+                    <i class="bi bi-plus-circle"></i> Add New Site
+                </a>
+                <a href="{{ url_for('sites') }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-list"></i> View All Sites
+                </a>
+                <a href="{{ url_for('field_report') }}" class="btn btn-success">
+                    <i class="bi bi-check-square"></i> Field Report
+                </a>
+                <a href="{{ url_for('disease_report') }}" class="btn btn-warning">
+                    <i class="bi bi-exclamation-triangle"></i> Disease Report
+                </a>
+                <a href="{{ url_for('export_management') }}" class="btn btn-info">
+                    <i class="bi bi-download"></i> Export Data
+                </a>
+                <a href="{{ url_for('report_dashboard') }}" class="btn btn-secondary">
+                    <i class="bi bi-graph-up"></i> Reports
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Actions -->
+<div class="row">
+    <div class="col">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="bi bi-clock-history"></i> Recent Actions</h5>
+            </div>
+            <div class="card-body">
+                {% if recent_actions %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Site</th>
+                                <th>Task</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for action in recent_actions %}
+                            <tr class="action-row" data-href="{{ url_for('site_detail', site_id=action.site_id) }}" style="cursor: pointer;">
+                                <td>{{ action.action_date.strftime('%Y-%m-%d %H:%M') }}</td>
+                                <td>
+                                    <a href="{{ url_for('site_detail', site_id=action.site_id) }}" class="text-decoration-none fw-bold">
+                                        <i class="bi bi-geo-alt-fill text-warning"></i> {{ action.site.name }}
+                                    </a>
+                                </td>
+                                <td><span class="badge bg-secondary">{{ action.task_name }}</span></td>
+                                <td>{{ action.description[:50] }}{% if action.description and action.description|length > 50 %}...{% endif %}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="text-center">
+                    <a href="{{ url_for('actions') }}" class="btn btn-outline-info">View All Actions</a>
+                </div>
+                {% else %}
+                <p class="text-muted text-center my-4">No actions recorded yet. Start logging your hive management activities!</p>
+                <div class="text-center">
+                    <a href="{{ url_for('log_action') }}" class="btn btn-info">Log Your First Action</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_key }}&callback=initMap" async defer></script>
+<script>
+// Ensure dashboard stat cards are clickable
+document.addEventListener('DOMContentLoaded', function() {
+    const statCards = document.querySelectorAll('.dashboard-stat-card');
+    
+    statCards.forEach(function(card) {
+        card.addEventListener('click', function(e) {
+            // Ensure the click event works properly
+            window.location.href = this.href;
+        });
+        
+        // Add visual feedback on click
+        card.addEventListener('mousedown', function(e) {
+            this.style.transform = 'translateY(-2px)';
+        });
+        
+        card.addEventListener('mouseup', function(e) {
+            this.style.transform = '';
+        });
+        
+        // Ensure cursor shows as pointer
+        card.style.cursor = 'pointer';
+    });
+    
+    // Make action rows clickable
+    const actionRows = document.querySelectorAll('.action-row');
+    
+    actionRows.forEach(function(row) {
+        row.addEventListener('click', function(e) {
+            // Don't navigate if clicking on the site name link
+            if (e.target.tagName === 'A') {
+                return;
+            }
+            
+            const href = this.getAttribute('data-href');
+            if (href) {
+                window.location.href = href;
+            }
+        });
+        
+        // Add hover effect
+        row.addEventListener('mouseenter', function() {
+            this.style.backgroundColor = 'rgba(0,123,255,0.1)';
+        });
+        
+        row.addEventListener('mouseleave', function() {
+            this.style.backgroundColor = '';
+        });
+    });
+});
+</script>
+<script>
+function initMap() {
+    // Default center - Collingwood, New Zealand
+    const center = { lat: -40.6764, lng: 172.6856 };
+    
+    const map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 12,
+        center: center,
+        mapTypeId: 'terrain'
+    });
+    
+    // Fetch sites and add markers
+    fetch('{{ url_for("api_sites") }}')
+        .then(response => response.json())
+        .then(sites => {
+            if (sites.length > 0) {
+                // Center map on first site
+                map.setCenter({ lat: sites[0].latitude, lng: sites[0].longitude });
+                
+                // Add markers for each site
+                sites.forEach(site => {
+                    const marker = new google.maps.Marker({
+                        position: { lat: site.latitude, lng: site.longitude },
+                        map: map,
+                        title: site.name,
+                        icon: {
+                            path: google.maps.SymbolPath.CIRCLE,
+                            scale: 10,
+                            fillColor: '#FFC107',
+                            fillOpacity: 0.8,
+                            strokeColor: '#FF9800',
+                            strokeWeight: 2
+                        }
+                    });
+                    
+                    // Info window
+                    const infoWindow = new google.maps.InfoWindow({
+                        content: `
+                            <div style="padding: 10px;">
+                                <h6><strong>${site.name}</strong></h6>
+                                <p class="mb-1"><small>${site.description || 'No description'}</small></p>
+                                <p class="mb-1"><strong>Hives:</strong> ${site.hive_count}</p>
+                                ${site.harvest_timeline ? `<p class="mb-1"><strong>Harvest:</strong> ${site.harvest_timeline}</p>` : ''}
+                                <a href="/site/${site.id}" class="btn btn-sm btn-warning mt-2">View Details</a>
+                            </div>
+                        `
+                    });
+                    
+                    marker.addListener('click', () => {
+                        infoWindow.open(map, marker);
+                    });
+                });
+                
+                // Fit bounds to show all markers
+                if (sites.length > 1) {
+                    const bounds = new google.maps.LatLngBounds();
+                    sites.forEach(site => {
+                        bounds.extend(new google.maps.LatLng(site.latitude, site.longitude));
+                    });
+                    map.fitBounds(bounds);
+                }
+            }
+        })
+        .catch(error => console.error('Error loading sites:', error));
+}
+</script>
+{% endblock %}
+

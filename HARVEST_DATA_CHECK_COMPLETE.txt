@@ -1,6 +1,0 @@
-﻿HARVEST DATA INTEGRATION CHECK COMPLETE
-âœ… Harvest records now preserve original metadata (addedBy, addedAt)
-âœ… Modified records include modification metadata (modifiedBy, modifiedAt)
-âœ… reports.html correctly processes harvest records with modification metadata
-âœ… Historical harvest records display properly in reports.html
-âœ… Year-on-year accumulation data integrity maintained

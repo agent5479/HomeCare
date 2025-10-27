@@ -1,5 +1,5 @@
 """
-LarsBees Setup Script
+HomeCare Management System Setup Script
 Helps initialize the application with basic configuration
 """
 
@@ -24,7 +24,7 @@ FLASK_APP=app.py
 FLASK_ENV=development
 
 # Database
-DATABASE_URL=sqlite:///larsbees.db
+DATABASE_URL=sqlite:///homecare.db
 
 # Google Maps API
 GOOGLE_MAPS_API_KEY=
@@ -67,7 +67,7 @@ def check_dependencies():
     return True
 
 def main():
-    print("🐝 LarsBees - Apiary Management System Setup")
+    print("🏥 HomeCare Management System Setup")
     print("=" * 50)
     
     # Create .env file
@@ -91,11 +91,11 @@ def main():
     print("1. Edit .env and add your Google Maps API key")
     print("2. Run the application: python app.py")
     print("3. Open browser: http://localhost:5000")
-    print("4. Login with test account:")
-    print("   Username: admin")
-    print("   Password: admin123")
+    print("4. Login with predefined accounts:")
+    print("   Jess (Admin): Jess / JessCard2025!")
+    print("   GBTech (Developer): GBTech / 1q2w3e!Q@W#E")
     print("\n📖 Read README.md for more information")
-    print("\nHappy Beekeeping! 🍯")
+    print("\nHappy Care Management! 🏥")
 
 if __name__ == "__main__":
     main()

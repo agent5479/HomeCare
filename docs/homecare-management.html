@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HomeCare Management - Professional Care Coordination</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <style>
+        /* HomeCare Management Design System - Professional Healthcare Theme */
+        
+        :root {
+            /* Healthcare Color Palette - Blue, White, Green, Gray */
+            --primary-blue: #4A90E2;
+            --secondary-blue: #2E5BBA;
+            --accent-green: #7ED321;
+            --success-green: #5CB85C;
+            --warning-orange: #F5A623;
+            --danger-red: #D0021B;
+            --white: #FFFFFF;
+            --light-gray: #F8F9FA;
+            --medium-gray: #6C757D;
+            --dark-gray: #343A40;
+            --text-primary: var(--dark-gray);
+            --text-secondary: var(--medium-gray);
+            
+            /* Enhanced Typography */
+            --font-family: 'Inter', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            --font-size-base: 16px;
+            --line-height-base: 1.6;
+            
+            /* Spacing */
+            --spacing-xs: 0.25rem;
+            --spacing-sm: 0.5rem;
+            --spacing-md: 1rem;
+            --spacing-lg: 1.5rem;
+            --spacing-xl: 2rem;
+            
+            /* Border Radius */
+            --border-radius-sm: 0.375rem;
+            --border-radius-md: 0.5rem;
+            --border-radius-lg: 0.75rem;
+            --border-radius-xl: 1rem;
+            
+            /* Shadows */
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Enhanced Base Styles */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        html, body {
+            height: 100%;
+            font-family: var(--font-family);
+            background: var(--light-gray);
+            color: var(--text-primary);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            font-size: var(--font-size-base);
+            line-height: var(--line-height-base);
+        }
+        
+        a {
+            color: inherit;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+        
+        a:hover {
+            color: var(--primary-blue);
+        }
+        
+        /* Navigation */
+        .navbar {
+            background: var(--white) !important;
+            box-shadow: var(--shadow-sm);
+            border-bottom: 1px solid #E9ECEF;
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--primary-blue) !important;
+        }
+        
+        .nav-link {
+            font-weight: 500;
+            color: var(--text-primary) !important;
+            padding: 0.75rem 1rem !important;
+            border-radius: var(--border-radius-sm);
+            transition: all 0.2s ease;
+        }
+        
+        .nav-link:hover {
+            background-color: var(--light-gray);
+            color: var(--primary-blue) !important;
+        }
+        
+        .nav-link.active {
+            background-color: var(--primary-blue);
+            color: var(--white) !important;
+        }
+        
+        /* Cards */
+        .card {
+            border: none;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-sm);
+            transition: all 0.2s ease;
+        }
+        
+        .card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+        
+        .client-card {
+            cursor: pointer;
+            border-left: 4px solid var(--primary-blue);
+        }
+        
+        .client-card:hover {
+            border-left-color: var(--secondary-blue);
+        }
+        
+        /* Buttons */
+        .btn {
+            border-radius: var(--border-radius-md);
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-blue);
+            border-color: var(--primary-blue);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary-blue);
+            border-color: var(--secondary-blue);
+        }
+        
+        .btn-outline-primary {
+            color: var(--primary-blue);
+            border-color: var(--primary-blue);
+        }
+        
+        .btn-outline-primary:hover {
+            background-color: var(--primary-blue);
+            border-color: var(--primary-blue);
+        }
+        
+        /* Stats Cards */
+        .stat-card {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+            color: var(--white);
+            border-radius: var(--border-radius-lg);
+            padding: 1.5rem;
+            text-align: center;
+        }
+        
+        .stat-card .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-card .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        /* Action Items */
+        .action-item {
+            background: var(--white);
+            border-radius: var(--border-radius-md);
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            border-left: 4px solid var(--accent-green);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        /* Forms */
+        .form-control {
+            border-radius: var(--border-radius-md);
+            border: 1px solid #DEE2E6;
+            transition: all 0.2s ease;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 0.2rem rgba(74, 144, 226, 0.25);
+        }
+        
+        /* Sync Indicator */
+        .sync-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1050;
+            background: var(--white);
+            border-radius: var(--border-radius-md);
+            padding: 0.75rem 1rem;
+            box-shadow: var(--shadow-lg);
+            border-left: 4px solid var(--accent-green);
+        }
+        
+        .sync-indicator.syncing {
+            border-left-color: var(--warning-orange);
+        }
+        
+        .sync-indicator.error {
+            border-left-color: var(--danger-red);
+        }
+        
+        .sync-indicator.hidden {
+            display: none;
+        }
+        
+        /* Map */
+        #map {
+            height: 400px;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .stat-card .stat-number {
+                font-size: 2rem;
+            }
+            
+            .navbar-brand {
+                font-size: 1.25rem;
+            }
+        }
+        
+        /* Loading States */
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+        
+        /* Badge Styles */
+        .badge {
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .badge.bg-primary {
+            background-color: var(--primary-blue) !important;
+        }
+        
+        .badge.bg-success {
+            background-color: var(--success-green) !important;
+        }
+        
+        .badge.bg-warning {
+            background-color: var(--warning-orange) !important;
+        }
+        
+        .badge.bg-danger {
+            background-color: var(--danger-red) !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <i class="bi bi-heart-pulse-fill me-2"></i>
+                HomeCare Management
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#" onclick="showDashboard()">
+                            <i class="bi bi-house-door me-1"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="showClients()">
+                            <i class="bi bi-people me-1"></i> Clients
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="showActions()">
+                            <i class="bi bi-clipboard-check me-1"></i> Care Actions
+                        </a>
+                    </li>
+                </ul>
+                
+                <ul class="navbar-nav">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-person-circle me-1"></i>
+                            <span id="currentUserName">User</span>
+                            <small class="d-block" id="currentUserRole" style="font-size: 0.7rem; opacity: 0.8;"></small>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><h6 class="dropdown-header" id="currentUserInfo">User Information</h6></li>
+                            <li><a class="dropdown-item" href="#" onclick="logout()">
+                                <i class="bi bi-box-arrow-right me-1"></i> Logout
+                            </a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Sync Indicator -->
+    <div id="syncIndicator" class="sync-indicator hidden">
+        <div id="syncText" class="d-flex align-items-center">
+            <i class="bi bi-cloud-check me-2"></i>
+            <span>Synced</span>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container-fluid mt-4">
+        
+        <!-- Login Screen -->
+        <div id="loginScreen" class="row justify-content-center">
+            <div class="col-md-6 col-lg-4">
+                <div class="card">
+                    <div class="card-body p-5">
+                        <div class="text-center mb-4">
+                            <i class="bi bi-heart-pulse-fill text-primary" style="font-size: 3rem;"></i>
+                            <h2 class="mt-3 mb-1">HomeCare Management</h2>
+                            <p class="text-muted">Professional Care Coordination</p>
+                        </div>
+                        
+                        <div class="alert alert-info mb-4">
+                            <h6 class="alert-heading">Available Login Credentials</h6>
+                            <div class="row">
+                                <div class="col-6">
+                                    <strong>Jess (Admin):</strong><br>
+                                    <small>Username: Jess<br>Password: JessCard2025!</small>
+                                </div>
+                                <div class="col-6">
+                                    <strong>GBTech (Developer):</strong><br>
+                                    <small>Username: GBTech<br>Password: 1q2w3e!Q@W#E</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <form id="loginForm">
+                            <div class="mb-3">
+                                <label for="loginUsername" class="form-label">Username</label>
+                                <input type="text" class="form-control" id="loginUsername" placeholder="Enter username">
+                            </div>
+                            <div class="mb-3">
+                                <label for="loginPassword" class="form-label">Password</label>
+                                <input type="password" class="form-control" id="loginPassword" placeholder="Enter password">
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="bi bi-box-arrow-in-right me-1"></i> Login
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main App -->
+        <div id="mainApp" class="hidden">
+            
+            <!-- Dashboard View -->
+            <div id="dashboardView">
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h1 class="h3 mb-3">
+                            <i class="bi bi-house-door me-2"></i> Care Dashboard
+                        </h1>
+                    </div>
+                </div>
+                
+                <!-- Stats Cards -->
+                <div class="row mb-4">
+                    <div class="col-md-3 mb-3">
+                        <div class="stat-card">
+                            <div class="stat-number" id="statClients">0</div>
+                            <div class="stat-label">Total Clients</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="stat-card">
+                            <div class="stat-number" id="statActiveClients">0</div>
+                            <div class="stat-label">Active Clients</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="stat-card">
+                            <div class="stat-number" id="statActions">0</div>
+                            <div class="stat-label">Care Actions</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="stat-card">
+                            <div class="stat-number" id="statToday">0</div>
+                            <div class="stat-label">Today's Visits</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Map and Recent Actions -->
+                <div class="row">
+                    <div class="col-lg-8 mb-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">
+                                    <i class="bi bi-geo-alt me-2"></i> Client Locations
+                                </h5>
+                            </div>
+                            <div class="card-body p-0">
+                                <div id="map"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-4 mb-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">
+                                    <i class="bi bi-clock-history me-2"></i> Recent Care Actions
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="recentActions">
+                                    <p class="text-muted">No care actions recorded yet.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Clients View -->
+            <div id="clientsView" class="hidden">
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h1 class="h3 mb-0">
+                                <i class="bi bi-people me-2"></i> Client Management
+                            </h1>
+                            <button class="btn btn-primary" onclick="showAddClientForm()">
+                                <i class="bi bi-person-plus me-1"></i> Add Client
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row" id="clientsList">
+                    <!-- Clients will be populated here -->
+                </div>
+            </div>
+
+            <!-- Client Form View -->
+            <div id="clientFormView" class="hidden">
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h1 class="h3 mb-0">
+                            <i class="bi bi-person-plus me-2"></i> <span id="clientFormTitle">Add Client</span>
+                        </h1>
+                    </div>
+                </div>
+                
+                <div class="row justify-content-center">
+                    <div class="col-lg-8">
+                        <div class="card">
+                            <div class="card-body">
+                                <form id="clientForm">
+                                    <input type="hidden" id="clientId">
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="clientName" class="form-label">Client Name *</label>
+                                            <input type="text" class="form-control" id="clientName" required>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="clientAge" class="form-label">Age</label>
+                                            <input type="number" class="form-control" id="clientAge" min="0" max="120">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="clientDescription" class="form-label">Description</label>
+                                        <textarea class="form-control" id="clientDescription" rows="3"></textarea>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="clientStatus" class="form-label">Status</label>
+                                            <select class="form-select" id="clientStatus">
+                                                <option value="active">Active</option>
+                                                <option value="inactive">Inactive</option>
+                                                <option value="discharged">Discharged</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="clientCareLevel" class="form-label">Care Level</label>
+                                            <select class="form-select" id="clientCareLevel">
+                                                <option value="standard">Standard</option>
+                                                <option value="intensive">Intensive</option>
+                                                <option value="specialized">Specialized</option>
+                                                <option value="palliative">Palliative</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="clientAddress" class="form-label">Address</label>
+                                            <input type="text" class="form-control" id="clientAddress" placeholder="Street address">
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="clientPhone" class="form-label">Phone Number</label>
+                                            <input type="tel" class="form-control" id="clientPhone" placeholder="Phone number">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="clientEmail" class="form-label">Email</label>
+                                            <input type="email" class="form-control" id="clientEmail" placeholder="Email address">
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="clientLat" class="form-label">Location (Latitude)</label>
+                                            <div class="input-group">
+                                                <input type="number" class="form-control" id="clientLat" step="any" placeholder="Latitude">
+                                                <button class="btn btn-outline-secondary" type="button" id="useLocationBtn">
+                                                    <i class="bi bi-crosshair"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="clientLng" class="form-label">Location (Longitude)</label>
+                                            <input type="number" class="form-control" id="clientLng" step="any" placeholder="Longitude">
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="actionTime" class="form-label">Time (for care actions)</label>
+                                            <input type="time" class="form-control" id="actionTime">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="clientMedicalConditions" class="form-label">Medical Conditions</label>
+                                        <textarea class="form-control" id="clientMedicalConditions" rows="2" placeholder="List any medical conditions, allergies, or special needs"></textarea>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="clientEmergencyContact" class="form-label">Emergency Contact</label>
+                                        <input type="text" class="form-control" id="clientEmergencyContact" placeholder="Name and phone number">
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="clientNotes" class="form-label">Notes</label>
+                                        <textarea class="form-control" id="clientNotes" rows="3" placeholder="Additional notes about the client"></textarea>
+                                    </div>
+                                    
+                                    <div class="d-flex gap-2">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="bi bi-check-lg me-1"></i> Save Client
+                                        </button>
+                                        <button type="button" class="btn btn-outline-secondary" onclick="showClients()">
+                                            <i class="bi bi-x-lg me-1"></i> Cancel
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions View -->
+            <div id="actionsView" class="hidden">
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h1 class="h3 mb-0">
+                                <i class="bi bi-clipboard-check me-2"></i> Care Actions
+                            </h1>
+                            <button class="btn btn-primary" onclick="showLogActionForm()">
+                                <i class="bi bi-plus-circle me-1"></i> Log Care Action
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <div id="actionsList">
+                                    <!-- Actions will be populated here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Log Action View -->
+            <div id="logActionView" class="hidden">
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h1 class="h3 mb-0">
+                            <i class="bi bi-plus-circle me-2"></i> Log Care Action
+                        </h1>
+                    </div>
+                </div>
+                
+                <div class="row justify-content-center">
+                    <div class="col-lg-10">
+                        <div class="card">
+                            <div class="card-body">
+                                <form id="actionForm">
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="actionClient" class="form-label">Client *</label>
+                                            <select class="form-select" id="actionClient" required>
+                                                <option value="">Select a client...</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="actionDate" class="form-label">Date *</label>
+                                            <input type="date" class="form-control" id="actionDate" required>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="actionTime" class="form-label">Time</label>
+                                            <input type="time" class="form-control" id="actionTime">
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="actionPriority" class="form-label">Priority</label>
+                                            <select class="form-select" id="actionPriority">
+                                                <option value="normal">Normal</option>
+                                                <option value="high">High</option>
+                                                <option value="urgent">Urgent</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label class="form-label">Care Tasks *</label>
+                                        <div class="row" id="taskCheckboxes">
+                                            <!-- Task checkboxes will be populated here -->
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="actionNotes" class="form-label">Notes</label>
+                                        <textarea class="form-control" id="actionNotes" rows="4" placeholder="Record any observations, concerns, or additional details about the care provided"></textarea>
+                                    </div>
+                                    
+                                    <div class="d-flex gap-2">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="bi bi-check-lg me-1"></i> Log Care Action
+                                        </button>
+                                        <button type="button" class="btn btn-outline-secondary" onclick="showActions()">
+                                            <i class="bi bi-x-lg me-1"></i> Cancel
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Google Maps API -->
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap"></script>
+    <!-- HomeCare Management Modules -->
+    <script type="module" src="js/homecare-core.js"></script>
+    <script src="js/homecare-clients.js"></script>
+    <script src="js/homecare-actions.js"></script>
+    
+    <!-- Main Application Script -->
+    <script>
+        // Main application initialization
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check for existing authentication
+            const savedUser = localStorage.getItem('homecare_user');
+            const savedTenant = localStorage.getItem('homecare_tenant');
+            const savedDisplayName = localStorage.getItem('homecare_displayName');
+            const savedRole = localStorage.getItem('homecare_role');
+            
+            if (savedUser && savedTenant) {
+                // User is already logged in
+                updateUserDisplay(savedDisplayName || savedUser, savedRole);
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('mainApp').classList.remove('hidden');
+                showDashboard();
+            } else {
+                // Show login screen
+                document.getElementById('loginScreen').classList.remove('hidden');
+                document.getElementById('mainApp').classList.add('hidden');
+            }
+        });
+        
+        // Update user display in navigation
+        function updateUserDisplay(displayName, role) {
+            const userNameEl = document.getElementById('currentUserName');
+            const userRoleEl = document.getElementById('currentUserRole');
+            const userInfoEl = document.getElementById('currentUserInfo');
+            
+            if (userNameEl) userNameEl.textContent = displayName;
+            if (userRoleEl) userRoleEl.textContent = role ? `(${role})` : '';
+            if (userInfoEl) userInfoEl.textContent = `${displayName} - ${role || 'User'}`;
+        }
+        
+        // Navigation functions
+        function showDashboard() {
+            hideAllViews();
+            document.getElementById('dashboardView').classList.remove('hidden');
+            updateDashboard();
+        }
+        
+        function showClients() {
+            HomeCareClients.showClientsView();
+        }
+        
+        function showActions() {
+            HomeCareActions.showActionsView();
+        }
+        
+        function hideAllViews() {
+            const views = ['dashboardView', 'clientsView', 'clientFormView', 'actionsView', 'logActionView'];
+            views.forEach(viewId => {
+                const element = document.getElementById(viewId);
+                if (element) {
+                    element.classList.add('hidden');
+                }
+            });
+        }
+        
+        // Login function
+        function handleLogin(e) {
+            e.preventDefault();
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            if (!username || !password) {
+                alert('Please enter both username and password');
+                return;
+            }
+            
+            HomeCareCore.login(username, password).then((userInfo) => {
+                updateUserDisplay(userInfo.displayName, userInfo.role);
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('mainApp').classList.remove('hidden');
+                showDashboard();
+            }).catch(error => {
+                alert('Login failed: ' + error.message);
+            });
+        }
+        
+        // Logout function
+        function logout() {
+            HomeCareCore.logout();
+            updateUserDisplay('User', '');
+            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('mainApp').classList.add('hidden');
+            document.getElementById('loginPassword').value = '';
+            document.getElementById('loginUsername').value = '';
+        }
+        
+        // Dashboard update
+        function updateDashboard() {
+            const stats = HomeCareCore.getDashboardStats();
+            
+            // Update stat cards
+            const statClients = document.getElementById('statClients');
+            const statActiveClients = document.getElementById('statActiveClients');
+            const statActions = document.getElementById('statActions');
+            const statToday = document.getElementById('statToday');
+            
+            if (statClients) statClients.textContent = stats.totalClients;
+            if (statActiveClients) statActiveClients.textContent = stats.activeClients;
+            if (statActions) statActions.textContent = stats.totalActions;
+            if (statToday) statToday.textContent = stats.todayActions;
+            
+            // Update recent actions
+            updateRecentActions();
+            
+            // Update map
+            if (typeof google !== 'undefined') {
+                initMap();
+            }
+        }
+        
+        function updateRecentActions() {
+            const actions = HomeCareCore.getCareActions();
+            const recentActions = actions.slice(-10).reverse();
+            const recentActionsContainer = document.getElementById('recentActions');
+            
+            if (recentActions.length === 0) {
+                recentActionsContainer.innerHTML = '<p class="text-muted">No care actions recorded yet.</p>';
+                return;
+            }
+            
+            const recentActionsHtml = recentActions.map(action => {
+                const client = HomeCareCore.getClient(action.clientId);
+                const clientName = client ? client.name : 'Unknown Client';
+                const loggedBy = action.loggedBy || 'Unknown';
+                
+                return `
+                    <div class="action-item">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <strong>${action.taskName}</strong> - ${clientName}
+                                <br><small class="text-muted">${HomeCareCore.formatDate(action.date)} • Logged by: ${loggedBy}</small>
+                            </div>
+                        </div>
+                        ${action.notes ? `<p class="mb-0 mt-1"><small>${action.notes}</small></p>` : ''}
+                    </div>
+                `;
+            }).join('');
+            
+            recentActionsContainer.innerHTML = recentActionsHtml;
+        }
+        
+        // Google Maps
+        let map;
+        let markers = [];
+        
+        function initMap() {
+            const clients = HomeCareCore.getClients();
+            
+            const mapOptions = {
+                zoom: 10,
+                center: clients.length > 0 
+                    ? { lat: clients[0].latitude, lng: clients[0].longitude }
+                    : { lat: 40.7128, lng: -74.0060 },
+                mapTypeId: 'terrain'
+            };
+            
+            map = new google.maps.Map(document.getElementById('map'), mapOptions);
+            
+            markers.forEach(marker => marker.setMap(null));
+            markers = [];
+            
+            clients.forEach(client => {
+                if (client.latitude && client.longitude) {
+                    const marker = new google.maps.Marker({
+                        position: { lat: client.latitude, lng: client.longitude },
+                        map: map,
+                        title: client.name,
+                        icon: {
+                            path: google.maps.SymbolPath.CIRCLE,
+                            scale: 10,
+                            fillColor: '#4A90E2',
+                            fillOpacity: 0.8,
+                            strokeColor: '#2E5BBA',
+                            strokeWeight: 2
+                        }
+                    });
+                    
+                    const infoWindow = new google.maps.InfoWindow({
+                        content: `
+                            <div style="padding: 10px;">
+                                <h6><strong>${client.name}</strong></h6>
+                                <p class="mb-1"><small>${client.description || 'No description'}</small></p>
+                                <p class="mb-0"><strong>Status:</strong> ${client.status || 'Active'}</p>
+                            </div>
+                        `
+                    });
+                    
+                    marker.addListener('click', () => {
+                        infoWindow.open(map, marker);
+                    });
+                    
+                    markers.push(marker);
+                }
+            });
+            
+            if (clients.length > 1) {
+                const bounds = new google.maps.LatLngBounds();
+                clients.forEach(client => {
+                    if (client.latitude && client.longitude) {
+                        bounds.extend(new google.maps.LatLng(client.latitude, client.longitude));
+                    }
+                });
+                map.fitBounds(bounds);
+            }
+        }
+        
+        // Set up form event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            const loginForm = document.getElementById('loginForm');
+            if (loginForm) {
+                loginForm.addEventListener('submit', handleLogin);
+            }
+        });
+    </script>
+</body>
+</html>

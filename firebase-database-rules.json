@@ -1,0 +1,176 @@
+{
+  "rules": {
+    // Global read/write access is denied by default
+    ".read": false,
+    ".write": false,
+    
+    // HomeCare Management System Rules
+    "homecare": {
+      // Allow read/write access to authenticated users
+      ".read": "auth != null",
+      ".write": "auth != null",
+      
+      // Tenant-specific data isolation
+      "tenants": {
+        // Each tenant can only access their own data
+        "$tenantId": {
+          ".read": "auth != null && (auth.uid == $tenantId || auth.token.role == 'admin' || auth.token.role == 'developer')",
+          ".write": "auth != null && (auth.uid == $tenantId || auth.token.role == 'admin' || auth.token.role == 'developer')",
+          
+          // Client data
+          "clients": {
+            ".read": "auth != null && (auth.uid == $tenantId || auth.token.role == 'admin' || auth.token.role == 'developer')",
+            ".write": "auth != null && (auth.uid == $tenantId || auth.token.role == 'admin' || auth.token.role == 'developer')",
+            "$clientId": {
+              ".validate": "newData.hasChildren(['name', 'status', 'care_level']) && newData.child('name').isString() && newData.child('status').isString() && newData.child('care_level').isString()"
+            }
+          },
+          
+          // Care actions
+          "care_actions": {
+            ".read": "auth != null && (auth.uid == $tenantId || auth.token.role == 'admin' || auth.token.role == 'developer')",
+            ".write": "auth != null && (auth.uid == $tenantId || auth.token.role == 'admin' || auth.token.role == 'developer')",
+            "$actionId": {
+              ".validate": "newData.hasChildren(['client_id', 'task_name', 'action_date', 'performed_by_id']) && newData.child('task_name').isString() && newData.child('action_date').isString()"
+            }
+          },
+          
+          // Scheduled tasks
+          "scheduled_tasks": {
+            ".read": "auth != null && (auth.uid == $tenantId || auth.token.role == 'admin' || auth.token.role == 'developer')",
+            ".write": "auth != null && (auth.uid == $tenantId || auth.token.role == 'admin' || auth.token.role == 'developer')",
+            "$taskId": {
+              ".validate": "newData.hasChildren(['client_id', 'task_name', 'scheduled_date', 'assigned_to_id']) && newData.child('task_name').isString() && newData.child('scheduled_date').isString()"
+            }
+          },
+          
+          // Medical assessments
+          "medical_assessments": {
+            ".read": "auth != null && (auth.uid == $tenantId || auth.token.role == 'admin' || auth.token.role == 'developer')",
+            ".write": "auth != null && (auth.uid == $tenantId || auth.token.role == 'admin' || auth.token.role == 'developer')",
+            "$assessmentId": {
+              ".validate": "newData.hasChildren(['client_id', 'assessment_type', 'assessment_date', 'performed_by_id']) && newData.child('assessment_type').isString() && newData.child('assessment_date').isString()"
+            }
+          },
+          
+          // Care plans
+          "care_plans": {
+            ".read": "auth != null && (auth.uid == $tenantId || auth.token.role == 'admin' || auth.token.role == 'developer')",
+            ".write": "auth != null && (auth.uid == $tenantId || auth.token.role == 'admin' || auth.token.role == 'developer')",
+            "$planId": {
+              ".validate": "newData.hasChildren(['client_id', 'title', 'start_date', 'created_by_id']) && newData.child('title').isString() && newData.child('start_date').isString()"
+            }
+          },
+          
+          // Care reports
+          "care_reports": {
+            ".read": "auth != null && (auth.uid == $tenantId || auth.token.role == 'admin' || auth.token.role == 'developer')",
+            ".write": "auth != null && (auth.uid == $tenantId || auth.token.role == 'admin' || auth.token.role == 'developer')",
+            "$reportId": {
+              ".validate": "newData.hasChildren(['client_id', 'report_type', 'report_date', 'created_by_id']) && newData.child('report_type').isString() && newData.child('report_date').isString()"
+            }
+          },
+          
+          // Incident reports
+          "incident_reports": {
+            ".read": "auth != null && (auth.uid == $tenantId || auth.token.role == 'admin' || auth.token.role == 'developer')",
+            ".write": "auth != null && (auth.uid == $tenantId || auth.token.role == 'admin' || auth.token.role == 'developer')",
+            "$incidentId": {
+              ".validate": "newData.hasChildren(['client_id', 'incident_type', 'incident_date', 'reported_by_id']) && newData.child('incident_type').isString() && newData.child('incident_date').isString()"
+            }
+          },
+          
+          // Notifications
+          "notifications": {
+            ".read": "auth != null && (auth.uid == $tenantId || auth.token.role == 'admin' || auth.token.role == 'developer')",
+            ".write": "auth != null && (auth.uid == $tenantId || auth.token.role == 'admin' || auth.token.role == 'developer')",
+            "$notificationId": {
+              ".validate": "newData.hasChildren(['user_id', 'title', 'message']) && newData.child('title').isString() && newData.child('message').isString()"
+            }
+          },
+          
+          // Weather data
+          "weather_data": {
+            ".read": "auth != null && (auth.uid == $tenantId || auth.token.role == 'admin' || auth.token.role == 'developer')",
+            ".write": "auth != null && (auth.uid == $tenantId || auth.token.role == 'admin' || auth.token.role == 'developer')",
+            "$weatherId": {
+              ".validate": "newData.hasChildren(['date', 'location_latitude', 'location_longitude']) && newData.child('date').isString()"
+            }
+          },
+          
+          // Care templates
+          "care_templates": {
+            ".read": "auth != null && (auth.uid == $tenantId || auth.token.role == 'admin' || auth.token.role == 'developer')",
+            ".write": "auth != null && (auth.uid == $tenantId || auth.token.role == 'admin' || auth.token.role == 'developer')",
+            "$templateId": {
+              ".validate": "newData.hasChildren(['name', 'created_by_id']) && newData.child('name').isString()"
+            }
+          },
+          
+          // User preferences and settings
+          "user_preferences": {
+            ".read": "auth != null && (auth.uid == $tenantId || auth.token.role == 'admin' || auth.token.role == 'developer')",
+            ".write": "auth != null && (auth.uid == $tenantId || auth.token.role == 'admin' || auth.token.role == 'developer')"
+          },
+          
+          // Dashboard widgets configuration
+          "dashboard_config": {
+            ".read": "auth != null && (auth.uid == $tenantId || auth.token.role == 'admin' || auth.token.role == 'developer')",
+            ".write": "auth != null && (auth.uid == $tenantId || auth.token.role == 'admin' || auth.token.role == 'developer')"
+          }
+        }
+      },
+      
+      // Global system data (accessible by all authenticated users)
+      "system": {
+        ".read": "auth != null",
+        ".write": "auth != null && (auth.token.role == 'admin' || auth.token.role == 'developer')",
+        
+        // Care task templates (global)
+        "care_task_templates": {
+          ".read": "auth != null",
+          ".write": "auth != null && (auth.token.role == 'admin' || auth.token.role == 'developer')",
+          "$templateId": {
+            ".validate": "newData.hasChildren(['name', 'category']) && newData.child('name').isString() && newData.child('category').isString()"
+          }
+        },
+        
+        // System announcements
+        "announcements": {
+          ".read": "auth != null",
+          ".write": "auth != null && (auth.token.role == 'admin' || auth.token.role == 'developer')",
+          "$announcementId": {
+            ".validate": "newData.hasChildren(['title', 'message', 'created_at']) && newData.child('title').isString() && newData.child('message').isString()"
+          }
+        },
+        
+        // System statistics (read-only for most users)
+        "statistics": {
+          ".read": "auth != null",
+          ".write": "auth != null && (auth.token.role == 'admin' || auth.token.role == 'developer')"
+        }
+      },
+      
+      // User management (admin only)
+      "users": {
+        ".read": "auth != null && (auth.token.role == 'admin' || auth.token.role == 'developer')",
+        ".write": "auth != null && (auth.token.role == 'admin' || auth.token.role == 'developer')",
+        "$userId": {
+          ".validate": "newData.hasChildren(['username', 'email', 'role']) && newData.child('username').isString() && newData.child('email').isString() && newData.child('role').isString()"
+        }
+      }
+    },
+    
+    // Backup and maintenance data (admin only)
+    "backups": {
+      ".read": "auth != null && auth.token.role == 'admin'",
+      ".write": "auth != null && auth.token.role == 'admin'"
+    },
+    
+    // Audit logs (admin only)
+    "audit_logs": {
+      ".read": "auth != null && auth.token.role == 'admin'",
+      ".write": "auth != null && auth.token.role == 'admin'"
+    }
+  }
+}

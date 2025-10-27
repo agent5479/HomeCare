@@ -1,116 +1,168 @@
 {% extends "base.html" %}
 
-{% block title %}Command Center - BeeMarshall{% endblock %}
+{% block title %}Dashboard - HomeCare Management System{% endblock %}
 
 {% block extra_css %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
-.hover-card {
+.widget-container {
+    background: var(--bg-white);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-md);
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+}
+
+.widget-header {
+    background: linear-gradient(135deg, var(--primary-blue), var(--dark-blue));
+    color: white;
+    padding: 1rem 1.5rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.widget-body {
+    padding: 1.5rem;
+}
+
+.stat-card {
     transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
     cursor: pointer;
     text-decoration: none;
-}
-
-.hover-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-    text-decoration: none;
-}
-
-.hover-card:hover .card-body {
-    cursor: pointer;
-}
-
-.dashboard-stat-card {
     display: block;
     width: 100%;
-    text-decoration: none;
 }
 
-.dashboard-stat-card:hover {
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
     text-decoration: none;
     color: inherit;
 }
 
-.dashboard-stat-card:hover .card {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+.chart-container {
+    position: relative;
+    height: 300px;
+    margin: 1rem 0;
 }
 
-.action-row:hover {
-    background-color: rgba(0,123,255,0.1) !important;
-    transform: scale(1.01);
+.activity-item {
+    border-left: 3px solid var(--primary-blue);
+    padding-left: 1rem;
+    margin-bottom: 1rem;
     transition: all 0.2s ease-in-out;
 }
 
-.action-row:hover td {
-    border-color: rgba(0,123,255,0.2);
+.activity-item:hover {
+    background-color: rgba(74, 144, 226, 0.05);
+    border-left-color: var(--dark-blue);
+}
+
+.quick-action-btn {
+    background: linear-gradient(135deg, var(--primary-blue), var(--dark-blue));
+    border: none;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--border-radius-md);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.2s ease-in-out;
+    font-weight: 500;
+}
+
+.quick-action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(74, 144, 226, 0.3);
+    color: white;
+    text-decoration: none;
+}
+
+.alert-widget {
+    border-left: 4px solid var(--warning);
+    background: rgba(255, 193, 7, 0.1);
+}
+
+.urgent-widget {
+    border-left: 4px solid var(--danger);
+    background: rgba(220, 53, 69, 0.1);
+}
+
+.info-widget {
+    border-left: 4px solid var(--info);
+    background: rgba(23, 162, 184, 0.1);
 }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="row mb-4">
-    <div class="col">
-        <h1 class="display-5"><i class="bi bi-shield-check"></i> Command Center</h1>
-        <p class="lead text-muted">Welcome back, {{ current_user.username }}! Ready for deployment.</p>
+<div class="row">
+    <div class="col-12">
+        <h1 class="h2 mb-4">
+            <i class="bi bi-house-door me-2"></i>Command Center
+            <small class="text-muted">Welcome back, {{ current_user.get_full_name() }}! Ready for deployment.</small>
+        </h1>
     </div>
 </div>
 
-<!-- Statistics Cards -->
+<!-- Key Statistics Widget -->
 <div class="row mb-4">
-    <div class="col-md-3">
-        <a href="{{ url_for('sites') }}" class="dashboard-stat-card">
-            <div class="card bg-warning text-dark">
+    <div class="col-md-3 mb-3">
+        <a href="{{ url_for('clients.list_clients') }}" class="stat-card">
+            <div class="card bg-primary text-white">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h6 class="card-subtitle mb-2">Total Sites</h6>
-                            <h2 class="card-title mb-0">{{ stats.total_sites }}</h2>
+                            <h6 class="card-subtitle mb-2">Active Clients</h6>
+                            <h2 class="card-title mb-0">{{ total_clients }}</h2>
                         </div>
-                        <i class="bi bi-geo-alt-fill" style="font-size: 3rem; opacity: 0.3;"></i>
+                        <i class="bi bi-people-fill" style="font-size: 3rem; opacity: 0.3;"></i>
                     </div>
                 </div>
             </div>
         </a>
     </div>
-    <div class="col-md-3">
-        <a href="{{ url_for('sites') }}" class="dashboard-stat-card">
+    <div class="col-md-3 mb-3">
+        <a href="{{ url_for('actions.list_actions') }}" class="stat-card">
             <div class="card bg-success text-white">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h6 class="card-subtitle mb-2">Total Hives</h6>
-                            <h2 class="card-title mb-0">{{ stats.total_hives }}</h2>
+                            <h6 class="card-subtitle mb-2">Actions Today</h6>
+                            <h2 class="card-title mb-0">{{ total_actions_today }}</h2>
                         </div>
-                        <i class="bi bi-hexagon-fill" style="font-size: 3rem; opacity: 0.3;"></i>
+                        <i class="bi bi-clipboard-check-fill" style="font-size: 3rem; opacity: 0.3;"></i>
                     </div>
                 </div>
             </div>
         </a>
     </div>
-    <div class="col-md-3">
-        <a href="{{ url_for('actions') }}" class="dashboard-stat-card">
-            <div class="card bg-info text-white">
+    <div class="col-md-3 mb-3">
+        <a href="{{ url_for('tasks.list_tasks') }}" class="stat-card">
+            <div class="card bg-warning text-dark">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h6 class="card-subtitle mb-2">Total Actions</h6>
-                            <h2 class="card-title mb-0">{{ stats.recent_actions_count }}</h2>
+                            <h6 class="card-subtitle mb-2">Pending Tasks</h6>
+                            <h2 class="card-title mb-0">{{ pending_tasks }}</h2>
                         </div>
-                        <i class="bi bi-list-check" style="font-size: 3rem; opacity: 0.3;"></i>
+                        <i class="bi bi-calendar-check-fill" style="font-size: 3rem; opacity: 0.3;"></i>
                     </div>
                 </div>
             </div>
         </a>
     </div>
-    <div class="col-md-3">
-        <a href="{{ url_for('disease_report') }}" class="dashboard-stat-card">
+    <div class="col-md-3 mb-3">
+        <a href="{{ url_for('tasks.overdue_tasks') }}" class="stat-card">
             <div class="card bg-danger text-white">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h6 class="card-subtitle mb-2">Flagged Issues</h6>
-                            <h2 class="card-title mb-0">{{ stats.flagged_issues or 0 }}</h2>
+                            <h6 class="card-subtitle mb-2">Urgent Tasks</h6>
+                            <h2 class="card-title mb-0">{{ urgent_tasks }}</h2>
                         </div>
                         <i class="bi bi-exclamation-triangle-fill" style="font-size: 3rem; opacity: 0.3;"></i>
                     </div>
@@ -120,83 +172,243 @@
     </div>
 </div>
 
-<!-- Map Section -->
+<!-- Quick Actions Widget -->
 <div class="row mb-4">
-    <div class="col">
-        <div class="card">
-            <div class="card-header bg-warning">
-                <h5 class="mb-0"><i class="bi bi-map"></i> Hive Site Locations</h5>
+    <div class="col-12">
+        <div class="widget-container">
+            <div class="widget-header">
+                <i class="bi bi-lightning-fill"></i>
+                Quick Actions
             </div>
-            <div class="card-body p-0">
-                <div id="map" style="height: 400px; width: 100%;"></div>
-            </div>
-            <div class="card-footer">
-                <a href="{{ url_for('add_site') }}" class="btn btn-warning">
-                    <i class="bi bi-plus-circle"></i> Add New Site
-                </a>
-                <a href="{{ url_for('sites') }}" class="btn btn-outline-secondary">
-                    <i class="bi bi-list"></i> View All Sites
-                </a>
-                <a href="{{ url_for('field_report') }}" class="btn btn-success">
-                    <i class="bi bi-check-square"></i> Field Report
-                </a>
-                <a href="{{ url_for('disease_report') }}" class="btn btn-warning">
-                    <i class="bi bi-exclamation-triangle"></i> Disease Report
-                </a>
-                <a href="{{ url_for('export_management') }}" class="btn btn-info">
-                    <i class="bi bi-download"></i> Export Data
-                </a>
-                <a href="{{ url_for('report_dashboard') }}" class="btn btn-secondary">
-                    <i class="bi bi-graph-up"></i> Reports
-                </a>
+            <div class="widget-body">
+                <div class="row">
+                    <div class="col-md-3 mb-2">
+                        <a href="{{ url_for('clients.add_client') }}" class="quick-action-btn w-100">
+                            <i class="bi bi-person-plus"></i>Add Client
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <a href="{{ url_for('actions.add_action') }}" class="quick-action-btn w-100">
+                            <i class="bi bi-clipboard-plus"></i>Log Care Action
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <a href="{{ url_for('tasks.add_task') }}" class="quick-action-btn w-100">
+                            <i class="bi bi-calendar-plus"></i>Schedule Task
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <a href="{{ url_for('actions.quick_log') }}" class="quick-action-btn w-100">
+                            <i class="bi bi-speedometer2"></i>Quick Log
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Recent Actions -->
-<div class="row">
-    <div class="col">
-        <div class="card">
-            <div class="card-header bg-info text-white">
-                <h5 class="mb-0"><i class="bi bi-clock-history"></i> Recent Actions</h5>
+<!-- Charts and Analytics Row -->
+<div class="row mb-4">
+    <!-- Care Actions Chart -->
+    <div class="col-lg-6 mb-4">
+        <div class="widget-container">
+            <div class="widget-header">
+                <i class="bi bi-graph-up-arrow"></i>
+                Care Actions Trend
             </div>
-            <div class="card-body">
-                {% if recent_actions %}
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Site</th>
-                                <th>Task</th>
-                                <th>Description</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for action in recent_actions %}
-                            <tr class="action-row" data-href="{{ url_for('site_detail', site_id=action.site_id) }}" style="cursor: pointer;">
-                                <td>{{ action.action_date.strftime('%Y-%m-%d %H:%M') }}</td>
-                                <td>
-                                    <a href="{{ url_for('site_detail', site_id=action.site_id) }}" class="text-decoration-none fw-bold">
-                                        <i class="bi bi-geo-alt-fill text-warning"></i> {{ action.site.name }}
-                                    </a>
-                                </td>
-                                <td><span class="badge bg-secondary">{{ action.task_name }}</span></td>
-                                <td>{{ action.description[:50] }}{% if action.description and action.description|length > 50 %}...{% endif %}</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+            <div class="widget-body">
+                <div class="chart-container">
+                    <canvas id="careActionsChart"></canvas>
                 </div>
-                <div class="text-center">
-                    <a href="{{ url_for('actions') }}" class="btn btn-outline-info">View All Actions</a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Care Level Distribution -->
+    <div class="col-lg-6 mb-4">
+        <div class="widget-container">
+            <div class="widget-header">
+                <i class="bi bi-pie-chart"></i>
+                Care Level Distribution
+            </div>
+            <div class="widget-body">
+                <div class="chart-container">
+                    <canvas id="careLevelChart"></canvas>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Alerts and Notifications Row -->
+<div class="row mb-4">
+    <!-- Urgent Alerts -->
+    <div class="col-md-6 mb-4">
+        <div class="widget-container urgent-widget">
+            <div class="widget-header">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+                Urgent Alerts
+            </div>
+            <div class="widget-body">
+                {% if urgent_tasks > 0 %}
+                    <div class="alert alert-danger">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        <strong>{{ urgent_tasks }} urgent task(s)</strong> require immediate attention.
+                        <a href="{{ url_for('tasks.overdue_tasks') }}" class="alert-link">View Details</a>
+                    </div>
                 {% else %}
-                <p class="text-muted text-center my-4">No actions recorded yet. Start logging your hive management activities!</p>
-                <div class="text-center">
-                    <a href="{{ url_for('log_action') }}" class="btn btn-info">Log Your First Action</a>
+                    <div class="text-center text-muted">
+                        <i class="bi bi-check-circle-fill" style="font-size: 2rem;"></i>
+                        <p class="mt-2 mb-0">No urgent alerts at this time</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- System Status -->
+    <div class="col-md-6 mb-4">
+        <div class="widget-container info-widget">
+            <div class="widget-header">
+                <i class="bi bi-shield-check"></i>
+                System Status
+            </div>
+            <div class="widget-body">
+                <div class="row text-center">
+                    <div class="col-6">
+                        <h4 class="text-success">{{ total_clients }}</h4>
+                        <small class="text-muted">Active Clients</small>
+                    </div>
+                    <div class="col-6">
+                        <h4 class="text-primary">{{ total_actions_today }}</h4>
+                        <small class="text-muted">Actions Today</small>
+                    </div>
                 </div>
+                <hr>
+                <div class="text-center">
+                    <span class="badge bg-success">System Online</span>
+                    <small class="text-muted d-block mt-1">All systems operational</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Activity and Upcoming Tasks -->
+<div class="row">
+    <!-- Recent Clients -->
+    <div class="col-md-6 mb-4">
+        <div class="widget-container">
+            <div class="widget-header">
+                <i class="bi bi-people-fill"></i>
+                Recent Clients
+            </div>
+            <div class="widget-body">
+                {% if recent_clients %}
+                    {% for client in recent_clients %}
+                    <div class="activity-item">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h6 class="mb-1">{{ client.name }}</h6>
+                                <small class="text-muted">
+                                    <span class="badge {{ client.get_care_level_class() }} me-1">{{ client.care_level.title() }}</span>
+                                    <span class="badge {{ client.get_status_class() }}">{{ client.status.title() }}</span>
+                                </small>
+                            </div>
+                            <a href="{{ url_for('clients.view_client', id=client.id) }}" class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    <div class="text-center mt-3">
+                        <a href="{{ url_for('clients.list_clients') }}" class="btn btn-outline-primary btn-sm">View All Clients</a>
+                    </div>
+                {% else %}
+                    <div class="text-center text-muted">
+                        <i class="bi bi-people" style="font-size: 2rem;"></i>
+                        <p class="mt-2 mb-0">No clients found</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Upcoming Tasks -->
+    <div class="col-md-6 mb-4">
+        <div class="widget-container">
+            <div class="widget-header">
+                <i class="bi bi-calendar-check-fill"></i>
+                Upcoming Tasks
+            </div>
+            <div class="widget-body">
+                {% if upcoming_tasks %}
+                    {% for task in upcoming_tasks %}
+                    <div class="activity-item">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h6 class="mb-1">{{ task.task_name }}</h6>
+                                <small class="text-muted">
+                                    {{ task.client.name }} • {{ task.scheduled_date.strftime('%Y-%m-%d') }}
+                                    {% if task.scheduled_time %}
+                                        at {{ task.scheduled_time.strftime('%H:%M') }}
+                                    {% endif %}
+                                </small>
+                            </div>
+                            <div>
+                                <span class="badge {{ task.get_priority_class() }} me-1">{{ task.priority.title() }}</span>
+                                <a href="{{ url_for('tasks.view_task', id=task.id) }}" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    <div class="text-center mt-3">
+                        <a href="{{ url_for('tasks.list_tasks') }}" class="btn btn-outline-primary btn-sm">View All Tasks</a>
+                    </div>
+                {% else %}
+                    <div class="text-center text-muted">
+                        <i class="bi bi-calendar-check" style="font-size: 2rem;"></i>
+                        <p class="mt-2 mb-0">No upcoming tasks</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Activity -->
+<div class="row">
+    <div class="col-12">
+        <div class="widget-container">
+            <div class="widget-header">
+                <i class="bi bi-clock-history"></i>
+                Recent Activity
+            </div>
+            <div class="widget-body">
+                {% if recent_activity %}
+                    {% for activity in recent_activity %}
+                    <div class="activity-item">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-1">{{ activity.description }}</h6>
+                                <small class="text-muted">
+                                    {{ activity.client }} • {{ activity.user }} • {{ activity.date.strftime('%Y-%m-%d %H:%M') }}
+                                </small>
+                            </div>
+                            <span class="badge bg-{{ 'success' if activity.type == 'action' else 'info' }}">
+                                {{ activity.type.title() }}
+                            </span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="text-center text-muted">
+                        <i class="bi bi-clock-history" style="font-size: 2rem;"></i>
+                        <p class="mt-2 mb-0">No recent activity</p>
+                    </div>
                 {% endif %}
             </div>
         </div>
@@ -205,123 +417,64 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_key }}&callback=initMap" async defer></script>
 <script>
-// Ensure dashboard stat cards are clickable
-document.addEventListener('DOMContentLoaded', function() {
-    const statCards = document.querySelectorAll('.dashboard-stat-card');
-    
-    statCards.forEach(function(card) {
-        card.addEventListener('click', function(e) {
-            // Ensure the click event works properly
-            window.location.href = this.href;
-        });
-        
-        // Add visual feedback on click
-        card.addEventListener('mousedown', function(e) {
-            this.style.transform = 'translateY(-2px)';
-        });
-        
-        card.addEventListener('mouseup', function(e) {
-            this.style.transform = '';
-        });
-        
-        // Ensure cursor shows as pointer
-        card.style.cursor = 'pointer';
-    });
-    
-    // Make action rows clickable
-    const actionRows = document.querySelectorAll('.action-row');
-    
-    actionRows.forEach(function(row) {
-        row.addEventListener('click', function(e) {
-            // Don't navigate if clicking on the site name link
-            if (e.target.tagName === 'A') {
-                return;
+// Care Actions Chart
+const careActionsCtx = document.getElementById('careActionsChart').getContext('2d');
+new Chart(careActionsCtx, {
+    type: 'line',
+    data: {
+        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+        datasets: [{
+            label: 'Care Actions',
+            data: [12, 19, 15, 25, 22, 18, 14],
+            borderColor: 'rgb(74, 144, 226)',
+            backgroundColor: 'rgba(74, 144, 226, 0.1)',
+            tension: 0.4,
+            fill: true
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                display: false
             }
-            
-            const href = this.getAttribute('data-href');
-            if (href) {
-                window.location.href = href;
+        },
+        scales: {
+            y: {
+                beginAtZero: true
             }
-        });
-        
-        // Add hover effect
-        row.addEventListener('mouseenter', function() {
-            this.style.backgroundColor = 'rgba(0,123,255,0.1)';
-        });
-        
-        row.addEventListener('mouseleave', function() {
-            this.style.backgroundColor = '';
-        });
-    });
+        }
+    }
+});
+
+// Care Level Distribution Chart
+const careLevelCtx = document.getElementById('careLevelChart').getContext('2d');
+new Chart(careLevelCtx, {
+    type: 'doughnut',
+    data: {
+        labels: ['Standard', 'Intensive', 'Specialized', 'Palliative'],
+        datasets: [{
+            data: [45, 25, 20, 10],
+            backgroundColor: [
+                'rgb(74, 144, 226)',
+                'rgb(255, 193, 7)',
+                'rgb(23, 162, 184)',
+                'rgb(220, 53, 69)'
+            ],
+            borderWidth: 0
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'bottom'
+            }
+        }
+    }
 });
 </script>
-<script>
-function initMap() {
-    // Default center - Collingwood, New Zealand
-    const center = { lat: -40.6764, lng: 172.6856 };
-    
-    const map = new google.maps.Map(document.getElementById('map'), {
-        zoom: 12,
-        center: center,
-        mapTypeId: 'terrain'
-    });
-    
-    // Fetch sites and add markers
-    fetch('{{ url_for("api_sites") }}')
-        .then(response => response.json())
-        .then(sites => {
-            if (sites.length > 0) {
-                // Center map on first site
-                map.setCenter({ lat: sites[0].latitude, lng: sites[0].longitude });
-                
-                // Add markers for each site
-                sites.forEach(site => {
-                    const marker = new google.maps.Marker({
-                        position: { lat: site.latitude, lng: site.longitude },
-                        map: map,
-                        title: site.name,
-                        icon: {
-                            path: google.maps.SymbolPath.CIRCLE,
-                            scale: 10,
-                            fillColor: '#FFC107',
-                            fillOpacity: 0.8,
-                            strokeColor: '#FF9800',
-                            strokeWeight: 2
-                        }
-                    });
-                    
-                    // Info window
-                    const infoWindow = new google.maps.InfoWindow({
-                        content: `
-                            <div style="padding: 10px;">
-                                <h6><strong>${site.name}</strong></h6>
-                                <p class="mb-1"><small>${site.description || 'No description'}</small></p>
-                                <p class="mb-1"><strong>Hives:</strong> ${site.hive_count}</p>
-                                ${site.harvest_timeline ? `<p class="mb-1"><strong>Harvest:</strong> ${site.harvest_timeline}</p>` : ''}
-                                <a href="/site/${site.id}" class="btn btn-sm btn-warning mt-2">View Details</a>
-                            </div>
-                        `
-                    });
-                    
-                    marker.addListener('click', () => {
-                        infoWindow.open(map, marker);
-                    });
-                });
-                
-                // Fit bounds to show all markers
-                if (sites.length > 1) {
-                    const bounds = new google.maps.LatLngBounds();
-                    sites.forEach(site => {
-                        bounds.extend(new google.maps.LatLng(site.latitude, site.longitude));
-                    });
-                    map.fitBounds(bounds);
-                }
-            }
-        })
-        .catch(error => console.error('Error loading sites:', error));
-}
-</script>
 {% endblock %}
-

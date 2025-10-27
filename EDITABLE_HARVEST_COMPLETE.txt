@@ -1,8 +1,0 @@
-﻿EDITABLE HARVEST RECORDS - COMPLETE
-
-âœ… Historical harvest records are now fully editable
-âœ… Edit button added to each record row
-âœ… Clicking edit populates form with existing data
-âœ… Update replaces the existing record in place
-âœ… Button text changes to 'Update Record' when editing
-âœ… Edit state resets after save or delete

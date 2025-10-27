@@ -1,452 +1,493 @@
+"""
+HomeCare Management System - WTForms
+Professional Care Coordination Platform
+"""
+
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, TextAreaField, FloatField, IntegerField, SelectField, BooleanField, DateTimeField, DateField, TimeField
-from wtforms.validators import DataRequired, Email, EqualTo, Length, ValidationError, Optional, NumberRange
-from models import User
+from wtforms import StringField, TextAreaField, IntegerField, SelectField, DateField, TimeField, BooleanField, PasswordField, SubmitField, HiddenField, FloatField, RadioField, FileField, MultipleFileField
+from wtforms.validators import DataRequired, Length, Email, Optional, NumberRange, ValidationError, InputRequired
+from wtforms.widgets import TextArea, CheckboxInput
+from datetime import date, datetime
 
 class LoginForm(FlaskForm):
-    """User login form"""
+    """Login form"""
     username = StringField('Username', validators=[DataRequired(), Length(min=3, max=80)])
     password = PasswordField('Password', validators=[DataRequired()])
     remember_me = BooleanField('Remember Me')
+    submit = SubmitField('Login')
 
-class RegistrationForm(FlaskForm):
-    """User registration form"""
-    username = StringField('Username', validators=[DataRequired(), Length(min=3, max=80)])
-    email = StringField('Email', validators=[DataRequired(), Email()])
-    password = PasswordField('Password', validators=[DataRequired(), Length(min=6)])
-    password2 = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
-    
-    def validate_username(self, username):
-        user = User.query.filter_by(username=username.data).first()
-        if user:
-            raise ValidationError('Username already taken. Please choose a different one.')
-    
-    def validate_email(self, email):
-        user = User.query.filter_by(email=email.data).first()
-        if user:
-            raise ValidationError('Email already registered. Please use a different one.')
-
-class HiveSiteForm(FlaskForm):
-    """Form for adding/editing hive sites"""
-    name = StringField('Site Name', validators=[DataRequired(), Length(max=100)])
-    description = TextAreaField('Description', validators=[Optional()])
-    latitude = FloatField('Latitude', validators=[DataRequired(), NumberRange(min=-90, max=90)])
-    longitude = FloatField('Longitude', validators=[DataRequired(), NumberRange(min=-180, max=180)])
-    hive_count = IntegerField('Number of Hives', validators=[DataRequired(), NumberRange(min=1, max=1000)], default=1)
-    harvest_timeline = StringField('Harvest Timeline', validators=[Optional(), Length(max=100)])
-    sugar_requirements = StringField('Sugar Requirements', validators=[Optional(), Length(max=100)])
-    notes = TextAreaField('Notes', validators=[Optional()])
-    
-    # Landowner information
-    landowner_name = StringField('Landowner Name', validators=[Optional(), Length(max=100)])
-    landowner_phone = StringField('Landowner Phone', validators=[Optional(), Length(max=20)])
-    landowner_email = StringField('Landowner Email', validators=[Optional(), Email(), Length(max=120)])
-    landowner_address = TextAreaField('Landowner Address', validators=[Optional()])
-    
-    # Site classification
-    functional_classification = SelectField('Functional Classification', choices=[
-        ('production', 'Production'),
-        ('nucleus', 'Nucleus'),
-        ('queen-rearing', 'Queen Rearing'),
-        ('research', 'Research'),
-        ('education', 'Education'),
-        ('quarantine', 'Quarantine'),
-        ('backup', 'Backup'),
-        ('custom', 'Custom')
-    ], default='production')
-    seasonal_classification = SelectField('Seasonal Classification', choices=[
-        ('summer', 'Summer Site'),
-        ('winter', 'Winter Site')
-    ], default='summer')
-    access_type = SelectField('Access Type', choices=[
-        ('all_weather', 'All Weather'),
-        ('dry_only', 'Dry Only')
-    ], default='all_weather')
-    contact_before_visit = BooleanField('Contact Landowner Before Visit')
-    is_quarantine = BooleanField('Site in Quarantine')
-    
-    # Hive setup details
-    single_brood_boxes = IntegerField('Single Brood Boxes', validators=[Optional(), NumberRange(min=0)], default=0)
-    double_brood_boxes = IntegerField('Double Brood Boxes', validators=[Optional(), NumberRange(min=0)], default=0)
-    nucs = IntegerField('Nucs (Tiny Hives)', validators=[Optional(), NumberRange(min=0)], default=0)
-    dead_hives = IntegerField('Dead Hives', validators=[Optional(), NumberRange(min=0)], default=0)
-    top_splits = IntegerField('Top Splits', validators=[Optional(), NumberRange(min=0)], default=0)
-    
-    # Hive strength ratings
-    strong_hives = IntegerField('Strong Hives', validators=[Optional(), NumberRange(min=0)], default=0)
-    medium_hives = IntegerField('Medium Hives', validators=[Optional(), NumberRange(min=0)], default=0)
-    weak_hives = IntegerField('Weak Hives', validators=[Optional(), NumberRange(min=0)], default=0)
-    
-    # Overall site strength categorization
-    site_strength = SelectField('Site Strength', choices=[
-        ('strong', 'Strong'),
-        ('medium', 'Medium'),
-        ('weak', 'Weak'),
-        ('nuc', 'NUC')
-    ], default='medium')
-
-class IndividualHiveForm(FlaskForm):
-    """Form for adding/editing individual hives"""
-    hive_number = StringField('Hive Number/ID', validators=[DataRequired(), Length(max=50)])
-    status = SelectField('Status', choices=[
-        ('healthy', 'Healthy'),
-        ('infected', 'Infected'),
-        ('quarantine', 'Quarantine'),
-        ('weak', 'Weak'),
-        ('queenless', 'Queenless'),
-        ('dead', 'Dead')
-    ], default='healthy')
-    
-    # Hive strength categorization
-    hive_strength = SelectField('Hive Strength', choices=[
-        ('strong', 'Strong'),
-        ('medium', 'Medium'),
-        ('weak', 'Weak'),
-        ('nuc', 'NUC')
-    ], default='medium')
-    
-    notes = TextAreaField('Notes', validators=[Optional()])
-
-class HiveActionForm(FlaskForm):
-    """Form for logging hive actions"""
-    site_id = SelectField('Hive Site', coerce=int, validators=[DataRequired()])
-    individual_hive_id = SelectField('Individual Hive (Optional)', coerce=int, validators=[Optional()])
-    task_type_id = SelectField('Task Type', coerce=int, validators=[Optional()])
-    custom_task_name = StringField('Custom Task Name', validators=[Optional(), Length(max=100)])
-    description = TextAreaField('Description/Notes', validators=[Optional()])
-    action_date = DateTimeField('Action Date', format='%Y-%m-%d', validators=[Optional()])
-
-
-class DiseaseReportForm(FlaskForm):
-    """Form for disease reporting"""
-    site_id = SelectField('Hive Site', coerce=int, validators=[DataRequired()])
-    afb_count = IntegerField('AFB (American Foulbrood)', validators=[Optional(), NumberRange(min=0)], default=0)
-    varroa_count = IntegerField('Varroa Mites', validators=[Optional(), NumberRange(min=0)], default=0)
-    chalkbrood_count = IntegerField('Chalkbrood', validators=[Optional(), NumberRange(min=0)], default=0)
-    sacbrood_count = IntegerField('Sacbrood', validators=[Optional(), NumberRange(min=0)], default=0)
-    dwv_count = IntegerField('DWV (Deformed Wing Virus)', validators=[Optional(), NumberRange(min=0)], default=0)
-    notes = TextAreaField('Additional Notes', validators=[Optional()])
-    report_date = DateTimeField('Report Date', format='%Y-%m-%d', validators=[Optional()])
-
-
-class FieldReportForm(FlaskForm):
-    """Form for quick field reporting with checkboxes and numbers"""
-    site_id = SelectField('Site', coerce=int, validators=[DataRequired()])
-    
-    # Quick action checkboxes
-    inspection = BooleanField('Inspection')
-    feeding = BooleanField('Feeding')
-    treatment = BooleanField('Treatment')
-    harvest = BooleanField('Harvest')
-    maintenance = BooleanField('Maintenance')
-    
-    # Hive counts
-    strong_hives = IntegerField('Strong Hives', validators=[Optional(), NumberRange(min=0)], default=0)
-    medium_hives = IntegerField('Medium Hives', validators=[Optional(), NumberRange(min=0)], default=0)
-    weak_hives = IntegerField('Weak Hives', validators=[Optional(), NumberRange(min=0)], default=0)
-    
-    # Disease counts
-    afb_count = IntegerField('AFB', validators=[Optional(), NumberRange(min=0)], default=0)
-    varroa_count = IntegerField('Varroa', validators=[Optional(), NumberRange(min=0)], default=0)
-    chalkbrood_count = IntegerField('Chalkbrood', validators=[Optional(), NumberRange(min=0)], default=0)
-    sacbrood_count = IntegerField('Sacbrood', validators=[Optional(), NumberRange(min=0)], default=0)
-    dwv_count = IntegerField('DWV', validators=[Optional(), NumberRange(min=0)], default=0)
-    
-    # Notes
-    notes = TextAreaField('Notes', validators=[Optional()])
-
-
-class ScheduledTaskForm(FlaskForm):
-    """Form for creating/editing scheduled tasks"""
-    task_template_id = SelectField('Task Template', coerce=int, validators=[DataRequired()])
-    title = StringField('Task Title', validators=[DataRequired(), Length(max=200)])
-    description = TextAreaField('Description', validators=[Optional()])
-    
-    # Scheduling
-    scheduled_date = DateField('Scheduled Date', validators=[DataRequired()])
-    scheduled_time = TimeField('Scheduled Time', validators=[Optional()])
-    due_date = DateField('Due Date', validators=[Optional()])
-    estimated_duration = IntegerField('Estimated Duration (minutes)', validators=[Optional(), NumberRange(min=1, max=1440)], default=60)
-    
-    # Status and priority
-    priority = SelectField('Priority', choices=[
-        ('low', 'Low'),
-        ('medium', 'Medium'),
-        ('high', 'High'),
-        ('urgent', 'Urgent')
-    ], default='medium')
-    
-    # Assignment
-    assigned_to_site_id = SelectField('Assign to Site (Optional)', coerce=int, validators=[Optional()])
-    assigned_to_hive_id = SelectField('Assign to Individual Hive (Optional)', coerce=int, validators=[Optional()])
-    
-    # Recurrence
-    is_recurring = BooleanField('Make this a recurring task')
-    recurrence_pattern = SelectField('Recurrence Pattern', choices=[
-        ('daily', 'Daily'),
-        ('weekly', 'Weekly'),
-        ('monthly', 'Monthly'),
-        ('yearly', 'Yearly')
-    ], validators=[Optional()])
-    recurrence_interval = IntegerField('Recurrence Interval', validators=[Optional(), NumberRange(min=1, max=12)], default=1)
-    recurrence_end_date = DateField('Recurrence End Date', validators=[Optional()])
-
-
-class TaskTemplateForm(FlaskForm):
-    """Form for creating/editing task templates"""
-    name = StringField('Template Name', validators=[DataRequired(), Length(max=100)])
-    description = TextAreaField('Description', validators=[Optional()])
-    category = SelectField('Category', choices=[
-        ('Disease Management', 'Disease Management'),
-        ('Inspection', 'Inspection'),
-        ('Feeding', 'Feeding'),
-        ('Harvest', 'Harvest'),
-        ('Treatment', 'Treatment'),
-        ('Seasonal', 'Seasonal'),
-        ('Maintenance', 'Maintenance'),
-        ('Transport', 'Transport'),
-        ('Queen Management', 'Queen Management'),
-        ('Other', 'Other')
-    ], validators=[DataRequired()])
-    
-    # Template details
-    estimated_duration = IntegerField('Estimated Duration (minutes)', validators=[Optional(), NumberRange(min=1, max=1440)], default=60)
-    priority = SelectField('Default Priority', choices=[
-        ('low', 'Low'),
-        ('medium', 'Medium'),
-        ('high', 'High'),
-        ('urgent', 'Urgent')
-    ], default='medium')
-    
-    # Seasonal settings
-    is_seasonal = BooleanField('This is a seasonal task')
-    season_months = StringField('Season Months (comma-separated, 1-12)', validators=[Optional()])
-    
-    # Weather requirements
-    weather_dependent = BooleanField('Task is weather dependent')
-    min_temperature = IntegerField('Minimum Temperature (°C)', validators=[Optional(), NumberRange(min=-50, max=50)])
-    max_temperature = IntegerField('Maximum Temperature (°C)', validators=[Optional(), NumberRange(min=-50, max=50)])
-    avoid_rain = BooleanField('Avoid rainy weather')
-    
-    # Timing constraints
-    best_time_of_day = SelectField('Best Time of Day', choices=[
-        ('any', 'Any Time'),
-        ('morning', 'Morning'),
-        ('afternoon', 'Afternoon'),
-        ('evening', 'Evening')
-    ], default='any')
-    
-    # Checklist items
-    checklist_items = TextAreaField('Checklist Items (one per line)', validators=[Optional()])
-    equipment_needed = TextAreaField('Equipment Needed (one per line)', validators=[Optional()])
-    supplies_needed = TextAreaField('Supplies Needed (one per line)', validators=[Optional()])
-
-
-class QuickScheduleForm(FlaskForm):
-    """Form for quick task scheduling"""
-    task_template_id = SelectField('Task Type', coerce=int, validators=[DataRequired()])
-    
-    # Assignment options
-    assign_to_all_sites = BooleanField('Assign to all sites')
-    selected_sites = SelectField('Select Sites', choices=[], validators=[Optional()], multiple=True)
-    selected_hives = SelectField('Select Individual Hives', choices=[], validators=[Optional()], multiple=True)
-    
-    # Scheduling options
-    schedule_type = SelectField('Schedule Type', choices=[
-        ('single', 'Single Task'),
-        ('recurring', 'Recurring Task')
-    ], default='single')
-    
-    # Single task scheduling
-    scheduled_date = DateField('Scheduled Date', validators=[Optional()])
-    scheduled_time = TimeField('Scheduled Time', validators=[Optional()])
-    
-    # Recurring task scheduling
-    recurrence_pattern = SelectField('Recurrence Pattern', choices=[
-        ('daily', 'Daily'),
-        ('weekly', 'Weekly'),
-        ('monthly', 'Monthly'),
-        ('yearly', 'Yearly')
-    ], validators=[Optional()])
-    recurrence_interval = IntegerField('Every X periods', validators=[Optional(), NumberRange(min=1, max=12)], default=1)
-    recurrence_end_date = DateField('End Date', validators=[Optional()])
-    
-    # Task settings
-    priority = SelectField('Priority', choices=[
-        ('low', 'Low'),
-        ('medium', 'Medium'),
-        ('high', 'High'),
-        ('urgent', 'Urgent')
-    ], default='medium')
-
-
-class TaskAssignmentForm(FlaskForm):
-    """Form for managing task assignments"""
-    scheduled_task_id = SelectField('Scheduled Task', coerce=int, validators=[DataRequired()])
-    target_type = SelectField('Target Type', choices=[
-        ('site', 'Site'),
-        ('individual_hive', 'Individual Hive')
-    ], validators=[DataRequired()])
-    target_id = SelectField('Target', coerce=int, validators=[DataRequired()])
-    notes = TextAreaField('Assignment Notes', validators=[Optional()])
-    estimated_duration = IntegerField('Estimated Duration Override (minutes)', validators=[Optional(), NumberRange(min=1, max=1440)])
-
-
-class UserManagementForm(FlaskForm):
-    """Form for admin user management"""
-    username = StringField('Username', validators=[DataRequired(), Length(min=3, max=80)])
-    email = StringField('Email', validators=[DataRequired(), Email()])
-    first_name = StringField('First Name', validators=[Optional(), Length(max=100)])
-    last_name = StringField('Last Name', validators=[Optional(), Length(max=100)])
-    phone = StringField('Phone', validators=[Optional(), Length(max=20)])
-    address = TextAreaField('Address', validators=[Optional()])
-    
-    # Role and status management
-    role = SelectField('Role', choices=[
-        ('admin', 'Administrator'),
-        ('owner', 'Owner'),
-        ('director', 'Director'),
-        ('staff', 'Staff Member'),
-        ('contractor', 'Contractor'),
-        ('trial', 'Trial User')
-    ], validators=[DataRequired()])
-    
+class ClientForm(FlaskForm):
+    """Client form for adding/editing clients"""
+    name = StringField('Client Name', validators=[DataRequired(), Length(min=2, max=200)])
+    description = TextAreaField('Description', validators=[Optional(), Length(max=1000)])
+    age = IntegerField('Age', validators=[Optional(), NumberRange(min=0, max=120)])
     status = SelectField('Status', choices=[
         ('active', 'Active'),
         ('inactive', 'Inactive'),
-        ('suspended', 'Suspended'),
-        ('trial', 'Trial')
-    ], validators=[DataRequired()])
-    
-    # Admin permissions
-    is_admin = BooleanField('Is Administrator')
-    can_manage_users = BooleanField('Can Manage Users')
-    is_active = BooleanField('Account Active')
-    
-    # Notes
-    notes = TextAreaField('Admin Notes', validators=[Optional()])
-
-
-class UserEditForm(FlaskForm):
-    """Form for users to edit their own profile"""
-    first_name = StringField('First Name', validators=[Optional(), Length(max=100)])
-    last_name = StringField('Last Name', validators=[Optional(), Length(max=100)])
-    email = StringField('Email', validators=[DataRequired(), Email()])
-    phone = StringField('Phone', validators=[Optional(), Length(max=20)])
-    address = TextAreaField('Address', validators=[Optional()])
-    notes = TextAreaField('Notes', validators=[Optional()])
-
-
-class UserCreateForm(FlaskForm):
-    """Form for creating new users"""
-    username = StringField('Username', validators=[DataRequired(), Length(min=3, max=80)])
-    email = StringField('Email', validators=[DataRequired(), Email()])
-    password = PasswordField('Password', validators=[DataRequired(), Length(min=6)])
-    password2 = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
-    
-    first_name = StringField('First Name', validators=[Optional(), Length(max=100)])
-    last_name = StringField('Last Name', validators=[Optional(), Length(max=100)])
-    phone = StringField('Phone', validators=[Optional(), Length(max=20)])
-    address = TextAreaField('Address', validators=[Optional()])
-    
-    # Role and status management
-    role = SelectField('Role', choices=[
-        ('admin', 'Administrator'),
-        ('owner', 'Owner'),
-        ('director', 'Director'),
-        ('staff', 'Staff Member'),
-        ('contractor', 'Contractor'),
-        ('trial', 'Trial User')
-    ], validators=[DataRequired()], default='staff')
-    
-    status = SelectField('Status', choices=[
-        ('active', 'Active'),
-        ('inactive', 'Inactive'),
-        ('suspended', 'Suspended'),
-        ('trial', 'Trial')
-    ], validators=[DataRequired()], default='active')
-    
-    # Admin permissions
-    is_admin = BooleanField('Is Administrator')
-    can_manage_users = BooleanField('Can Manage Users')
-    
-    # Notes
-    notes = TextAreaField('Admin Notes', validators=[Optional()])
-    
-    def validate_username(self, username):
-        from models import User
-        user = User.query.filter_by(username=username.data).first()
-        if user:
-            raise ValidationError('Username already taken. Please choose a different one.')
-    
-    def validate_email(self, email):
-        from models import User
-        user = User.query.filter_by(email=email.data).first()
-        if user:
-            raise ValidationError('Email already registered. Please use a different one.')
-
-
-class OrganizationForm(FlaskForm):
-    """Form for creating/editing organizations"""
-    name = StringField('Organization Name', validators=[DataRequired(), Length(max=200)])
-    description = TextAreaField('Description', validators=[Optional()])
+        ('discharged', 'Discharged')
+    ], default='active')
+    care_level = SelectField('Care Level', choices=[
+        ('standard', 'Standard'),
+        ('intensive', 'Intensive'),
+        ('specialized', 'Specialized'),
+        ('palliative', 'Palliative')
+    ], default='standard')
     
     # Contact information
-    contact_email = StringField('Contact Email', validators=[Optional(), Email(), Length(max=120)])
-    contact_phone = StringField('Contact Phone', validators=[Optional(), Length(max=20)])
-    address = TextAreaField('Address', validators=[Optional()])
+    phone = StringField('Phone Number', validators=[Optional(), Length(max=20)])
+    email = StringField('Email', validators=[Optional(), Email(), Length(max=120)])
+    address = TextAreaField('Address', validators=[Optional(), Length(max=500)])
+    emergency_contact = StringField('Emergency Contact', validators=[Optional(), Length(max=200)])
     
-    # Organization settings
-    max_users = IntegerField('Maximum Users', validators=[Optional(), NumberRange(min=1, max=1000)], default=10)
-    max_sites = IntegerField('Maximum Sites', validators=[Optional(), NumberRange(min=1, max=10000)], default=50)
-    subscription_tier = SelectField('Subscription Tier', choices=[
-        ('basic', 'Basic'),
-        ('pro', 'Professional'),
-        ('enterprise', 'Enterprise')
-    ], default='basic')
+    # Medical information
+    medical_conditions = TextAreaField('Medical Conditions', validators=[Optional(), Length(max=1000)])
+    allergies = TextAreaField('Allergies', validators=[Optional(), Length(max=500)])
+    medications = TextAreaField('Medications', validators=[Optional(), Length(max=1000)])
+    special_instructions = TextAreaField('Special Instructions', validators=[Optional(), Length(max=1000)])
+    
+    # Location
+    latitude = StringField('Latitude', validators=[Optional()])
+    longitude = StringField('Longitude', validators=[Optional()])
+    
+    submit = SubmitField('Save Client')
 
+class CareActionForm(FlaskForm):
+    """Care action form for logging care activities"""
+    client_id = SelectField('Client', coerce=int, validators=[DataRequired()])
+    task_id = SelectField('Care Task', coerce=int, validators=[DataRequired()])
+    action_date = DateField('Date', validators=[DataRequired()])
+    action_time = TimeField('Time', validators=[Optional()])
+    notes = TextAreaField('Notes', validators=[Optional(), Length(max=1000)])
+    priority = SelectField('Priority', choices=[
+        ('normal', 'Normal'),
+        ('high', 'High'),
+        ('urgent', 'Urgent')
+    ], default='normal')
+    status = SelectField('Status', choices=[
+        ('completed', 'Completed'),
+        ('pending', 'Pending'),
+        ('cancelled', 'Cancelled')
+    ], default='completed')
+    
+    submit = SubmitField('Log Care Action')
 
-class OrganizationUserForm(FlaskForm):
-    """Form for adding users to organization"""
-    username = StringField('Username', validators=[DataRequired(), Length(min=3, max=80)])
-    email = StringField('Email', validators=[DataRequired(), Email()])
-    password = PasswordField('Password', validators=[DataRequired(), Length(min=6)])
-    password2 = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
+class ScheduledTaskForm(FlaskForm):
+    """Scheduled task form for future care planning"""
+    client_id = SelectField('Client', coerce=int, validators=[DataRequired()])
+    assigned_to_id = SelectField('Assigned To', coerce=int, validators=[DataRequired()])
+    task_id = SelectField('Care Task', coerce=int, validators=[DataRequired()])
+    scheduled_date = DateField('Scheduled Date', validators=[DataRequired()])
+    scheduled_time = TimeField('Scheduled Time', validators=[Optional()])
+    priority = SelectField('Priority', choices=[
+        ('normal', 'Normal'),
+        ('high', 'High'),
+        ('urgent', 'Urgent')
+    ], default='normal')
+    notes = TextAreaField('Notes', validators=[Optional(), Length(max=1000)])
     
-    first_name = StringField('First Name', validators=[Optional(), Length(max=100)])
-    last_name = StringField('Last Name', validators=[Optional(), Length(max=100)])
-    phone = StringField('Phone', validators=[Optional(), Length(max=20)])
-    
-    # Role and status management
-    role = SelectField('Role', choices=[
-        ('admin', 'Administrator'),
-        ('owner', 'Owner'),
-        ('director', 'Director'),
-        ('staff', 'Staff Member'),
-        ('contractor', 'Contractor'),
-        ('trial', 'Trial User')
-    ], validators=[DataRequired()], default='staff')
-    
+    submit = SubmitField('Schedule Task')
+
+class EmployeeForm(FlaskForm):
+    """Employee form for team management"""
+    user_id = SelectField('User', coerce=int, validators=[DataRequired()])
+    employee_id = StringField('Employee ID', validators=[Optional(), Length(max=50)])
+    department = StringField('Department', validators=[Optional(), Length(max=100)])
+    position = StringField('Position', validators=[Optional(), Length(max=100)])
+    hire_date = DateField('Hire Date', validators=[Optional()])
     status = SelectField('Status', choices=[
         ('active', 'Active'),
         ('inactive', 'Inactive'),
-        ('suspended', 'Suspended'),
-        ('trial', 'Trial')
-    ], validators=[DataRequired()], default='active')
+        ('terminated', 'Terminated')
+    ], default='active')
+    skills = TextAreaField('Skills (one per line)', validators=[Optional()])
+    certifications = TextAreaField('Certifications (one per line)', validators=[Optional()])
+    emergency_contact = StringField('Emergency Contact', validators=[Optional(), Length(max=200)])
     
-    # Admin permissions
-    is_organization_admin = BooleanField('Organization Administrator')
-    can_manage_users = BooleanField('Can Manage Users')
-    
-    def validate_username(self, username):
-        from models import User
-        user = User.query.filter_by(username=username.data).first()
-        if user:
-            raise ValidationError('Username already taken. Please choose a different one.')
-    
-    def validate_email(self, email):
-        from models import User
-        user = User.query.filter_by(email=email.data).first()
-        if user:
-            raise ValidationError('Email already registered. Please use a different one.')
+    submit = SubmitField('Save Employee')
 
+class UserForm(FlaskForm):
+    """User form for user management"""
+    username = StringField('Username', validators=[DataRequired(), Length(min=3, max=80)])
+    email = StringField('Email', validators=[DataRequired(), Email(), Length(max=120)])
+    first_name = StringField('First Name', validators=[Optional(), Length(max=100)])
+    last_name = StringField('Last Name', validators=[Optional(), Length(max=100)])
+    phone = StringField('Phone', validators=[Optional(), Length(max=20)])
+    address = TextAreaField('Address', validators=[Optional(), Length(max=500)])
+    role = SelectField('Role', choices=[
+        ('admin', 'Admin'),
+        ('developer', 'Developer'),
+        ('supervisor', 'Supervisor'),
+        ('caregiver', 'Caregiver')
+    ], default='caregiver')
+    status = SelectField('Status', choices=[
+        ('active', 'Active'),
+        ('inactive', 'Inactive'),
+        ('suspended', 'Suspended')
+    ], default='active')
+    notes = TextAreaField('Notes', validators=[Optional(), Length(max=1000)])
+    
+    submit = SubmitField('Save User')
+
+class QuickScheduleForm(FlaskForm):
+    """Quick schedule form for rapid task scheduling"""
+    client_id = SelectField('Client', coerce=int, validators=[DataRequired()])
+    task_ids = StringField('Task IDs (comma-separated)', validators=[DataRequired()])
+    scheduled_date = DateField('Scheduled Date', validators=[DataRequired()])
+    scheduled_time = TimeField('Scheduled Time', validators=[Optional()])
+    priority = SelectField('Priority', choices=[
+        ('normal', 'Normal'),
+        ('high', 'High'),
+        ('urgent', 'Urgent')
+    ], default='normal')
+    notes = TextAreaField('Notes', validators=[Optional(), Length(max=1000)])
+    
+    submit = SubmitField('Schedule Tasks')
+
+class EnhancedClientForm(FlaskForm):
+    """Enhanced client form with comprehensive information"""
+    # Basic Information
+    name = StringField('Client Name', validators=[DataRequired(), Length(min=2, max=200)])
+    description = TextAreaField('Description', validators=[Optional(), Length(max=1000)])
+    age = IntegerField('Age', validators=[Optional(), NumberRange(min=0, max=120)])
+    date_of_birth = DateField('Date of Birth', validators=[Optional()])
+    gender = SelectField('Gender', choices=[
+        ('male', 'Male'),
+        ('female', 'Female'),
+        ('other', 'Other')
+    ], validators=[Optional()])
+    status = SelectField('Status', choices=[
+        ('active', 'Active'),
+        ('inactive', 'Inactive'),
+        ('discharged', 'Discharged'),
+        ('suspended', 'Suspended')
+    ], default='active')
+    care_level = SelectField('Care Level', choices=[
+        ('standard', 'Standard'),
+        ('intensive', 'Intensive'),
+        ('specialized', 'Specialized'),
+        ('palliative', 'Palliative')
+    ], default='standard')
+    
+    # Contact Information
+    phone = StringField('Phone Number', validators=[Optional(), Length(max=20)])
+    email = StringField('Email', validators=[Optional(), Email(), Length(max=120)])
+    address = TextAreaField('Address', validators=[Optional(), Length(max=500)])
+    city = StringField('City', validators=[Optional(), Length(max=100)])
+    state = StringField('State', validators=[Optional(), Length(max=50)])
+    postal_code = StringField('Postal Code', validators=[Optional(), Length(max=20)])
+    country = StringField('Country', validators=[Optional(), Length(max=50)], default='US')
+    
+    # Emergency Contacts
+    emergency_contact_name = StringField('Emergency Contact Name', validators=[Optional(), Length(max=200)])
+    emergency_contact_phone = StringField('Emergency Contact Phone', validators=[Optional(), Length(max=20)])
+    emergency_contact_relationship = StringField('Relationship', validators=[Optional(), Length(max=100)])
+    secondary_emergency_contact = StringField('Secondary Emergency Contact', validators=[Optional(), Length(max=200)])
+    secondary_emergency_phone = StringField('Secondary Emergency Phone', validators=[Optional(), Length(max=20)])
+    
+    # Medical Information
+    medical_conditions = TextAreaField('Medical Conditions', validators=[Optional(), Length(max=2000)])
+    allergies = TextAreaField('Allergies', validators=[Optional(), Length(max=1000)])
+    medications = TextAreaField('Medications', validators=[Optional(), Length(max=2000)])
+    special_instructions = TextAreaField('Special Instructions', validators=[Optional(), Length(max=2000)])
+    dietary_restrictions = TextAreaField('Dietary Restrictions', validators=[Optional(), Length(max=1000)])
+    mobility_requirements = TextAreaField('Mobility Requirements', validators=[Optional(), Length(max=1000)])
+    communication_needs = TextAreaField('Communication Needs', validators=[Optional(), Length(max=1000)])
+    
+    # Insurance and Payment
+    insurance_provider = StringField('Insurance Provider', validators=[Optional(), Length(max=200)])
+    insurance_policy_number = StringField('Policy Number', validators=[Optional(), Length(max=100)])
+    medicare_number = StringField('Medicare Number', validators=[Optional(), Length(max=100)])
+    medicaid_number = StringField('Medicaid Number', validators=[Optional(), Length(max=100)])
+    payment_method = SelectField('Payment Method', choices=[
+        ('private', 'Private Pay'),
+        ('insurance', 'Insurance'),
+        ('medicare', 'Medicare'),
+        ('medicaid', 'Medicaid')
+    ], validators=[Optional()])
+    
+    # Care Preferences
+    preferred_caregiver_gender = SelectField('Preferred Caregiver Gender', choices=[
+        ('', 'No Preference'),
+        ('male', 'Male'),
+        ('female', 'Female')
+    ], validators=[Optional()])
+    preferred_language = StringField('Preferred Language', validators=[Optional(), Length(max=50)])
+    cultural_considerations = TextAreaField('Cultural Considerations', validators=[Optional(), Length(max=1000)])
+    religious_considerations = TextAreaField('Religious Considerations', validators=[Optional(), Length(max=1000)])
+    
+    # Location
+    latitude = StringField('Latitude', validators=[Optional()])
+    longitude = StringField('Longitude', validators=[Optional()])
+    location_notes = TextAreaField('Location Notes', validators=[Optional(), Length(max=500)])
+    
+    # Care Assessment
+    care_needs_assessment = TextAreaField('Care Needs Assessment', validators=[Optional(), Length(max=2000)])
+    risk_factors = TextAreaField('Risk Factors', validators=[Optional(), Length(max=1000)])
+    care_goals = TextAreaField('Care Goals', validators=[Optional(), Length(max=1000)])
+    care_restrictions = TextAreaField('Care Restrictions', validators=[Optional(), Length(max=1000)])
+    
+    # Review Dates
+    last_assessment_date = DateField('Last Assessment Date', validators=[Optional()])
+    next_review_date = DateField('Next Review Date', validators=[Optional()])
+    
+    submit = SubmitField('Save Client')
+
+class MedicalAssessmentForm(FlaskForm):
+    """Medical assessment form for health monitoring"""
+    client_id = SelectField('Client', coerce=int, validators=[DataRequired()])
+    assessment_type = SelectField('Assessment Type', choices=[
+        ('initial', 'Initial Assessment'),
+        ('routine', 'Routine Assessment'),
+        ('emergency', 'Emergency Assessment'),
+        ('follow_up', 'Follow-up Assessment')
+    ], validators=[DataRequired()])
+    assessment_date = DateField('Assessment Date', validators=[DataRequired()], default=date.today)
+    assessment_time = TimeField('Assessment Time', validators=[Optional()])
+    
+    # Vital Signs
+    blood_pressure_systolic = IntegerField('Systolic BP', validators=[Optional(), NumberRange(min=50, max=300)])
+    blood_pressure_diastolic = IntegerField('Diastolic BP', validators=[Optional(), NumberRange(min=30, max=200)])
+    heart_rate = IntegerField('Heart Rate (BPM)', validators=[Optional(), NumberRange(min=30, max=200)])
+    temperature = FloatField('Temperature (°F)', validators=[Optional(), NumberRange(min=90, max=110)])
+    oxygen_saturation = IntegerField('Oxygen Saturation (%)', validators=[Optional(), NumberRange(min=70, max=100)])
+    weight = FloatField('Weight (lbs)', validators=[Optional(), NumberRange(min=50, max=500)])
+    height = FloatField('Height (inches)', validators=[Optional(), NumberRange(min=36, max=84)])
+    
+    # Health Indicators
+    pain_level = SelectField('Pain Level (0-10)', choices=[
+        ('', 'Not Assessed'),
+        ('0', '0 - No Pain'),
+        ('1', '1 - Very Mild'),
+        ('2', '2 - Mild'),
+        ('3', '3 - Mild'),
+        ('4', '4 - Moderate'),
+        ('5', '5 - Moderate'),
+        ('6', '6 - Moderate'),
+        ('7', '7 - Severe'),
+        ('8', '8 - Severe'),
+        ('9', '9 - Very Severe'),
+        ('10', '10 - Unbearable')
+    ], validators=[Optional()])
+    mobility_level = SelectField('Mobility Level', choices=[
+        ('', 'Not Assessed'),
+        ('independent', 'Independent'),
+        ('assisted', 'Assisted'),
+        ('dependent', 'Dependent')
+    ], validators=[Optional()])
+    cognitive_status = SelectField('Cognitive Status', choices=[
+        ('', 'Not Assessed'),
+        ('alert', 'Alert'),
+        ('confused', 'Confused'),
+        ('disoriented', 'Disoriented')
+    ], validators=[Optional()])
+    mood_status = SelectField('Mood Status', choices=[
+        ('', 'Not Assessed'),
+        ('good', 'Good'),
+        ('fair', 'Fair'),
+        ('poor', 'Poor'),
+        ('depressed', 'Depressed')
+    ], validators=[Optional()])
+    
+    # Assessment Notes
+    subjective_notes = TextAreaField('Subjective Notes (Client Report)', validators=[Optional(), Length(max=2000)])
+    objective_notes = TextAreaField('Objective Notes (Observations)', validators=[Optional(), Length(max=2000)])
+    assessment_notes = TextAreaField('Assessment Notes', validators=[Optional(), Length(max=2000)])
+    recommendations = TextAreaField('Recommendations', validators=[Optional(), Length(max=2000)])
+    
+    # Follow-up
+    requires_follow_up = BooleanField('Requires Follow-up')
+    follow_up_date = DateField('Follow-up Date', validators=[Optional()])
+    follow_up_notes = TextAreaField('Follow-up Notes', validators=[Optional(), Length(max=1000)])
+    
+    submit = SubmitField('Save Assessment')
+
+class CarePlanForm(FlaskForm):
+    """Care plan form for comprehensive care planning"""
+    client_id = SelectField('Client', coerce=int, validators=[DataRequired()])
+    title = StringField('Plan Title', validators=[DataRequired(), Length(max=200)])
+    description = TextAreaField('Description', validators=[Optional(), Length(max=2000)])
+    plan_type = SelectField('Plan Type', choices=[
+        ('comprehensive', 'Comprehensive'),
+        ('specialized', 'Specialized'),
+        ('emergency', 'Emergency')
+    ], default='comprehensive')
+    status = SelectField('Status', choices=[
+        ('active', 'Active'),
+        ('inactive', 'Inactive'),
+        ('completed', 'Completed'),
+        ('suspended', 'Suspended')
+    ], default='active')
+    
+    # Plan Dates
+    start_date = DateField('Start Date', validators=[DataRequired()], default=date.today)
+    end_date = DateField('End Date', validators=[Optional()])
+    review_date = DateField('Review Date', validators=[Optional()])
+    
+    # Goals and Objectives
+    primary_goals = TextAreaField('Primary Goals', validators=[Optional(), Length(max=2000)])
+    secondary_goals = TextAreaField('Secondary Goals', validators=[Optional(), Length(max=2000)])
+    success_metrics = TextAreaField('Success Metrics', validators=[Optional(), Length(max=2000)])
+    
+    submit = SubmitField('Save Care Plan')
+
+class CareReportForm(FlaskForm):
+    """Care report form for comprehensive reporting"""
+    client_id = SelectField('Client', coerce=int, validators=[DataRequired()])
+    report_type = SelectField('Report Type', choices=[
+        ('daily', 'Daily Report'),
+        ('weekly', 'Weekly Report'),
+        ('monthly', 'Monthly Report'),
+        ('incident', 'Incident Report'),
+        ('assessment', 'Assessment Report')
+    ], validators=[DataRequired()])
+    report_date = DateField('Report Date', validators=[DataRequired()], default=date.today)
+    report_period_start = DateField('Report Period Start', validators=[Optional()])
+    report_period_end = DateField('Report Period End', validators=[Optional()])
+    
+    # Report Content
+    title = StringField('Report Title', validators=[DataRequired(), Length(max=200)])
+    summary = TextAreaField('Summary', validators=[Optional(), Length(max=2000)])
+    detailed_notes = TextAreaField('Detailed Notes', validators=[Optional(), Length(max=5000)])
+    
+    # Health Status
+    overall_health_status = SelectField('Overall Health Status', choices=[
+        ('', 'Not Assessed'),
+        ('excellent', 'Excellent'),
+        ('good', 'Good'),
+        ('fair', 'Fair'),
+        ('poor', 'Poor'),
+        ('critical', 'Critical')
+    ], validators=[Optional()])
+    mood_status = SelectField('Mood Status', choices=[
+        ('', 'Not Assessed'),
+        ('good', 'Good'),
+        ('fair', 'Fair'),
+        ('poor', 'Poor'),
+        ('depressed', 'Depressed')
+    ], validators=[Optional()])
+    mobility_status = SelectField('Mobility Status', choices=[
+        ('', 'Not Assessed'),
+        ('independent', 'Independent'),
+        ('assisted', 'Assisted'),
+        ('dependent', 'Dependent')
+    ], validators=[Optional()])
+    cognitive_status = SelectField('Cognitive Status', choices=[
+        ('', 'Not Assessed'),
+        ('alert', 'Alert'),
+        ('confused', 'Confused'),
+        ('disoriented', 'Disoriented')
+    ], validators=[Optional()])
+    
+    # Concerns and Recommendations
+    concerns = TextAreaField('Concerns', validators=[Optional(), Length(max=2000)])
+    recommendations = TextAreaField('Recommendations', validators=[Optional(), Length(max=2000)])
+    follow_up_required = BooleanField('Follow-up Required')
+    follow_up_notes = TextAreaField('Follow-up Notes', validators=[Optional(), Length(max=1000)])
+    
+    submit = SubmitField('Save Report')
+
+class IncidentReportForm(FlaskForm):
+    """Incident report form for safety and emergency tracking"""
+    client_id = SelectField('Client', coerce=int, validators=[DataRequired()])
+    incident_type = SelectField('Incident Type', choices=[
+        ('fall', 'Fall'),
+        ('medical_emergency', 'Medical Emergency'),
+        ('behavioral', 'Behavioral Issue'),
+        ('safety', 'Safety Concern'),
+        ('other', 'Other')
+    ], validators=[DataRequired()])
+    incident_date = DateField('Incident Date', validators=[DataRequired()], default=date.today)
+    incident_time = TimeField('Incident Time', validators=[DataRequired()])
+    location = StringField('Location', validators=[Optional(), Length(max=200)])
+    
+    # Incident Description
+    title = StringField('Incident Title', validators=[DataRequired(), Length(max=200)])
+    description = TextAreaField('Description', validators=[DataRequired(), Length(max=2000)])
+    immediate_actions = TextAreaField('Immediate Actions Taken', validators=[Optional(), Length(max=2000)])
+    injuries_sustained = TextAreaField('Injuries Sustained', validators=[Optional(), Length(max=1000)])
+    medical_attention_required = BooleanField('Medical Attention Required')
+    
+    # Severity and Priority
+    severity = SelectField('Severity', choices=[
+        ('low', 'Low'),
+        ('medium', 'Medium'),
+        ('high', 'High'),
+        ('critical', 'Critical')
+    ], default='low')
+    priority = SelectField('Priority', choices=[
+        ('normal', 'Normal'),
+        ('high', 'High'),
+        ('urgent', 'Urgent')
+    ], default='normal')
+    
+    # Follow-up
+    follow_up_required = BooleanField('Follow-up Required')
+    follow_up_actions = TextAreaField('Follow-up Actions', validators=[Optional(), Length(max=2000)])
+    follow_up_date = DateField('Follow-up Date', validators=[Optional()])
+    
+    submit = SubmitField('Save Incident Report')
+
+class CareTemplateForm(FlaskForm):
+    """Care template form for reusable care plans"""
+    name = StringField('Template Name', validators=[DataRequired(), Length(max=200)])
+    description = TextAreaField('Description', validators=[Optional(), Length(max=1000)])
+    category = SelectField('Category', choices=[
+        ('dementia', 'Dementia Care'),
+        ('palliative', 'Palliative Care'),
+        ('rehabilitation', 'Rehabilitation'),
+        ('post_surgery', 'Post-Surgery Care'),
+        ('chronic_condition', 'Chronic Condition'),
+        ('general', 'General Care')
+    ], validators=[Optional()])
+    care_level = SelectField('Care Level', choices=[
+        ('standard', 'Standard'),
+        ('intensive', 'Intensive'),
+        ('specialized', 'Specialized'),
+        ('palliative', 'Palliative')
+    ], default='standard')
+    is_public = BooleanField('Make Template Public')
+    
+    submit = SubmitField('Save Template')
+
+class NotificationForm(FlaskForm):
+    """Notification form for alerts and reminders"""
+    user_id = SelectField('User', coerce=int, validators=[DataRequired()])
+    title = StringField('Title', validators=[DataRequired(), Length(max=200)])
+    message = TextAreaField('Message', validators=[DataRequired(), Length(max=1000)])
+    notification_type = SelectField('Type', choices=[
+        ('info', 'Information'),
+        ('warning', 'Warning'),
+        ('error', 'Error'),
+        ('success', 'Success'),
+        ('reminder', 'Reminder')
+    ], default='info')
+    priority = SelectField('Priority', choices=[
+        ('low', 'Low'),
+        ('normal', 'Normal'),
+        ('high', 'High'),
+        ('urgent', 'Urgent')
+    ], default='normal')
+    expires_at = DateField('Expires At', validators=[Optional()])
+    
+    submit = SubmitField('Send Notification')
+
+class ExportForm(FlaskForm):
+    """Export form for data export"""
+    export_type = SelectField('Export Type', choices=[
+        ('clients', 'Clients'),
+        ('care_actions', 'Care Actions'),
+        ('scheduled_tasks', 'Scheduled Tasks'),
+        ('medical_assessments', 'Medical Assessments'),
+        ('care_reports', 'Care Reports'),
+        ('incident_reports', 'Incident Reports')
+    ], validators=[DataRequired()])
+    format = SelectField('Format', choices=[
+        ('csv', 'CSV'),
+        ('excel', 'Excel'),
+        ('pdf', 'PDF')
+    ], default='csv')
+    date_from = DateField('From Date', validators=[Optional()])
+    date_to = DateField('To Date', validators=[Optional()])
+    include_archived = BooleanField('Include Archived Records')
+    
+    submit = SubmitField('Export Data')

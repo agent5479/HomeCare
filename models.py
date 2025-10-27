@@ -1,13 +1,19 @@
+"""
+HomeCare Management System - Database Models
+Professional Care Coordination Platform
+"""
+
 from datetime import datetime, timedelta
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 import json
+from collections import defaultdict
 
 db = SQLAlchemy()
 
 class User(UserMixin, db.Model):
-    """User model for authentication"""
+    """User model for authentication and role management"""
     __tablename__ = 'users'
     
     id = db.Column(db.Integer, primary_key=True)
@@ -18,8 +24,8 @@ class User(UserMixin, db.Model):
     is_active = db.Column(db.Boolean, default=True)
     
     # User role and status management
-    role = db.Column(db.String(50), default='staff')  # admin, owner, director, staff, contractor, trial
-    status = db.Column(db.String(50), default='active')  # active, inactive, suspended, trial
+    role = db.Column(db.String(50), default='caregiver')  # admin, developer, caregiver, supervisor
+    status = db.Column(db.String(50), default='active')  # active, inactive, suspended
     first_name = db.Column(db.String(100))
     last_name = db.Column(db.String(100))
     phone = db.Column(db.String(20))
@@ -37,8 +43,9 @@ class User(UserMixin, db.Model):
     is_super_admin = db.Column(db.Boolean, default=False)  # Only for system administrators
     
     # Relationships
-    hive_sites = db.relationship('HiveSite', backref='owner', lazy='dynamic', cascade='all, delete-orphan')
-    organization = db.relationship('Organization', backref='users', lazy='dynamic')
+    clients = db.relationship('Client', backref='assigned_caregiver', lazy='dynamic', cascade='all, delete-orphan')
+    care_actions = db.relationship('CareAction', backref='performed_by', lazy='dynamic', cascade='all, delete-orphan')
+    scheduled_tasks = db.relationship('ScheduledTask', backref='assigned_to', lazy='dynamic', cascade='all, delete-orphan')
     
     def set_password(self, password):
         """Hash and set password"""
@@ -48,643 +55,681 @@ class User(UserMixin, db.Model):
         """Check if password matches hash"""
         return check_password_hash(self.password_hash, password)
     
-    def __repr__(self):
-        return f'<User {self.username}>'
-    
     def get_full_name(self):
         """Get user's full name"""
         if self.first_name and self.last_name:
             return f"{self.first_name} {self.last_name}"
         return self.username
     
-    def is_owner_or_admin(self):
-        """Check if user is owner or admin"""
-        return self.role in ['admin', 'owner'] or self.is_admin
+    def can_delete(self):
+        """Check if user can delete records"""
+        return self.role in ['admin', 'developer', 'supervisor']
     
-    def can_edit_users(self):
-        """Check if user can edit other users"""
-        return self.is_admin or self.can_manage_users or self.role in ['admin', 'owner', 'director']
+    def can_manage_clients(self):
+        """Check if user can manage clients"""
+        return self.role in ['admin', 'developer', 'supervisor', 'caregiver']
     
-    def is_super_admin(self):
-        """Check if user is a super admin (system-wide)"""
-        return self.is_super_admin
-    
-    def is_org_admin(self):
-        """Check if user is an organization admin"""
-        return self.is_organization_admin or self.role in ['admin', 'owner']
-    
-    def can_manage_organization(self):
-        """Check if user can manage organization settings"""
-        return self.is_organization_admin or self.is_super_admin or self.role in ['admin', 'owner']
-    
-    def get_organization_users(self):
-        """Get all users in the same organization"""
-        if not self.organization_id:
-            return User.query.filter_by(id=self.id)
-        return User.query.filter_by(organization_id=self.organization_id)
-    
-    def get_role_display_name(self):
-        """Get display name for role"""
-        role_names = {
-            'admin': 'Administrator',
-            'owner': 'Owner',
-            'director': 'Director',
-            'staff': 'Staff Member',
-            'contractor': 'Contractor',
-            'trial': 'Trial User'
-        }
-        return role_names.get(self.role, self.role.title())
-    
-    def get_status_display_name(self):
-        """Get display name for status"""
-        status_names = {
-            'active': 'Active',
-            'inactive': 'Inactive',
-            'suspended': 'Suspended',
-            'trial': 'Trial'
-        }
-        return status_names.get(self.status, self.status.title())
+    def __repr__(self):
+        return f'<User {self.username}>'
 
-
-class Organization(db.Model):
-    """Organization model for multi-tenant architecture"""
-    __tablename__ = 'organizations'
+class Client(db.Model):
+    """Client model for home care recipients"""
+    __tablename__ = 'clients'
     
     id = db.Column(db.Integer, primary_key=True)
-    firebase_org_id = db.Column(db.String(100), unique=True, nullable=False)
     name = db.Column(db.String(200), nullable=False)
     description = db.Column(db.Text)
-    
-    # Organization settings
-    max_users = db.Column(db.Integer, default=10)
-    max_sites = db.Column(db.Integer, default=50)
-    subscription_tier = db.Column(db.String(50), default='basic')  # basic, pro, enterprise
+    age = db.Column(db.Integer)
+    date_of_birth = db.Column(db.Date)
+    gender = db.Column(db.String(10))  # male, female, other
+    status = db.Column(db.String(50), default='active')  # active, inactive, discharged, suspended
+    care_level = db.Column(db.String(50), default='standard')  # standard, intensive, specialized, palliative
     
     # Contact information
-    contact_email = db.Column(db.String(120))
-    contact_phone = db.Column(db.String(20))
+    phone = db.Column(db.String(20))
+    email = db.Column(db.String(120))
     address = db.Column(db.Text)
+    city = db.Column(db.String(100))
+    state = db.Column(db.String(50))
+    postal_code = db.Column(db.String(20))
+    country = db.Column(db.String(50), default='US')
     
-    # Status
-    is_active = db.Column(db.Boolean, default=True)
+    # Emergency contacts
+    emergency_contact_name = db.Column(db.String(200))
+    emergency_contact_phone = db.Column(db.String(20))
+    emergency_contact_relationship = db.Column(db.String(100))
+    secondary_emergency_contact = db.Column(db.String(200))
+    secondary_emergency_phone = db.Column(db.String(20))
+    
+    # Medical information
+    medical_conditions = db.Column(db.Text)
+    allergies = db.Column(db.Text)
+    medications = db.Column(db.Text)
+    special_instructions = db.Column(db.Text)
+    dietary_restrictions = db.Column(db.Text)
+    mobility_requirements = db.Column(db.Text)
+    communication_needs = db.Column(db.Text)
+    
+    # Insurance and payment
+    insurance_provider = db.Column(db.String(200))
+    insurance_policy_number = db.Column(db.String(100))
+    medicare_number = db.Column(db.String(100))
+    medicaid_number = db.Column(db.String(100))
+    payment_method = db.Column(db.String(50))  # private, insurance, medicare, medicaid
+    
+    # Care preferences
+    preferred_caregiver_gender = db.Column(db.String(10))
+    preferred_language = db.Column(db.String(50))
+    cultural_considerations = db.Column(db.Text)
+    religious_considerations = db.Column(db.Text)
+    
+    # Location
+    latitude = db.Column(db.Float)
+    longitude = db.Column(db.Float)
+    location_notes = db.Column(db.Text)
+    
+    # Care assessment
+    care_needs_assessment = db.Column(db.Text)
+    risk_factors = db.Column(db.Text)
+    care_goals = db.Column(db.Text)
+    care_restrictions = db.Column(db.Text)
+    
+    # Timestamps
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    last_assessment_date = db.Column(db.Date)
+    next_review_date = db.Column(db.Date)
     
     # Relationships
-    users = db.relationship('User', backref='organization', lazy='dynamic')
+    assigned_caregiver_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
+    care_actions = db.relationship('CareAction', backref='client', lazy='dynamic', cascade='all, delete-orphan')
+    scheduled_tasks = db.relationship('ScheduledTask', backref='client', lazy='dynamic', cascade='all, delete-orphan')
+    care_plans = db.relationship('CarePlan', backref='client', lazy='dynamic', cascade='all, delete-orphan')
+    medical_assessments = db.relationship('MedicalAssessment', backref='client', lazy='dynamic', cascade='all, delete-orphan')
+    care_reports = db.relationship('CareReport', backref='client', lazy='dynamic', cascade='all, delete-orphan')
+    incident_reports = db.relationship('IncidentReport', backref='client', lazy='dynamic', cascade='all, delete-orphan')
+    
+    def get_care_level_class(self):
+        """Get CSS class for care level"""
+        level_classes = {
+            'standard': 'bg-primary',
+            'intensive': 'bg-warning',
+            'specialized': 'bg-info',
+            'palliative': 'bg-danger'
+        }
+        return level_classes.get(self.care_level, 'bg-secondary')
+    
+    def get_status_class(self):
+        """Get CSS class for status"""
+        status_classes = {
+            'active': 'bg-success',
+            'inactive': 'bg-secondary',
+            'discharged': 'bg-info'
+        }
+        return status_classes.get(self.status, 'bg-secondary')
     
     def __repr__(self):
-        return f'<Organization {self.name}>'
-    
-    def get_user_count(self):
-        """Get number of active users in organization"""
-        return self.users.filter_by(is_active=True).count()
-    
-    def get_site_count(self):
-        """Get number of sites in organization"""
-        return HiveSite.query.join(User).filter(
-            User.organization_id == self.firebase_org_id,
-            HiveSite.is_active == True
-        ).count()
+        return f'<Client {self.name}>'
 
-
-class HiveSite(db.Model):
-    """Hive site location model"""
-    __tablename__ = 'hive_sites'
+class CareAction(db.Model):
+    """Care action model for logging care activities"""
+    __tablename__ = 'care_actions'
     
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    name = db.Column(db.String(100), nullable=False)
-    description = db.Column(db.Text)
-    latitude = db.Column(db.Float, nullable=False)
-    longitude = db.Column(db.Float, nullable=False)
-    hive_count = db.Column(db.Integer, default=1)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    is_active = db.Column(db.Boolean, default=True)
-    
-    # Custom settings
-    harvest_timeline = db.Column(db.String(100))
-    sugar_requirements = db.Column(db.String(100))
-    notes = db.Column(db.Text)
-    
-    # New landowner information
-    landowner_name = db.Column(db.String(100))
-    landowner_phone = db.Column(db.String(20))
-    landowner_email = db.Column(db.String(120))
-    landowner_address = db.Column(db.Text)
-    
-    # Site classification
-    functional_classification = db.Column(db.String(20), default='production')  # production, nucleus, queen-rearing, research, education, quarantine, backup, custom
-    seasonal_classification = db.Column(db.String(20), default='summer')  # summer, winter
-    access_type = db.Column(db.String(20), default='all_weather')  # all_weather, dry_only
-    contact_before_visit = db.Column(db.Boolean, default=False)
-    is_quarantine = db.Column(db.Boolean, default=False)
-    
-    # Hive setup details
-    single_brood_boxes = db.Column(db.Integer, default=0)
-    double_brood_boxes = db.Column(db.Integer, default=0)
-    nucs = db.Column(db.Integer, default=0)
-    dead_hives = db.Column(db.Integer, default=0)
-    top_splits = db.Column(db.Integer, default=0)
-    
-    # Hive strength ratings
-    strong_hives = db.Column(db.Integer, default=0)
-    medium_hives = db.Column(db.Integer, default=0)
-    weak_hives = db.Column(db.Integer, default=0)
-    
-    # Overall site strength categorization
-    site_strength = db.Column(db.String(20), default='medium')  # strong, medium, weak, nuc
-    
-    # Relationships
-    individual_hives = db.relationship('IndividualHive', backref='site', lazy='dynamic', cascade='all, delete-orphan')
-    actions = db.relationship('HiveAction', backref='site', lazy='dynamic', cascade='all, delete-orphan')
-    
-    def __repr__(self):
-        return f'<HiveSite {self.name}>'
-    
-    def get_strength_display_name(self):
-        """Get display name for site strength"""
-        strength_names = {
-            'strong': 'Strong',
-            'medium': 'Medium',
-            'weak': 'Weak',
-            'nuc': 'NUC'
-        }
-        return strength_names.get(self.site_strength, 'Medium')
-    
-    def get_strength_color(self):
-        """Get color for site strength"""
-        colors = {
-            'strong': 'success',
-            'medium': 'warning',
-            'weak': 'danger',
-            'nuc': 'info'
-        }
-        return colors.get(self.site_strength, 'secondary')
-
-
-class IndividualHive(db.Model):
-    """Individual hive tracking (optional, for infection management)"""
-    __tablename__ = 'individual_hives'
-    
-    id = db.Column(db.Integer, primary_key=True)
-    site_id = db.Column(db.Integer, db.ForeignKey('hive_sites.id'), nullable=False)
-    hive_number = db.Column(db.String(50), nullable=False)
-    status = db.Column(db.String(50), default='healthy')  # healthy, infected, quarantine, etc.
-    
-    # Hive strength categorization
-    hive_strength = db.Column(db.String(20), default='medium')  # strong, medium, weak, nuc
-    
-    notes = db.Column(db.Text)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    is_active = db.Column(db.Boolean, default=True)
-    
-    # Relationships
-    actions = db.relationship('HiveAction', backref='individual_hive', lazy='dynamic')
-    
-    def __repr__(self):
-        return f'<IndividualHive {self.hive_number}>'
-    
-    def get_strength_display_name(self):
-        """Get display name for hive strength"""
-        strength_names = {
-            'strong': 'Strong',
-            'medium': 'Medium',
-            'weak': 'Weak',
-            'nuc': 'NUC'
-        }
-        return strength_names.get(self.hive_strength, 'Medium')
-    
-    def get_strength_color(self):
-        """Get color for hive strength"""
-        colors = {
-            'strong': 'success',
-            'medium': 'warning',
-            'weak': 'danger',
-            'nuc': 'info'
-        }
-        return colors.get(self.hive_strength, 'secondary')
-
-
-class TaskType(db.Model):
-    """Predefined task types for hive management"""
-    __tablename__ = 'task_types'
-    
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False, unique=True)
-    description = db.Column(db.Text)
-    category = db.Column(db.String(50))  # inspection, feeding, treatment, harvest, maintenance
-    is_active = db.Column(db.Boolean, default=True)
-    order = db.Column(db.Integer, default=0)
-    
-    def __repr__(self):
-        return f'<TaskType {self.name}>'
-
-
-class HiveAction(db.Model):
-    """Record of actions performed on hives"""
-    __tablename__ = 'hive_actions'
-    
-    id = db.Column(db.Integer, primary_key=True)
-    site_id = db.Column(db.Integer, db.ForeignKey('hive_sites.id'), nullable=False)
-    individual_hive_id = db.Column(db.Integer, db.ForeignKey('individual_hives.id'), nullable=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    client_id = db.Column(db.Integer, db.ForeignKey('clients.id'), nullable=False)
+    performed_by_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    task_id = db.Column(db.Integer, db.ForeignKey('care_tasks.id'), nullable=False)
     
     # Action details
-    task_type_id = db.Column(db.Integer, db.ForeignKey('task_types.id'), nullable=True)
-    task_name = db.Column(db.String(100), nullable=False)
-    description = db.Column(db.Text)
-    action_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    task_name = db.Column(db.String(200), nullable=False)
+    task_category = db.Column(db.String(100))
+    action_date = db.Column(db.Date, nullable=False)
+    action_time = db.Column(db.Time)
+    notes = db.Column(db.Text)
+    priority = db.Column(db.String(20), default='normal')  # normal, high, urgent
+    status = db.Column(db.String(20), default='completed')  # completed, pending, cancelled
+    
+    # Timestamps
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
-    # Status
-    is_archived = db.Column(db.Boolean, default=False)
-    
-    # Relationships
-    user = db.relationship('User', backref='actions')
-    task_type = db.relationship('TaskType', backref='actions')
+    def get_priority_class(self):
+        """Get CSS class for priority"""
+        priority_classes = {
+            'normal': 'bg-secondary',
+            'high': 'bg-warning',
+            'urgent': 'bg-danger'
+        }
+        return priority_classes.get(self.priority, 'bg-secondary')
     
     def __repr__(self):
-        return f'<HiveAction {self.task_name} - {self.action_date}>'
+        return f'<CareAction {self.task_name} for {self.client.name}>'
 
-
-class DiseaseReport(db.Model):
-    """Disease reporting for sites"""
-    __tablename__ = 'disease_reports'
+class CareTask(db.Model):
+    """Care task template model"""
+    __tablename__ = 'care_tasks'
     
     id = db.Column(db.Integer, primary_key=True)
-    site_id = db.Column(db.Integer, db.ForeignKey('hive_sites.id'), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    name = db.Column(db.String(200), nullable=False)
+    category = db.Column(db.String(100), nullable=False)
+    description = db.Column(db.Text)
+    is_common = db.Column(db.Boolean, default=False)
+    is_active = db.Column(db.Boolean, default=True)
     
-    # Disease counts
-    afb_count = db.Column(db.Integer, default=0)  # American Foulbrood
-    varroa_count = db.Column(db.Integer, default=0)  # Varroa mites
-    chalkbrood_count = db.Column(db.Integer, default=0)  # Chalkbrood
-    sacbrood_count = db.Column(db.Integer, default=0)  # Sacbrood
-    dwv_count = db.Column(db.Integer, default=0)  # Deformed Wing Virus
-    
-    # Report details
-    report_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    notes = db.Column(db.Text)
+    # Timestamps
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
     # Relationships
-    site = db.relationship('HiveSite', backref='disease_reports')
-    user = db.relationship('User', backref='disease_reports')
+    care_actions = db.relationship('CareAction', backref='care_task', lazy='dynamic')
+    scheduled_tasks = db.relationship('ScheduledTask', backref='care_task', lazy='dynamic')
+    
+    def get_category_class(self):
+        """Get CSS class for category"""
+        category_classes = {
+            'Personal Care': 'bg-primary',
+            'Medical Care': 'bg-danger',
+            'Daily Living': 'bg-success',
+            'Emotional Support': 'bg-info',
+            'Safety & Monitoring': 'bg-warning',
+            'Specialized Care': 'bg-secondary'
+        }
+        return category_classes.get(self.category, 'bg-secondary')
     
     def __repr__(self):
-        return f'<DiseaseReport {self.site.name} - {self.report_date}>'
-
+        return f'<CareTask {self.name}>'
 
 class ScheduledTask(db.Model):
-    """Scheduled tasks for hive management"""
+    """Scheduled task model for future care planning"""
     __tablename__ = 'scheduled_tasks'
     
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    task_template_id = db.Column(db.Integer, db.ForeignKey('task_templates.id'), nullable=False)
+    client_id = db.Column(db.Integer, db.ForeignKey('clients.id'), nullable=False)
+    assigned_to_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    task_id = db.Column(db.Integer, db.ForeignKey('care_tasks.id'), nullable=False)
     
     # Task details
-    title = db.Column(db.String(200), nullable=False)
-    description = db.Column(db.Text)
+    task_name = db.Column(db.String(200), nullable=False)
+    task_category = db.Column(db.String(100))
+    scheduled_date = db.Column(db.Date, nullable=False)
+    scheduled_time = db.Column(db.Time)
+    priority = db.Column(db.String(20), default='normal')  # normal, high, urgent
+    status = db.Column(db.String(20), default='pending')  # pending, completed, cancelled
+    notes = db.Column(db.Text)
     
-    # Scheduling
-    scheduled_date = db.Column(db.DateTime, nullable=False)
-    due_date = db.Column(db.DateTime, nullable=True)
-    estimated_duration = db.Column(db.Integer, default=60)  # minutes
-    
-    # Status
-    status = db.Column(db.String(20), default='pending')  # pending, in_progress, completed, cancelled, overdue
-    priority = db.Column(db.String(10), default='medium')  # low, medium, high, urgent
-    
-    # Assignment
-    assigned_to_site_id = db.Column(db.Integer, db.ForeignKey('hive_sites.id'), nullable=True)
-    assigned_to_hive_id = db.Column(db.Integer, db.ForeignKey('individual_hives.id'), nullable=True)
-    
-    # Recurrence
-    is_recurring = db.Column(db.Boolean, default=False)
-    recurrence_pattern = db.Column(db.String(20))  # daily, weekly, monthly, yearly
-    recurrence_interval = db.Column(db.Integer, default=1)
-    recurrence_end_date = db.Column(db.DateTime, nullable=True)
-    
-    # Calendar integration
-    google_calendar_event_id = db.Column(db.String(255), nullable=True)
-    calendar_synced = db.Column(db.Boolean, default=False)
+    # Completion tracking
+    completed_at = db.Column(db.DateTime)
+    completed_by_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
+    completion_notes = db.Column(db.Text)
     
     # Timestamps
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    completed_at = db.Column(db.DateTime, nullable=True)
-    
-    # Relationships
-    user = db.relationship('User', backref='scheduled_tasks')
-    task_template = db.relationship('TaskTemplate', backref='scheduled_tasks')
-    assigned_site = db.relationship('HiveSite', backref='scheduled_tasks')
-    assigned_hive = db.relationship('IndividualHive', backref='scheduled_tasks')
-    
-    def __repr__(self):
-        return f'<ScheduledTask {self.title} - {self.scheduled_date}>'
     
     def is_overdue(self):
         """Check if task is overdue"""
-        if self.status in ['completed', 'cancelled']:
+        if self.status == 'completed':
             return False
-        return self.due_date and datetime.utcnow() > self.due_date
+        return datetime.now().date() > self.scheduled_date
     
-    def get_next_recurrence(self):
-        """Calculate next occurrence for recurring tasks"""
-        if not self.is_recurring:
+    def get_priority_class(self):
+        """Get CSS class for priority"""
+        priority_classes = {
+            'normal': 'bg-secondary',
+            'high': 'bg-warning',
+            'urgent': 'bg-danger'
+        }
+        return priority_classes.get(self.priority, 'bg-secondary')
+    
+    def __repr__(self):
+        return f'<ScheduledTask {self.task_name} for {self.client.name}>'
+
+class Employee(db.Model):
+    """Employee model for team management"""
+    __tablename__ = 'employees'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    
+    # Employee details
+    employee_id = db.Column(db.String(50), unique=True)
+    department = db.Column(db.String(100))
+    position = db.Column(db.String(100))
+    hire_date = db.Column(db.Date)
+    status = db.Column(db.String(20), default='active')  # active, inactive, terminated
+    
+    # Skills and certifications
+    skills = db.Column(db.Text)  # JSON string of skills
+    certifications = db.Column(db.Text)  # JSON string of certifications
+    emergency_contact = db.Column(db.String(200))
+    
+    # Timestamps
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    def get_skills_list(self):
+        """Get skills as a list"""
+        if self.skills:
+            return json.loads(self.skills)
+        return []
+    
+    def set_skills_list(self, skills_list):
+        """Set skills from a list"""
+        self.skills = json.dumps(skills_list)
+    
+    def get_certifications_list(self):
+        """Get certifications as a list"""
+        if self.certifications:
+            return json.loads(self.certifications)
+        return []
+    
+    def set_certifications_list(self, certs_list):
+        """Set certifications from a list"""
+        self.certifications = json.dumps(certs_list)
+    
+    def __repr__(self):
+        return f'<Employee {self.user.username}>'
+
+class CarePlan(db.Model):
+    """Care plan model for comprehensive care planning"""
+    __tablename__ = 'care_plans'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    client_id = db.Column(db.Integer, db.ForeignKey('clients.id'), nullable=False)
+    created_by_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    
+    # Plan details
+    title = db.Column(db.String(200), nullable=False)
+    description = db.Column(db.Text)
+    plan_type = db.Column(db.String(50), default='comprehensive')  # comprehensive, specialized, emergency
+    status = db.Column(db.String(20), default='active')  # active, inactive, completed, suspended
+    
+    # Plan dates
+    start_date = db.Column(db.Date, nullable=False)
+    end_date = db.Column(db.Date)
+    review_date = db.Column(db.Date)
+    
+    # Plan goals and objectives
+    primary_goals = db.Column(db.Text)
+    secondary_goals = db.Column(db.Text)
+    success_metrics = db.Column(db.Text)
+    
+    # Timestamps
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    # Relationships
+    care_plan_tasks = db.relationship('CarePlanTask', backref='care_plan', lazy='dynamic', cascade='all, delete-orphan')
+    assessments = db.relationship('MedicalAssessment', backref='care_plan', lazy='dynamic', cascade='all, delete-orphan')
+    
+    def __repr__(self):
+        return f'<CarePlan {self.title} for {self.client.name}>'
+
+class CarePlanTask(db.Model):
+    """Care plan task model for detailed task planning"""
+    __tablename__ = 'care_plan_tasks'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    care_plan_id = db.Column(db.Integer, db.ForeignKey('care_plans.id'), nullable=False)
+    task_id = db.Column(db.Integer, db.ForeignKey('care_tasks.id'), nullable=False)
+    
+    # Task details
+    task_name = db.Column(db.String(200), nullable=False)
+    task_category = db.Column(db.String(100))
+    description = db.Column(db.Text)
+    priority = db.Column(db.String(20), default='normal')  # normal, high, urgent
+    frequency = db.Column(db.String(50), default='daily')  # daily, weekly, monthly, as_needed
+    duration_minutes = db.Column(db.Integer, default=30)
+    
+    # Assignment
+    assigned_to_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
+    is_required = db.Column(db.Boolean, default=True)
+    
+    # Status tracking
+    status = db.Column(db.String(20), default='pending')  # pending, in_progress, completed, cancelled
+    completion_notes = db.Column(db.Text)
+    completed_at = db.Column(db.DateTime)
+    
+    # Timestamps
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    def __repr__(self):
+        return f'<CarePlanTask {self.task_name}>'
+
+class MedicalAssessment(db.Model):
+    """Medical assessment model for health monitoring"""
+    __tablename__ = 'medical_assessments'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    client_id = db.Column(db.Integer, db.ForeignKey('clients.id'), nullable=False)
+    care_plan_id = db.Column(db.Integer, db.ForeignKey('care_plans.id'), nullable=True)
+    performed_by_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    
+    # Assessment details
+    assessment_type = db.Column(db.String(50), nullable=False)  # initial, routine, emergency, follow_up
+    assessment_date = db.Column(db.Date, nullable=False)
+    assessment_time = db.Column(db.Time)
+    
+    # Vital signs
+    blood_pressure_systolic = db.Column(db.Integer)
+    blood_pressure_diastolic = db.Column(db.Integer)
+    heart_rate = db.Column(db.Integer)
+    temperature = db.Column(db.Float)
+    oxygen_saturation = db.Column(db.Integer)
+    weight = db.Column(db.Float)
+    height = db.Column(db.Float)
+    
+    # Health indicators
+    pain_level = db.Column(db.Integer)  # 0-10 scale
+    mobility_level = db.Column(db.String(20))  # independent, assisted, dependent
+    cognitive_status = db.Column(db.String(20))  # alert, confused, disoriented
+    mood_status = db.Column(db.String(20))  # good, fair, poor, depressed
+    
+    # Assessment notes
+    subjective_notes = db.Column(db.Text)  # Client's own report
+    objective_notes = db.Column(db.Text)  # Caregiver's observations
+    assessment_notes = db.Column(db.Text)  # Overall assessment
+    recommendations = db.Column(db.Text)  # Care recommendations
+    
+    # Follow-up
+    requires_follow_up = db.Column(db.Boolean, default=False)
+    follow_up_date = db.Column(db.Date)
+    follow_up_notes = db.Column(db.Text)
+    
+    # Timestamps
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    def get_bmi(self):
+        """Calculate BMI if height and weight are available"""
+        if self.height and self.weight:
+            height_m = self.height / 100  # Convert cm to meters
+            return round(self.weight / (height_m ** 2), 1)
+        return None
+    
+    def get_blood_pressure_category(self):
+        """Get blood pressure category"""
+        if not self.blood_pressure_systolic or not self.blood_pressure_diastolic:
             return None
         
-        current = self.scheduled_date
-        now = datetime.utcnow()
+        sys = self.blood_pressure_systolic
+        dia = self.blood_pressure_diastolic
         
-        while current <= now:
-            if self.recurrence_pattern == 'daily':
-                current += timedelta(days=self.recurrence_interval)
-            elif self.recurrence_pattern == 'weekly':
-                current += timedelta(weeks=self.recurrence_interval)
-            elif self.recurrence_pattern == 'monthly':
-                # Simple monthly calculation
-                month = current.month + self.recurrence_interval
-                year = current.year
-                while month > 12:
-                    month -= 12
-                    year += 1
-                current = current.replace(year=year, month=month)
-            elif self.recurrence_pattern == 'yearly':
-                current = current.replace(year=current.year + self.recurrence_interval)
-        
-        return current
+        if sys < 120 and dia < 80:
+            return 'normal'
+        elif sys < 130 and dia < 80:
+            return 'elevated'
+        elif sys < 140 or dia < 90:
+            return 'high_stage_1'
+        elif sys < 180 or dia < 120:
+            return 'high_stage_2'
+        else:
+            return 'hypertensive_crisis'
+    
+    def __repr__(self):
+        return f'<MedicalAssessment {self.assessment_type} for {self.client.name}>'
 
-
-class TaskTemplate(db.Model):
-    """Predefined task templates for scheduling"""
-    __tablename__ = 'task_templates'
+class CareReport(db.Model):
+    """Care report model for comprehensive reporting"""
+    __tablename__ = 'care_reports'
     
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
-    description = db.Column(db.Text)
-    category = db.Column(db.String(50), nullable=False)  # Disease Management, Inspection, Feeding, etc.
+    client_id = db.Column(db.Integer, db.ForeignKey('clients.id'), nullable=False)
+    created_by_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    
+    # Report details
+    report_type = db.Column(db.String(50), nullable=False)  # daily, weekly, monthly, incident, assessment
+    report_date = db.Column(db.Date, nullable=False)
+    report_period_start = db.Column(db.Date)
+    report_period_end = db.Column(db.Date)
+    
+    # Report content
+    title = db.Column(db.String(200), nullable=False)
+    summary = db.Column(db.Text)
+    detailed_notes = db.Column(db.Text)
+    
+    # Care activities summary
+    total_actions = db.Column(db.Integer, default=0)
+    completed_tasks = db.Column(db.Integer, default=0)
+    pending_tasks = db.Column(db.Integer, default=0)
+    urgent_issues = db.Column(db.Integer, default=0)
+    
+    # Health status
+    overall_health_status = db.Column(db.String(20))  # excellent, good, fair, poor, critical
+    mood_status = db.Column(db.String(20))
+    mobility_status = db.Column(db.String(20))
+    cognitive_status = db.Column(db.String(20))
+    
+    # Concerns and recommendations
+    concerns = db.Column(db.Text)
+    recommendations = db.Column(db.Text)
+    follow_up_required = db.Column(db.Boolean, default=False)
+    follow_up_notes = db.Column(db.Text)
+    
+    # Status
+    status = db.Column(db.String(20), default='draft')  # draft, submitted, reviewed, approved
+    reviewed_by_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
+    reviewed_at = db.Column(db.DateTime)
+    review_notes = db.Column(db.Text)
+    
+    # Timestamps
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    def __repr__(self):
+        return f'<CareReport {self.title} for {self.client.name}>'
+
+class IncidentReport(db.Model):
+    """Incident report model for safety and emergency tracking"""
+    __tablename__ = 'incident_reports'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    client_id = db.Column(db.Integer, db.ForeignKey('clients.id'), nullable=False)
+    reported_by_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    
+    # Incident details
+    incident_type = db.Column(db.String(50), nullable=False)  # fall, medical_emergency, behavioral, safety, other
+    incident_date = db.Column(db.Date, nullable=False)
+    incident_time = db.Column(db.Time, nullable=False)
+    location = db.Column(db.String(200))
+    
+    # Incident description
+    title = db.Column(db.String(200), nullable=False)
+    description = db.Column(db.Text, nullable=False)
+    immediate_actions = db.Column(db.Text)
+    injuries_sustained = db.Column(db.Text)
+    medical_attention_required = db.Column(db.Boolean, default=False)
+    
+    # Severity and priority
+    severity = db.Column(db.String(20), default='low')  # low, medium, high, critical
+    priority = db.Column(db.String(20), default='normal')  # normal, high, urgent
+    
+    # Follow-up
+    follow_up_required = db.Column(db.Boolean, default=False)
+    follow_up_actions = db.Column(db.Text)
+    follow_up_date = db.Column(db.Date)
+    follow_up_completed = db.Column(db.Boolean, default=False)
+    
+    # Status
+    status = db.Column(db.String(20), default='open')  # open, investigating, resolved, closed
+    assigned_to_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
+    resolution_notes = db.Column(db.Text)
+    resolved_at = db.Column(db.DateTime)
+    
+    # Timestamps
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    def __repr__(self):
+        return f'<IncidentReport {self.title} for {self.client.name}>'
+
+class Notification(db.Model):
+    """Notification model for alerts and reminders"""
+    __tablename__ = 'notifications'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    
+    # Notification details
+    title = db.Column(db.String(200), nullable=False)
+    message = db.Column(db.Text, nullable=False)
+    notification_type = db.Column(db.String(50), default='info')  # info, warning, error, success, reminder
+    priority = db.Column(db.String(20), default='normal')  # low, normal, high, urgent
+    
+    # Related entities
+    related_client_id = db.Column(db.Integer, db.ForeignKey('clients.id'), nullable=True)
+    related_task_id = db.Column(db.Integer, db.ForeignKey('scheduled_tasks.id'), nullable=True)
+    related_action_id = db.Column(db.Integer, db.ForeignKey('care_actions.id'), nullable=True)
+    
+    # Status
+    is_read = db.Column(db.Boolean, default=False)
+    read_at = db.Column(db.DateTime)
+    is_archived = db.Column(db.Boolean, default=False)
+    archived_at = db.Column(db.DateTime)
+    
+    # Timestamps
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    expires_at = db.Column(db.DateTime)
+    
+    def is_expired(self):
+        """Check if notification has expired"""
+        if self.expires_at:
+            return datetime.utcnow() > self.expires_at
+        return False
+    
+    def __repr__(self):
+        return f'<Notification {self.title} for {self.user.username}>'
+
+class CareTemplate(db.Model):
+    """Care template model for reusable care plans"""
+    __tablename__ = 'care_templates'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    created_by_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     
     # Template details
-    estimated_duration = db.Column(db.Integer, default=60)  # minutes
-    priority = db.Column(db.String(10), default='medium')
-    is_seasonal = db.Column(db.Boolean, default=False)
-    season_months = db.Column(db.String(50))  # JSON array of months [3,4,5] for spring
+    name = db.Column(db.String(200), nullable=False)
+    description = db.Column(db.Text)
+    category = db.Column(db.String(100))  # dementia, palliative, rehabilitation, etc.
+    care_level = db.Column(db.String(50))  # standard, intensive, specialized, palliative
     
-    # Checklist items
-    checklist_items = db.Column(db.Text)  # JSON array of checklist items
-    
-    # Equipment and supplies needed
-    equipment_needed = db.Column(db.Text)  # JSON array of equipment
-    supplies_needed = db.Column(db.Text)   # JSON array of supplies
-    
-    # Weather requirements
-    weather_dependent = db.Column(db.Boolean, default=False)
-    min_temperature = db.Column(db.Integer, nullable=True)
-    max_temperature = db.Column(db.Integer, nullable=True)
-    avoid_rain = db.Column(db.Boolean, default=False)
-    
-    # Timing constraints
-    best_time_of_day = db.Column(db.String(20))  # morning, afternoon, evening, any
-    avoid_times = db.Column(db.String(100))  # JSON array of times to avoid
-    
-    # Relationships and dependencies
-    depends_on_tasks = db.Column(db.Text)  # JSON array of task template IDs
-    follow_up_tasks = db.Column(db.Text)   # JSON array of task template IDs
-    
-    # Status
+    # Template content
+    template_data = db.Column(db.Text)  # JSON data for template structure
+    is_public = db.Column(db.Boolean, default=False)
     is_active = db.Column(db.Boolean, default=True)
-    is_system_template = db.Column(db.Boolean, default=False)  # System vs user-created
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
+    
+    # Usage tracking
+    usage_count = db.Column(db.Integer, default=0)
+    last_used_at = db.Column(db.DateTime)
     
     # Timestamps
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
-    # Relationships
-    creator = db.relationship('User', backref='task_templates')
+    def get_template_data(self):
+        """Get template data as dictionary"""
+        if self.template_data:
+            return json.loads(self.template_data)
+        return {}
+    
+    def set_template_data(self, data):
+        """Set template data from dictionary"""
+        self.template_data = json.dumps(data)
     
     def __repr__(self):
-        return f'<TaskTemplate {self.name}>'
-    
-    def get_checklist_items(self):
-        """Get checklist items as list"""
-        if self.checklist_items:
-            return json.loads(self.checklist_items)
-        return []
-    
-    def set_checklist_items(self, items):
-        """Set checklist items from list"""
-        self.checklist_items = json.dumps(items)
-    
-    def get_equipment_needed(self):
-        """Get equipment needed as list"""
-        if self.equipment_needed:
-            return json.loads(self.equipment_needed)
-        return []
-    
-    def set_equipment_needed(self, equipment):
-        """Set equipment needed from list"""
-        self.equipment_needed = json.dumps(equipment)
-    
-    def get_supplies_needed(self):
-        """Get supplies needed as list"""
-        if self.supplies_needed:
-            return json.loads(self.supplies_needed)
-        return []
-    
-    def set_supplies_needed(self, supplies):
-        """Set supplies needed from list"""
-        self.supplies_needed = json.dumps(supplies)
+        return f'<CareTemplate {self.name}>'
 
-
-class TaskAssignment(db.Model):
-    """Assignments of scheduled tasks to specific sites or hives"""
-    __tablename__ = 'task_assignments'
+class WeatherData(db.Model):
+    """Weather data model for location-based weather tracking"""
+    __tablename__ = 'weather_data'
     
     id = db.Column(db.Integer, primary_key=True)
-    scheduled_task_id = db.Column(db.Integer, db.ForeignKey('scheduled_tasks.id'), nullable=False)
+    client_id = db.Column(db.Integer, db.ForeignKey('clients.id'), nullable=True)
+    location_latitude = db.Column(db.Float, nullable=False)
+    location_longitude = db.Column(db.Float, nullable=False)
     
-    # Assignment target
-    target_type = db.Column(db.String(20), nullable=False)  # site, individual_hive
-    target_id = db.Column(db.Integer, nullable=False)  # ID of site or individual hive
+    # Weather details
+    date = db.Column(db.Date, nullable=False)
+    time = db.Column(db.Time, nullable=False)
     
-    # Assignment details
-    notes = db.Column(db.Text)
-    estimated_duration = db.Column(db.Integer, default=60)  # Override template duration
+    # Weather conditions
+    temperature = db.Column(db.Float)  # Celsius
+    humidity = db.Column(db.Float)  # Percentage
+    pressure = db.Column(db.Float)  # hPa
+    wind_speed = db.Column(db.Float)  # km/h
+    wind_direction = db.Column(db.Integer)  # Degrees
+    precipitation = db.Column(db.Float)  # mm
+    uv_index = db.Column(db.Integer)
     
-    # Status
-    status = db.Column(db.String(20), default='pending')  # pending, in_progress, completed, skipped
+    # Weather description
+    condition = db.Column(db.String(100))  # sunny, cloudy, rainy, etc.
+    description = db.Column(db.String(200))
     
     # Timestamps
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    completed_at = db.Column(db.DateTime, nullable=True)
-    
-    # Relationships
-    scheduled_task = db.relationship('ScheduledTask', backref='assignments')
     
     def __repr__(self):
-        return f'<TaskAssignment {self.scheduled_task.title} - {self.target_type}:{self.target_id}>'
+        return f'<WeatherData {self.condition} at {self.location_latitude}, {self.location_longitude}>'
 
-
-def init_default_task_templates(db_instance):
-    """Initialize default task templates"""
-    default_templates = [
-        {
-            'name': 'Disease Management',
-            'category': 'Disease Management',
-            'description': 'Comprehensive disease monitoring and treatment',
-            'estimated_duration': 90,
-            'priority': 'high',
-            'is_seasonal': True,
-            'season_months': '[3,4,5,9,10,11]',
-            'weather_dependent': True,
-            'min_temperature': 10,
-            'avoid_rain': True,
-            'best_time_of_day': 'morning',
-            'checklist_items': '["Check for AFB symptoms", "Test for Varroa mites", "Inspect for Chalkbrood", "Check for Nosema", "Apply treatments if needed", "Record findings"]',
-            'equipment_needed': '["Hive tool", "Smoker", "Alcohol wash kit", "Microscope", "Treatment supplies"]',
-            'supplies_needed': '["Varroa treatment", "Oxytetracycline", "Formic acid"]'
-        },
-        {
-            'name': 'General Inspection',
-            'category': 'Inspection',
-            'description': 'Regular comprehensive hive inspection',
-            'estimated_duration': 45,
-            'priority': 'medium',
-            'is_seasonal': True,
-            'season_months': '[3,4,5,6,7,8,9]',
-            'weather_dependent': True,
-            'min_temperature': 15,
-            'avoid_rain': True,
-            'best_time_of_day': 'morning',
-            'checklist_items': '["Check queen presence", "Inspect brood pattern", "Check food stores", "Look for pests", "Assess hive strength", "Check for swarm cells"]',
-            'equipment_needed': '["Hive tool", "Smoker", "Bee brush", "Frame grip"]',
-            'supplies_needed': '[]'
-        },
-        {
-            'name': 'Feeding Round',
-            'category': 'Feeding',
-            'description': 'Distribute supplemental feed to colonies',
-            'estimated_duration': 30,
-            'priority': 'medium',
-            'is_seasonal': True,
-            'season_months': '[2,3,9,10,11]',
-            'weather_dependent': False,
-            'best_time_of_day': 'evening',
-            'checklist_items': '["Check existing feed levels", "Prepare sugar syrup", "Add pollen patties", "Check feeding stations", "Record amounts given"]',
-            'equipment_needed': '["Feeding containers", "Measuring cups", "Syrup bucket"]',
-            'supplies_needed': '["Sugar", "Pollen substitute", "Honey"]'
-        },
-        {
-            'name': 'Harvest Honey',
-            'category': 'Harvest',
-            'description': 'Harvest honey from supers',
-            'estimated_duration': 120,
-            'priority': 'medium',
-            'is_seasonal': True,
-            'season_months': '[7,8,9]',
-            'weather_dependent': True,
-            'min_temperature': 20,
-            'avoid_rain': True,
-            'best_time_of_day': 'morning',
-            'checklist_items': '["Check honey moisture content", "Remove supers", "Uncap frames", "Extract honey", "Filter honey", "Store properly"]',
-            'equipment_needed': '["Honey extractor", "Uncapping knife", "Honey filter", "Storage containers"]',
-            'supplies_needed': '["Honey containers", "Labels"]'
-        },
-        {
-            'name': 'Spring Build Up',
-            'category': 'Seasonal',
-            'description': 'Early season colony stimulation',
-            'estimated_duration': 60,
-            'priority': 'high',
-            'is_seasonal': True,
-            'season_months': '[3,4,5]',
-            'weather_dependent': True,
-            'min_temperature': 12,
-            'avoid_rain': True,
-            'best_time_of_day': 'morning',
-            'checklist_items': '["Check overwintering success", "Equalize colonies", "Add space", "Stimulate with feed", "Check for queen issues"]',
-            'equipment_needed': '["Hive tool", "Smoker", "Extra boxes"]',
-            'supplies_needed': '["Sugar syrup", "Pollen patties"]'
-        },
-        {
-            'name': 'Treatment Round',
-            'category': 'Treatment',
-            'description': 'Apply pest control treatments',
-            'estimated_duration': 75,
-            'priority': 'high',
-            'is_seasonal': True,
-            'season_months': '[9,10,11,3,4]',
-            'weather_dependent': True,
-            'min_temperature': 10,
-            'avoid_rain': True,
-            'best_time_of_day': 'morning',
-            'checklist_items': '["Test varroa levels", "Apply formic acid", "Check treatment effectiveness", "Record treatment dates", "Monitor for resistance"]',
-            'equipment_needed': '["Treatment supplies", "Measuring tools", "Protective gear"]',
-            'supplies_needed': '["Formic acid", "Oxalic acid", "Thymol"]'
-        }
-    ]
-    
-    for template_data in default_templates:
-        existing = TaskTemplate.query.filter_by(name=template_data['name']).first()
-        if not existing:
-            template = TaskTemplate(**template_data)
-            template.is_system_template = True
-            db_instance.session.add(template)
-    
-    db_instance.session.commit()
-
-
-def init_default_tasks(db_instance):
-    """Initialize default task types"""
+def init_default_care_tasks(db):
+    """Initialize default care tasks"""
     default_tasks = [
-        # Inspection tasks
-        {'name': 'General Inspection', 'category': 'inspection', 'description': 'Regular hive inspection', 'order': 1},
-        {'name': 'Queen Check', 'category': 'inspection', 'description': 'Check for queen presence and eggs', 'order': 2},
-        {'name': 'Brood Pattern Check', 'category': 'inspection', 'description': 'Inspect brood pattern health', 'order': 3},
-        {'name': 'Pest Inspection', 'category': 'inspection', 'description': 'Check for pests and diseases', 'order': 4},
+        # Personal Care
+        {'name': 'Personal Hygiene Assistance', 'category': 'Personal Care', 'common': True, 'description': 'Assist with daily hygiene routines'},
+        {'name': 'Bathing Assistance', 'category': 'Personal Care', 'common': True, 'description': 'Help with bathing and showering'},
+        {'name': 'Dressing Assistance', 'category': 'Personal Care', 'common': True, 'description': 'Help with getting dressed and undressed'},
+        {'name': 'Grooming Assistance', 'category': 'Personal Care', 'common': True, 'description': 'Assist with hair care, shaving, and grooming'},
+        {'name': 'Toileting Assistance', 'category': 'Personal Care', 'common': True, 'description': 'Help with bathroom needs'},
+        {'name': 'Mobility Assistance', 'category': 'Personal Care', 'common': True, 'description': 'Help with walking and movement'},
         
-        # Feeding tasks
-        {'name': 'Sugar Syrup Feeding', 'category': 'feeding', 'description': 'Fed sugar syrup to colony', 'order': 10},
-        {'name': 'Pollen Patty', 'category': 'feeding', 'description': 'Provided pollen substitute', 'order': 11},
-        {'name': 'Fondant Feeding', 'category': 'feeding', 'description': 'Emergency winter feeding', 'order': 12},
+        # Medical Care
+        {'name': 'Medication Administration', 'category': 'Medical Care', 'common': True, 'description': 'Administer prescribed medications'},
+        {'name': 'Vital Signs Check', 'category': 'Medical Care', 'common': True, 'description': 'Monitor blood pressure, pulse, temperature'},
+        {'name': 'Blood Pressure Monitoring', 'category': 'Medical Care', 'common': True, 'description': 'Regular blood pressure checks'},
+        {'name': 'Blood Sugar Testing', 'category': 'Medical Care', 'common': True, 'description': 'Monitor blood glucose levels'},
+        {'name': 'Wound Care', 'category': 'Medical Care', 'common': False, 'description': 'Clean and dress wounds'},
+        {'name': 'Injection Administration', 'category': 'Medical Care', 'common': False, 'description': 'Give injections as prescribed'},
+        {'name': 'Physical Therapy Exercises', 'category': 'Medical Care', 'common': False, 'description': 'Assist with prescribed exercises'},
+        {'name': 'Respiratory Care', 'category': 'Medical Care', 'common': False, 'description': 'Assist with breathing treatments'},
         
-        # Treatment tasks
-        {'name': 'Varroa Treatment', 'category': 'treatment', 'description': 'Applied varroa mite treatment', 'order': 20},
-        {'name': 'Nosema Treatment', 'category': 'treatment', 'description': 'Applied nosema treatment', 'order': 21},
-        {'name': 'Small Hive Beetle Treatment', 'category': 'treatment', 'description': 'SHB management', 'order': 22},
+        # Daily Living
+        {'name': 'Meal Preparation', 'category': 'Daily Living', 'common': True, 'description': 'Prepare nutritious meals'},
+        {'name': 'Feeding Assistance', 'category': 'Daily Living', 'common': True, 'description': 'Help with eating and drinking'},
+        {'name': 'Housekeeping', 'category': 'Daily Living', 'common': True, 'description': 'Light housekeeping tasks'},
+        {'name': 'Laundry', 'category': 'Daily Living', 'common': True, 'description': 'Wash and fold clothes'},
+        {'name': 'Shopping', 'category': 'Daily Living', 'common': True, 'description': 'Grocery and personal shopping'},
+        {'name': 'Transportation', 'category': 'Daily Living', 'common': True, 'description': 'Transport to appointments'},
+        {'name': 'Appointment Scheduling', 'category': 'Daily Living', 'common': True, 'description': 'Schedule medical appointments'},
+        {'name': 'Medication Pickup', 'category': 'Daily Living', 'common': True, 'description': 'Pick up prescriptions'},
         
-        # Harvest tasks
-        {'name': 'Honey Harvest', 'category': 'harvest', 'description': 'Harvested honey frames', 'order': 30},
-        {'name': 'Wax Harvest', 'category': 'harvest', 'description': 'Collected beeswax', 'order': 31},
-        {'name': 'Propolis Harvest', 'category': 'harvest', 'description': 'Collected propolis', 'order': 32},
+        # Emotional Support
+        {'name': 'Companionship', 'category': 'Emotional Support', 'common': True, 'description': 'Provide social interaction and companionship'},
+        {'name': 'Social Activities', 'category': 'Emotional Support', 'common': True, 'description': 'Engage in recreational activities'},
+        {'name': 'Mental Health Check', 'category': 'Emotional Support', 'common': True, 'description': 'Monitor emotional well-being'},
+        {'name': 'Family Communication', 'category': 'Emotional Support', 'common': False, 'description': 'Facilitate family communication'},
+        {'name': 'Crisis Intervention', 'category': 'Emotional Support', 'common': False, 'description': 'Provide crisis support'},
         
-        # Maintenance tasks
-        {'name': 'Add Super', 'category': 'maintenance', 'description': 'Added honey super', 'order': 40},
-        {'name': 'Remove Super', 'category': 'maintenance', 'description': 'Removed honey super', 'order': 41},
-        {'name': 'Replace Frames', 'category': 'maintenance', 'description': 'Replaced old frames', 'order': 42},
-        {'name': 'Hive Repair', 'category': 'maintenance', 'description': 'Repaired hive equipment', 'order': 43},
-        {'name': 'Entrance Reducer', 'category': 'maintenance', 'description': 'Adjusted entrance reducer', 'order': 44},
-        {'name': 'Queen Excluder', 'category': 'maintenance', 'description': 'Installed/removed queen excluder', 'order': 45},
+        # Safety & Monitoring
+        {'name': 'Safety Assessment', 'category': 'Safety & Monitoring', 'common': True, 'description': 'Assess home safety conditions'},
+        {'name': 'Fall Risk Assessment', 'category': 'Safety & Monitoring', 'common': True, 'description': 'Evaluate fall risk factors'},
+        {'name': 'Home Safety Check', 'category': 'Safety & Monitoring', 'common': True, 'description': 'Check for safety hazards'},
+        {'name': 'Emergency Response', 'category': 'Safety & Monitoring', 'common': False, 'description': 'Respond to emergency situations'},
+        {'name': 'Security Check', 'category': 'Safety & Monitoring', 'common': False, 'description': 'Verify home security'},
         
-        # Special events
-        {'name': 'Swarm Collection', 'category': 'event', 'description': 'Collected a swarm', 'order': 50},
-        {'name': 'Split Colony', 'category': 'event', 'description': 'Split colony for expansion', 'order': 51},
-        {'name': 'Combine Colonies', 'category': 'event', 'description': 'Combined weak colonies', 'order': 52},
-        {'name': 'Requeen', 'category': 'event', 'description': 'Introduced new queen', 'order': 53},
+        # Specialized Care
+        {'name': 'Dementia Care', 'category': 'Specialized Care', 'common': False, 'description': 'Specialized dementia support'},
+        {'name': 'Alzheimer\'s Support', 'category': 'Specialized Care', 'common': False, 'description': 'Alzheimer\'s specific care'},
+        {'name': 'Disability Support', 'category': 'Specialized Care', 'common': False, 'description': 'Support for physical disabilities'},
+        {'name': 'Palliative Care', 'category': 'Specialized Care', 'common': False, 'description': 'End-of-life comfort care'},
+        {'name': 'Hospice Support', 'category': 'Specialized Care', 'common': False, 'description': 'Hospice care assistance'},
+        {'name': 'Rehabilitation Support', 'category': 'Specialized Care', 'common': False, 'description': 'Post-injury rehabilitation'}
     ]
     
     for task_data in default_tasks:
-        existing = TaskType.query.filter_by(name=task_data['name']).first()
-        if not existing:
-            task = TaskType(**task_data)
-            db_instance.session.add(task)
+        existing_task = CareTask.query.filter_by(name=task_data['name']).first()
+        if not existing_task:
+            task = CareTask(**task_data)
+            db.session.add(task)
     
-    db_instance.session.commit()
-
+    db.session.commit()
