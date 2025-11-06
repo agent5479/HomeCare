@@ -1,14 +1,14 @@
-/* BeeMarshall - Centralized Branding System
+/* HomeCare - Centralized Branding System
  * Color Palette | Typography | Component Styles
- * Version: v1.3
+ * Version: v0.7 - HomeCare Theme
  */
 
 :root {
-    /* ===== COLOR PALETTE - Hive Theme ===== */
+    /* ===== COLOR PALETTE - HomeCare Blue Theme ===== */
     /* Primary Colors */
-    --light-yellow: #FFFACD;        /* Background/Light */
-    --dark-yellow: #DAA520;         /* Primary Accent */
-    --gold: #FFD700;                /* Secondary Accent */
+    --light-blue: #E3F2FD;          /* Background/Light */
+    --primary-blue: #1976D2;        /* Primary Accent */
+    --secondary-blue: #42A5F5;      /* Secondary Accent */
     --white: #FFFFFF;               /* Pure White */
     --black: #000000;               /* Primary Text */
     
@@ -32,16 +32,16 @@
     
     /* Background Colors */
     --bg-primary: var(--white);
-    --bg-secondary: var(--light-yellow);
-    --bg-accent: var(--dark-yellow);
+    --bg-secondary: var(--light-blue);
+    --bg-accent: var(--primary-blue);
     --bg-success: #d4edda;
     --bg-warning: #fff3cd;
     --bg-danger: #f8d7da;
     --bg-info: #d1ecf1;
     
     /* Glass Morphism */
-    --glass-bg: rgba(255, 250, 205, 0.95);
-    --glass-border: rgba(218, 165, 32, 0.3);
+    --glass-bg: rgba(227, 242, 253, 0.95);
+    --glass-border: rgba(25, 118, 210, 0.3);
     
     /* ===== TYPOGRAPHY SYSTEM ===== */
     --font-family-primary: 'Inter', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -110,7 +110,7 @@
     --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
     --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1);
     --shadow-2xl: 0 25px 50px rgba(0, 0, 0, 0.15);
-    --shadow-hive: 0 8px 32px rgba(218, 165, 32, 0.15);
+    --shadow-homecare: 0 8px 32px rgba(25, 118, 210, 0.15);
     
     /* ===== TRANSITIONS & ANIMATIONS ===== */
     --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
@@ -174,13 +174,13 @@ p {
 }
 
 a {
-    color: var(--dark-yellow);
+    color: var(--primary-blue);
     text-decoration: none;
     transition: color var(--transition-fast);
 }
 
 a:hover {
-    color: var(--gold);
+    color: var(--secondary-blue);
 }
 
 /* ===== BUTTON COMPONENTS ===== */
@@ -202,31 +202,31 @@ a:hover {
 }
 
 .btn:focus {
-    outline: 2px solid var(--dark-yellow);
+    outline: 2px solid var(--primary-blue);
     outline-offset: 2px;
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, var(--dark-yellow), var(--gold));
-    color: var(--black);
-    border-color: var(--dark-yellow);
+    background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+    color: var(--white);
+    border-color: var(--primary-blue);
 }
 
 .btn-primary:hover {
-    background: linear-gradient(135deg, var(--gold), var(--dark-yellow));
+    background: linear-gradient(135deg, var(--secondary-blue), var(--primary-blue));
     transform: translateY(-1px);
     box-shadow: var(--shadow-md);
 }
 
 .btn-outline-primary {
     background: transparent;
-    border-color: var(--dark-yellow);
-    color: var(--black);
+    border-color: var(--primary-blue);
+    color: var(--primary-blue);
 }
 
 .btn-outline-primary:hover {
-    background: var(--dark-yellow);
-    color: var(--black);
+    background: var(--primary-blue);
+    color: var(--white);
 }
 
 .btn-success {
@@ -261,8 +261,8 @@ a:hover {
 .card {
     background: var(--white);
     border-radius: var(--radius-lg);
-    border: 2px solid var(--dark-yellow);
-    box-shadow: var(--shadow-hive);
+    border: 2px solid var(--primary-blue);
+    box-shadow: var(--shadow-homecare);
     overflow: hidden;
 }
 
@@ -274,7 +274,7 @@ a:hover {
 .card-header {
     padding: var(--spacing-4);
     background: var(--glass-bg);
-    border-bottom: 2px solid var(--dark-yellow);
+    border-bottom: 2px solid var(--primary-blue);
     font-weight: var(--font-weight-semibold);
 }
 
@@ -284,7 +284,7 @@ a:hover {
 
 .card-footer {
     padding: var(--spacing-4);
-    background: var(--light-yellow);
+    background: var(--light-blue);
     border-top: 2px solid var(--glass-border);
 }
 
@@ -304,8 +304,8 @@ a:hover {
 .form-control:focus,
 .form-select:focus {
     outline: none;
-    border-color: var(--dark-yellow);
-    box-shadow: 0 0 0 3px rgba(218, 165, 32, 0.1);
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.1);
 }
 
 .form-label {
@@ -383,28 +383,28 @@ a:hover {
 }
 
 /* ===== UTILITY CLASSES ===== */
-.text-hive-primary {
-    color: var(--dark-yellow);
+.text-homecare-primary {
+    color: var(--primary-blue);
 }
 
-.text-hive-secondary {
-    color: var(--gold);
+.text-homecare-secondary {
+    color: var(--secondary-blue);
 }
 
-.bg-hive-primary {
-    background: var(--dark-yellow);
+.bg-homecare-primary {
+    background: var(--primary-blue);
 }
 
-.bg-hive-secondary {
-    background: var(--light-yellow);
+.bg-homecare-secondary {
+    background: var(--light-blue);
 }
 
-.border-hive {
-    border-color: var(--dark-yellow);
+.border-homecare {
+    border-color: var(--primary-blue);
 }
 
-.shadow-hive {
-    box-shadow: var(--shadow-hive);
+.shadow-homecare {
+    box-shadow: var(--shadow-homecare);
 }
 
 /* ===== RESPONSIVE DESIGN ===== */
@@ -420,55 +420,55 @@ a:hover {
 }
 
 /* ===== ENHANCED MINI-CARDS ===== */
-/* Hive Strength Badges - Performance optimized (no animations) */
-.hive-strength-badge {
+/* Client Status Badges - Performance optimized (no animations) */
+.client-status-badge {
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-.hive-strength-badge:hover {
+.client-status-badge:hover {
     /* Subtle shadow change only, no transform for performance */
     box-shadow: 0 3px 6px rgba(0,0,0,0.15);
 }
 
-/* Hive Box Cards - Performance optimized (no animations) */
-.hive-box-card {
+/* Client Info Cards - Performance optimized (no animations) */
+.client-info-card {
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     border: 2px solid transparent;
 }
 
-.hive-box-card:hover {
+.client-info-card:hover {
     /* Subtle shadow change only, no transform/scale for performance */
     box-shadow: 0 4px 8px rgba(0,0,0,0.15);
 }
 
 /* Mobile responsiveness for mini-cards */
 @media (max-width: 768px) {
-    .hive-strength-badge {
+    .client-status-badge {
         min-width: 70px !important;
         font-size: 0.8rem !important;
         padding: 0.4rem 0.6rem !important;
     }
     
-    .hive-box-card {
+    .client-info-card {
         min-width: 90px !important;
         max-width: 110px !important;
     }
     
-    .hive-box-card .card-body {
+    .client-info-card .card-body {
         padding: 0.5rem !important;
     }
     
-    .hive-box-card .card-body i {
+    .client-info-card .card-body i {
         font-size: 1rem !important;
     }
     
-    .hive-box-card .card-body .fw-bold {
+    .client-info-card .card-body .fw-bold {
         font-size: 0.7rem !important;
     }
     
-    .hive-box-card .card-body .h5 {
+    .client-info-card .card-body .h5 {
         font-size: 1rem !important;
     }
 }
@@ -500,9 +500,9 @@ a:hover {
 
 /* ===== BACK TO TOP BUTTON ===== */
 /* Button is now positioned in bottom right next to sync overlay */
-/* Styles are defined in beemarshall-full.html */
+/* Styles are defined in caremarshall-full.html */
 
-/* ===== INTERACTIVE HIVE ANALYSIS CARD ===== */
+/* ===== INTERACTIVE CLIENT ANALYSIS CARD ===== */
 /* Draggable and Resizable Card Styles */
 .draggable-card {
     background: white;
@@ -526,8 +526,8 @@ a:hover {
     overflow: auto;
 }
 
-/* Hive Category Cards */
-.hive-category-card {
+/* Client Category Cards */
+.client-category-card {
     background: var(--glass-bg);
     border-radius: 8px;
     padding: 1.5rem;
@@ -539,58 +539,58 @@ a:hover {
     overflow: hidden;
 }
 
-.hive-category-card:hover {
+.client-category-card:hover {
     transform: translateY(-4px);
     box-shadow: 0 12px 30px rgba(0,0,0,0.15);
-    border-color: var(--dark-yellow);
+    border-color: var(--primary-blue);
 }
 
-.hive-category-card.clickable {
+.client-category-card.clickable {
     cursor: pointer;
 }
 
-.hive-icon {
+.client-icon {
     font-size: 2.5rem;
     margin-bottom: 0.5rem;
     transition: all 0.3s ease;
 }
 
-.hive-icon.strong { color: #28a745; }
-.hive-icon.medium { color: #ffc107; }
-.hive-icon.weak { color: #fd7e14; }
-.hive-icon.nuc { color: #6f42c1; }
-.hive-icon.dead { color: #dc3545; }
-.hive-icon.empty { color: #6c757d; }
+.client-icon.independent { color: #28a745; }
+.client-icon.assisted { color: #42A5F5; }
+.client-icon.dependent { color: #fd7e14; }
+.client-icon.rehabilitation { color: #6f42c1; }
+.client-icon.hospice { color: #dc3545; }
+.client-icon.inactive { color: #6c757d; }
 
-.hive-count {
+.client-count {
     font-size: 2rem;
     font-weight: 700;
     color: var(--black);
     margin-bottom: 0.25rem;
 }
 
-.hive-label {
+.client-label {
     font-size: 1.1rem;
     font-weight: 600;
     color: var(--black);
     margin-bottom: 0.25rem;
 }
 
-.hive-description {
+.client-description {
     font-size: 0.9rem;
     color: var(--gray-600);
 }
 
-.hive-category-card:hover .hive-icon {
+.client-category-card:hover .client-icon {
     transform: scale(1.1);
 }
 
-.hive-category-card:hover .hive-count {
-    color: var(--dark-yellow);
+.client-category-card:hover .client-count {
+    color: var(--primary-blue);
 }
 
-/* Compact Hive Category Cards (non-interactive) */
-.hive-category-card-compact {
+/* Compact Client Category Cards (non-interactive) */
+.client-category-card-compact {
     background: var(--glass-bg);
     border-radius: 6px;
     padding: 0.5rem;
@@ -669,33 +669,33 @@ a:hover {
     }
 }
 
-.hive-icon-compact {
+.client-icon-compact {
     font-size: 1.25rem;
     margin-bottom: 0.2rem;
 }
 
 @media (min-width: 576px) {
-    .hive-icon-compact {
+    .client-icon-compact {
         font-size: 1.5rem;
         margin-bottom: 0.25rem;
     }
 }
 
 @media (min-width: 992px) {
-    .hive-icon-compact {
+    .client-icon-compact {
         font-size: 1.75rem;
         margin-bottom: 0.3rem;
     }
 }
 
-.hive-icon-compact.strong { color: #28a745; }
-.hive-icon-compact.medium { color: #ffc107; }
-.hive-icon-compact.weak { color: #fd7e14; }
-.hive-icon-compact.nuc { color: #6f42c1; }
-.hive-icon-compact.dead { color: #dc3545; }
-.hive-icon-compact.empty { color: #6c757d; }
+.client-icon-compact.independent { color: #28a745; }
+.client-icon-compact.assisted { color: #42A5F5; }
+.client-icon-compact.dependent { color: #fd7e14; }
+.client-icon-compact.rehabilitation { color: #6f42c1; }
+.client-icon-compact.hospice { color: #dc3545; }
+.client-icon-compact.inactive { color: #6c757d; }
 
-.hive-count-compact {
+.client-count-compact {
     font-size: 1.1rem;
     font-weight: 700;
     color: var(--black);
@@ -704,20 +704,20 @@ a:hover {
 }
 
 @media (min-width: 576px) {
-    .hive-count-compact {
+    .client-count-compact {
         font-size: 1.5rem;
         margin-bottom: 0.15rem;
     }
 }
 
 @media (min-width: 992px) {
-    .hive-count-compact {
+    .client-count-compact {
         font-size: 1.75rem;
         margin-bottom: 0.2rem;
     }
 }
 
-.hive-label-compact {
+.client-label-compact {
     font-size: 0.75rem;
     font-weight: 500;
     color: var(--gray-700);
@@ -726,13 +726,13 @@ a:hover {
 }
 
 @media (min-width: 576px) {
-    .hive-label-compact {
+    .client-label-compact {
         font-size: 0.85rem;
     }
 }
 
 @media (min-width: 992px) {
-    .hive-label-compact {
+    .client-label-compact {
         font-size: 0.9rem;
     }
 }
@@ -747,8 +747,8 @@ a:hover {
         transition-duration: 0.01ms !important;
     }
     
-    .hive-strength-badge,
-    .hive-box-card {
+    .client-status-badge,
+    .client-info-card {
         transition: none !important;
     }
     

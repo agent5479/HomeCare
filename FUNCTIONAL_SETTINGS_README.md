@@ -1,9 +1,9 @@
-# BeeMarshall - Functional Settings & Fallback Guide
+# HomeCare - Functional Settings & Fallback Guide
 
 ## 🚨 Critical System Settings
 
 ### GitHub Secrets Configuration
-**Repository**: `https://github.com/agent5479/LarsBees/settings/secrets/actions`
+**Repository**: `https://github.com/agent5479/HomeCare/settings/secrets/actions`
 
 #### Required Secrets:
 ```
@@ -39,13 +39,13 @@ LARS_USERNAME=your_lars_username
 ```
 
 ### GitHub Pages Settings
-**Repository**: `https://github.com/agent5479/LarsBees/settings/pages`
+**Repository**: `https://github.com/agent5479/HomeCare/settings/pages`
 
 - **Source**: GitHub Actions
 - **Branch**: gh-pages (auto-generated)
 
 ### GitHub Actions Permissions
-**Repository**: `https://github.com/agent5479/LarsBees/settings/actions`
+**Repository**: `https://github.com/agent5479/HomeCare/settings/actions`
 
 - **Workflow permissions**: Read and write permissions
 - **Allow GitHub Actions to create and approve pull requests**: ✅
@@ -85,12 +85,12 @@ tenants/
 2. GitHub Actions automatically:
    - Injects secrets into `env-config.js`
    - Deploys to GitHub Pages
-   - Updates live site at `https://agent5479.github.io/LarsBees/`
+   - Updates live site at `https://agent5479.github.io/HomeCare/`
 
 ### Manual Fallback
 If automatic deployment fails:
 
-1. **Check GitHub Actions**: `https://github.com/agent5479/LarsBees/actions`
+1. **Check GitHub Actions**: `https://github.com/agent5479/HomeCare/actions`
 2. **Verify Secrets**: Ensure all required secrets are set
 3. **Check Permissions**: Verify GitHub Pages and Actions permissions
 4. **Manual Deploy**: Run workflow manually from Actions tab
@@ -130,8 +130,8 @@ If automatic deployment fails:
 
 ### System Administrator
 - **GitHub**: agent5479
-- **Repository**: https://github.com/agent5479/LarsBees
-- **Live Site**: https://agent5479.github.io/LarsBees/
+- **Repository**: https://github.com/agent5479/HomeCare
+- **Live Site**: https://agent5479.github.io/HomeCare/
 
 ### Critical Files Backup
 - All configuration in GitHub repository
@@ -156,5 +156,5 @@ If automatic deployment fails:
 ---
 
 **Last Updated**: January 2025
-**Version**: 1.3
+**Version**: 0.7
 **Status**: Fully Operational

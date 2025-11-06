@@ -1,4 +1,4 @@
-// BeeMarshall - Utility Functions
+// HomeCare - Utility Functions
 // Production Environment Management
 
 // Environment Detection
@@ -38,7 +38,7 @@ window.Logger = Logger;
 // Environment Configuration
 const EnvironmentConfig = {
     isProduction: isProduction,
-    apiUrl: isProduction ? 'https://api.beemarshall.com' : 'http://localhost:3000',
+    apiUrl: isProduction ? 'https://api.homecare.com' : 'http://localhost:3000',
     debugMode: !isProduction,
     enableDebugPanel: !isProduction,
     logLevel: isProduction ? 'error' : 'debug'

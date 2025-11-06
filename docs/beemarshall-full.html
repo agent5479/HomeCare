@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BeeMarshall - Professional Apiary Logistics</title>
+    <title>CareMarshall - Professional Care Management System</title>
     
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -11,33 +11,33 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <!-- BeeMarshall Branding System -->
+    <!-- CareMarshall Branding System -->
     <link rel="stylesheet" href="css/brand.css" />
     
     <style>
-        /* BeeMarshall Enhanced UI - Following Design Philosophy */
+        /* CareMarshall Enhanced UI - Following Design Philosophy */
         
         :root {
-            /* Hive Design System - Light Yellow, Dark Yellow, White, Black */
-            --light-yellow: #FFFACD;
-            --dark-yellow: #DAA520;
+            /* CareMarshall Design System - Light Blue, Primary Blue, White, Black */
+            --light-blue: #E3F2FD;
+            --primary-blue: #1976D2;
             --white: #FFFFFF;
             --black: #000000;
-            --accent: #FFD700;
-            --bg: var(--light-yellow);
-            --glass: rgba(255,250,205,0.95);
-            --shadow: 0 8px 32px rgba(218,165,32,0.15);
+            --accent: #42A5F5;
+            --bg: var(--light-blue);
+            --glass: rgba(227, 242, 253, 0.95);
+            --shadow: 0 8px 32px rgba(25, 118, 210, 0.15);
             --radius: 12px;
             --transition: all .22s cubic-bezier(.4,0,.2,1);
             
-            /* Hive Color Palette */
-            --primary-bg: var(--light-yellow);
-            --primary-accent: var(--dark-yellow);
+            /* CareMarshall Color Palette */
+            --primary-bg: var(--light-blue);
+            --primary-accent: var(--primary-blue);
             --secondary-accent: var(--white);
             --text-primary: var(--black);
             --text-secondary: #666666;
-            --success: var(--dark-yellow);
-            --warning: var(--dark-yellow);
+            --success: #28a745;
+            --warning: #ffc107;
             --danger: #DC3545;
             --info: var(--accent);
             
@@ -143,52 +143,52 @@
         
         
         .btn-primary {
-            background: linear-gradient(135deg, var(--dark-yellow), var(--accent));
-            color: var(--black);
-            border: 2px solid var(--dark-yellow);
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent));
+            color: var(--white);
+            border: 2px solid var(--primary-blue);
             font-weight: 600;
         }
         
         .btn-primary:hover {
             transform: translateY(-1px) scale(1.02);
-            box-shadow: 0 12px 28px rgba(218,165,32,0.25);
-            background: linear-gradient(135deg, var(--accent), var(--dark-yellow));
+            box-shadow: 0 12px 28px rgba(25, 118, 210, 0.25);
+            background: linear-gradient(135deg, var(--accent), var(--primary-blue));
         }
         
         .btn-outline-primary {
             background: transparent;
-            border: 2px solid var(--dark-yellow);
-            color: var(--black);
+            border: 2px solid var(--primary-blue);
+            color: var(--primary-blue);
         }
         
         .btn-outline-primary:hover {
-            background: var(--dark-yellow);
-            border-color: var(--dark-yellow);
-            color: var(--black);
+            background: var(--primary-blue);
+            border-color: var(--primary-blue);
+            color: var(--white);
         }
         
-        /* Enhanced Card Styles - Migration Tool Aesthetic */
+        /* Enhanced Card Styles - CareMarshall Aesthetic */
         .card {
             background: var(--white);
             border-radius: var(--radius);
-            border: 2px solid var(--dark-yellow);
-            box-shadow: 0 8px 32px rgba(218,165,32,0.15);
+            border: 2px solid var(--primary-blue);
+            box-shadow: 0 8px 32px rgba(25, 118, 210, 0.15);
             transition: var(--transition);
             backdrop-filter: blur(12px) saturate(1.1);
         }
         
         .card:hover {
             transform: translateY(-4px);
-            box-shadow: 0 12px 40px rgba(218,165,32,0.2);
+            box-shadow: 0 12px 40px rgba(25, 118, 210, 0.2);
         }
         
-        /* Glass morphism for modals - Migration Tool Aesthetic */
+        /* Glass morphism for modals - CareMarshall Aesthetic */
         .modal-content {
             background: var(--white);
-            border: 2px solid var(--dark-yellow);
+            border: 2px solid var(--primary-blue);
             backdrop-filter: blur(12px) saturate(1.1);
             border-radius: var(--radius);
-            box-shadow: 0 8px 32px rgba(218,165,32,0.15);
+            box-shadow: 0 8px 32px rgba(25, 118, 210, 0.15);
         }
         
         /* Version Tag Styling */
@@ -338,7 +338,7 @@
         /* Enhanced Form Styles */
         .form-control {
             border-radius: var(--radius);
-            border: 2px solid var(--dark-yellow);
+            border: 2px solid var(--primary-blue);
             transition: var(--transition);
             background: var(--white);
             backdrop-filter: blur(8px);
@@ -347,12 +347,12 @@
         .form-control:focus {
             outline: none;
             border-color: var(--accent);
-            box-shadow: 0 0 0 0.2rem rgba(218, 165, 32, 0.25);
+            box-shadow: 0 0 0 0.2rem rgba(25, 118, 210, 0.25);
         }
         
         .form-select {
             border-radius: var(--radius);
-            border: 2px solid var(--dark-yellow);
+            border: 2px solid var(--primary-blue);
             transition: var(--transition);
             background: var(--white);
             backdrop-filter: blur(8px);
@@ -361,7 +361,7 @@
         .form-select:focus {
             outline: none;
             border-color: var(--accent);
-            box-shadow: 0 0 0 0.2rem rgba(218, 165, 32, 0.25);
+            box-shadow: 0 0 0 0.2rem rgba(25, 118, 210, 0.25);
         }
         
         /* Collapsible site filter */
@@ -455,7 +455,7 @@
         
         /* Navbar sticky positioning - ensure it works across all views */
         .navbar {
-            background: var(--dark-yellow) !important;
+            background: var(--primary-blue) !important;
             border-bottom: 2px solid var(--black);
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             position: -webkit-sticky !important; /* Safari */
@@ -537,7 +537,7 @@
             transform: translateX(-50%);
             width: 80%;
             height: 3px;
-            background: linear-gradient(90deg, transparent 0%, var(--dark-yellow) 50%, transparent 100%);
+            background: linear-gradient(90deg, transparent 0%, var(--primary-blue) 50%, transparent 100%);
             border-radius: 2px 2px 0 0;
         }
         
@@ -548,7 +548,7 @@
         /* Dropdown styling */
         .dropdown-menu {
             background: var(--white);
-            border: 2px solid var(--dark-yellow);
+            border: 2px solid var(--primary-blue);
             border-radius: var(--border-radius-md);
             box-shadow: var(--shadow-lg);
             padding: 0.5rem 0;
@@ -562,7 +562,7 @@
         }
         
         .dropdown-item:hover {
-            background: linear-gradient(135deg, var(--light-yellow) 0%, rgba(255,193,7,0.2) 100%);
+            background: linear-gradient(135deg, var(--light-blue) 0%, rgba(25,118,210,0.2) 100%);
             color: var(--black);
             transform: translateX(4px);
         }
@@ -572,7 +572,7 @@
         }
         
         .dropdown-divider {
-            border-color: var(--dark-yellow);
+            border-color: var(--primary-blue);
             opacity: 0.3;
             margin: 0.5rem 0;
         }
@@ -612,9 +612,9 @@
         }
         
         .btn-success {
-            background: linear-gradient(135deg, var(--dark-yellow) 0%, var(--accent) 100%);
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--accent) 100%);
             color: var(--black);
-            border: 2px solid var(--dark-yellow);
+            border: 2px solid var(--primary-blue);
         }
         
         .btn-warning {
@@ -794,7 +794,7 @@
         
         .site-popup h6 {
             margin-bottom: 0.5rem;
-            color: var(--dark-yellow);
+            color: var(--primary-blue);
         }
         
         .site-popup p {
@@ -1107,7 +1107,7 @@
             right: 20px;
             z-index: 1050;
             background: rgba(255, 255, 255, 0.95);
-            border: 1px solid var(--dark-yellow);
+            border: 1px solid var(--primary-blue);
             border-radius: 20px;
             padding: 8px 16px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
@@ -1355,45 +1355,45 @@
             font-weight: 600;
         }
         
-        /* Hexagon Button for Welcome Modal */
-        .hexagon-button {
+        /* Care Button for Welcome Modal */
+        .care-button {
             position: relative;
-            width: 120px;
-            height: 60px;
-            background: #28a745;
+            width: 140px;
+            height: 50px;
+            background: var(--primary-blue, #1976D2);
             border: none;
-            border-radius: 0;
-            clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+            border-radius: 25px;
             transition: all 0.3s ease;
-            padding: 0;
+            padding: 0 20px;
             display: flex;
             align-items: center;
             justify-content: center;
+            box-shadow: 0 2px 8px rgba(25, 118, 210, 0.2);
         }
         
-        .hexagon-button:hover {
-            background: #218838;
-            transform: scale(1.05);
-            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+        .care-button:hover {
+            background: var(--secondary-blue, #42A5F5);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
         }
         
-        .hexagon-button:active {
-            transform: scale(0.95);
+        .care-button:active {
+            transform: translateY(0);
         }
         
-        .hexagon-content {
+        .care-content {
             display: flex;
             align-items: center;
             justify-content: center;
             width: 100%;
             height: 100%;
+            gap: 8px;
         }
         
-        .hexagon-text {
+        .care-text {
             color: white;
             font-weight: 600;
-            font-size: 0.9rem;
-            text-transform: lowercase;
+            font-size: 0.95rem;
             letter-spacing: 0.5px;
         }
         
@@ -1426,9 +1426,9 @@
                 <div class="card shadow-lg" style="background: var(--glass); backdrop-filter: blur(12px) saturate(1.1); border: 1px solid rgba(255,255,255,0.2);">
                     <div class="card-body p-5">
                         <div class="text-center mb-4">
-                            <i class="bi bi-hexagon-fill" style="font-size: 4rem; color: var(--accent);"></i>
-                            <h2 class="mt-3" style="color: var(--brand);">BeeMarshall</h2>
-                            <p class="text-muted">Professional Apiary Management System</p>
+                            <i class="bi bi-house-heart-fill" style="font-size: 4rem; color: var(--accent);"></i>
+                            <h2 class="mt-3" style="color: var(--brand);">CareMarshall</h2>
+                            <p class="text-muted">Professional Care Management System</p>
                         </div>
                         
                         <!-- Login Status Messages -->
@@ -1503,7 +1503,7 @@
             <div class="container-fluid">
                 <!-- Logo/Brand -->
                 <a class="navbar-brand" href="#" onclick="showDashboard(); return false;">
-                    <i class="bi bi-hexagon-fill"></i> BeeMarshall
+                    <i class="bi bi-house-heart-fill"></i> CareMarshall
                 </a>
                 
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -1663,10 +1663,10 @@
                         <div class="card dashboard-stat-card hives-card" onclick="showSites()" data-target="sites">
                             <div class="card-body text-center position-relative">
                                 <div class="stat-icon-container">
-                                    <i class="bi bi-hexagon-fill text-warning"></i>
+                                    <i class="bi bi-house-heart-fill text-primary"></i>
                                 </div>
                                 <h3 id="statHives" class="stat-number">0</h3>
-                                <p class="stat-label">Total Hives</p>
+                                <p class="stat-label">Total Clients</p>
                                 <div class="stat-action-indicator">
                                     <i class="bi bi-arrow-right-circle"></i>
                                 </div>
@@ -1705,63 +1705,63 @@
 
                 <!-- Breakdown Cards Row - Responsive Layout -->
                 <div class="row mb-3 g-2 g-lg-2" style="display: flex; flex-wrap: nowrap;">
-                    <!-- Hive Strength Breakdown -->
+                    <!-- Client Status Breakdown -->
                     <div class="col-12 col-lg-6" style="flex: 0 0 50%; max-width: 50%; padding-left: 0.5rem; padding-right: 0.5rem;">
                         <div class="card h-100">
                             <div class="card-body py-2 px-2 px-md-3">
                                 <div class="row g-1 g-sm-2">
-                                    <!-- Strong Hives -->
+                                    <!-- Independent Clients -->
                                     <div class="col" style="flex: 0 0 20%; max-width: 20%;">
-                                        <div class="hive-category-card-compact">
-                                            <div class="hive-icon-compact strong">
-                                                <i class="bi bi-hexagon-fill"></i>
+                                        <div class="client-category-card-compact">
+                                            <div class="client-icon-compact independent">
+                                                <i class="bi bi-house-check-fill"></i>
                                             </div>
-                                            <div class="hive-count-compact" id="strongCount">0</div>
-                                            <div class="hive-label-compact">Strong</div>
+                                            <div class="client-count-compact" id="strongCount">0</div>
+                                            <div class="client-label-compact">Independent</div>
                                         </div>
                                     </div>
                                     
-                                    <!-- Medium Hives -->
+                                    <!-- Assisted Clients -->
                                     <div class="col" style="flex: 0 0 20%; max-width: 20%;">
-                                        <div class="hive-category-card-compact">
-                                            <div class="hive-icon-compact medium">
-                                                <i class="bi bi-hexagon"></i>
+                                        <div class="client-category-card-compact">
+                                            <div class="client-icon-compact assisted">
+                                                <i class="bi bi-house-heart"></i>
                                             </div>
-                                            <div class="hive-count-compact" id="mediumCount">0</div>
-                                            <div class="hive-label-compact">Medium</div>
+                                            <div class="client-count-compact" id="mediumCount">0</div>
+                                            <div class="client-label-compact">Assisted</div>
                                         </div>
                                     </div>
                                     
-                                    <!-- Weak Hives -->
+                                    <!-- Dependent Clients -->
                                     <div class="col" style="flex: 0 0 20%; max-width: 20%;">
-                                        <div class="hive-category-card-compact">
-                                            <div class="hive-icon-compact weak">
-                                                <i class="bi bi-hexagon"></i>
+                                        <div class="client-category-card-compact">
+                                            <div class="client-icon-compact dependent">
+                                                <i class="bi bi-heart-pulse"></i>
                                             </div>
-                                            <div class="hive-count-compact" id="weakCount">0</div>
-                                            <div class="hive-label-compact">Weak</div>
+                                            <div class="client-count-compact" id="weakCount">0</div>
+                                            <div class="client-label-compact">Dependent</div>
                                         </div>
                                     </div>
                                     
-                                    <!-- NUC Hives -->
+                                    <!-- Rehabilitation Clients -->
                                     <div class="col" style="flex: 0 0 20%; max-width: 20%;">
-                                        <div class="hive-category-card-compact">
-                                            <div class="hive-icon-compact nuc">
-                                                <i class="bi bi-hexagon-half"></i>
+                                        <div class="client-category-card-compact">
+                                            <div class="client-icon-compact rehabilitation">
+                                                <i class="bi bi-hospital"></i>
                                             </div>
-                                            <div class="hive-count-compact" id="nucCount">0</div>
-                                            <div class="hive-label-compact">NUC</div>
+                                            <div class="client-count-compact" id="nucCount">0</div>
+                                            <div class="client-label-compact">Rehabilitation</div>
                                         </div>
                                     </div>
                                     
-                                    <!-- Dead Hives -->
+                                    <!-- Hospice Clients -->
                                     <div class="col" style="flex: 0 0 20%; max-width: 20%;">
-                                        <div class="hive-category-card-compact">
-                                            <div class="hive-icon-compact dead">
-                                                <i class="bi bi-hexagon"></i>
+                                        <div class="client-category-card-compact">
+                                            <div class="client-icon-compact hospice">
+                                                <i class="bi bi-heart-fill"></i>
                                             </div>
-                                            <div class="hive-count-compact" id="deadCount">0</div>
-                                            <div class="hive-label-compact">Dead</div>
+                                            <div class="client-count-compact" id="deadCount">0</div>
+                                            <div class="client-label-compact">Hospice</div>
                                         </div>
                                     </div>
                                 </div>
@@ -1880,7 +1880,7 @@
                                             <div class="map-placeholder-content">
                                                 <i class="bi bi-map" style="font-size: 3rem; color: #6c757d;"></i>
                                                 <h6 class="mt-3 text-muted">Interactive Map Preview</h6>
-                                                <p class="text-muted small">Click anywhere to load your apiary map</p>
+                                                <p class="text-muted small">Click anywhere to load your client locations map</p>
                                                 <button class="btn btn-outline-primary btn-sm mt-2">
                                                     <i class="bi bi-play-circle me-1"></i>Initialize Map
                                                 </button>
@@ -1982,7 +1982,7 @@
             <!-- Sites View -->
             <div id="sitesView" class="hidden">
                 <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h2><i class="bi bi-geo-alt"></i> Apiary Sites</h2>
+                    <h2><i class="bi bi-geo-alt"></i> Client Locations</h2>
                     <div>
                         <button class="btn btn-outline-success me-2" onclick="exportSitesCSV()">
                             <i class="bi bi-download"></i> Export CSV
@@ -1999,7 +1999,7 @@
                     <div class="text-center my-5">
                         <i class="bi bi-geo-alt" style="font-size: 3rem; color: #ccc;"></i>
                         <h5 class="mt-3 text-muted">No sites yet</h5>
-                        <p class="text-muted">Get started by adding your first apiary location</p>
+                        <p class="text-muted">Get started by adding your first client location</p>
                         <button class="btn btn-primary admin-only" onclick="showAddSiteForm()">
                             <i class="bi bi-plus"></i> Add Your First Site
                         </button>
@@ -2029,30 +2029,30 @@
                                     <div class="row">
                                         <div class="col-md-6 mb-3">
                                             <label for="siteName" class="form-label">Site Name <span class="text-danger">*</span></label>
-                                            <input type="text" class="form-control" id="siteName" required placeholder="e.g., Main Apiary, North Field">
-                                            <div class="form-text">Give your apiary location a descriptive name</div>
+                                            <input type="text" class="form-control" id="siteName" required placeholder="e.g., Main Care Facility, North Branch">
+                                            <div class="form-text">Give your client location a descriptive name</div>
                                         </div>
                                         <div class="col-md-6 mb-3">
                                             <label for="functionalClassification" class="form-label">Functional Classification <span class="text-danger">*</span></label>
                                             <select class="form-select" id="functionalClassification" required>
                                                 <option value="">Select functional classification...</option>
-                                                <option value="production">Production</option>
-                                                <option value="nucleus">NUC (Nucleus)</option>
-                                                <option value="queen-rearing">Queen Rearing</option>
+                                                <option value="production">Residential Care</option>
+                                                <option value="nucleus">Assisted Living</option>
+                                                <option value="queen-rearing">Rehabilitation Facility</option>
                                                 <option value="research">Research</option>
-                                                <option value="education">Education</option>
-                                                <option value="quarantine">Quarantine</option>
-                                                <option value="backup">Backup</option>
+                                                <option value="education">Education/Training</option>
+                                                <option value="quarantine">Quarantine/Isolation</option>
+                                                <option value="backup">Backup/Overflow</option>
                                                 <option value="custom">Custom</option>
                                             </select>
-                                            <div class="form-text">Choose the primary purpose of this apiary location</div>
+                                            <div class="form-text">Choose the primary purpose of this care location</div>
                                         </div>
                                         <div class="col-md-6 mb-3">
                                             <label for="seasonalClassification" class="form-label">Seasonal Classification</label>
                                             <select class="form-select" id="seasonalClassification">
-                                                <option value="summer">Summer Site</option>
-                                                <option value="winter">Winter Site</option>
-                                                <option value="all-year">All Year Round</option>
+                                                <option value="summer">Temporary/Seasonal</option>
+                                                <option value="winter">Short-term Care</option>
+                                                <option value="all-year">Long-term Care</option>
                                             </select>
                                             <div class="form-text">When is this site primarily used?</div>
                                         </div>
@@ -2134,13 +2134,13 @@
                                     <div class="row">
                                         <div class="col-md-6 mb-3">
                                             <label for="siteLat" class="form-label">Latitude <span class="text-danger">*</span></label>
-                                            <input type="number" class="form-control" id="siteLat" step="0.000001" min="-90" max="90" placeholder="-40.6764" required>
-                                            <div class="form-text">Enter latitude (e.g., -40.6764 for Collingwood, NZ)</div>
+                                            <input type="number" class="form-control" id="siteLat" step="0.000001" min="-90" max="90" placeholder="-40.8557" required>
+                                            <div class="form-text">Enter latitude (e.g., -40.8557 for Takaka, NZ)</div>
                                         </div>
                                         <div class="col-md-6 mb-3">
                                             <label for="siteLng" class="form-label">Longitude <span class="text-danger">*</span></label>
-                                            <input type="number" class="form-control" id="siteLng" step="0.000001" min="-180" max="180" placeholder="172.6856" required>
-                                            <div class="form-text">Enter longitude (e.g., 172.6856 for Collingwood, NZ)</div>
+                                            <input type="number" class="form-control" id="siteLng" step="0.000001" min="-180" max="180" placeholder="172.8066" required>
+                                            <div class="form-text">Enter longitude (e.g., 172.8066 for Takaka, NZ)</div>
                                         </div>
                                     </div>
                                     
@@ -2236,7 +2236,7 @@
                                                     <div class="form-check">
                                                         <input class="form-check-input" type="checkbox" id="contactBeforeVisit">
                                                         <label class="form-check-label" for="contactBeforeVisit">
-                                                            Contact Landowner Before Visit
+                                                            Contact Required Before Visit
                                                         </label>
                                                     </div>
                                                 </div>
@@ -2244,7 +2244,7 @@
                                                     <div class="form-check">
                                                         <input class="form-check-input" type="checkbox" id="isQuarantine">
                                                         <label class="form-check-label" for="isQuarantine">
-                                                            Quarantine Site
+                                                            Isolation/Quarantine Required
                                                         </label>
                                                     </div>
                                                 </div>
@@ -2252,30 +2252,218 @@
                                         </div>
                                     </div>
                                     
-                                    <!-- Landowner Information -->
+                                    <!-- Special Needs Flags -->
                                     <div class="card mb-3">
                                         <div class="card-header">
-                                            <h6><i class="bi bi-person"></i> Landowner Information</h6>
+                                            <h6><i class="bi bi-flag-fill"></i> Special Needs & Access Requirements</h6>
+                                            <small class="text-muted">Select all that apply to help care workers prepare for visits</small>
                                         </div>
                                         <div class="card-body">
                                             <div class="row">
                                                 <div class="col-md-6 mb-3">
-                                                    <label for="landownerName" class="form-label">Name</label>
-                                                    <input type="text" class="form-control" id="landownerName">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="wheelchairAccessible">
+                                                        <label class="form-check-label" for="wheelchairAccessible">
+                                                            <i class="bi bi-wheelchair text-primary"></i> Wheelchair Accessible
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6 mb-3">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="medicalEquipmentOnSite">
+                                                        <label class="form-check-label" for="medicalEquipmentOnSite">
+                                                            <i class="bi bi-heart-pulse text-danger"></i> Medical Equipment On-Site
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6 mb-3">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="specialInstructionsRequired">
+                                                        <label class="form-check-label" for="specialInstructionsRequired">
+                                                            <i class="bi bi-exclamation-triangle text-warning"></i> Special Instructions Required
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6 mb-3">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="petPresent">
+                                                        <label class="form-check-label" for="petPresent">
+                                                            <i class="bi bi-heart text-info"></i> Pet Present
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6 mb-3">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="familyMemberPresent">
+                                                        <label class="form-check-label" for="familyMemberPresent">
+                                                            <i class="bi bi-people text-success"></i> Family Member Present
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6 mb-3">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="restrictedAccess">
+                                                        <label class="form-check-label" for="restrictedAccess">
+                                                            <i class="bi bi-shield-lock text-secondary"></i> Restricted Access
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6 mb-3">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="emergencyContactRequired">
+                                                        <label class="form-check-label" for="emergencyContactRequired">
+                                                            <i class="bi bi-telephone text-danger"></i> Emergency Contact Required
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6 mb-3">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="medicationStorageAvailable">
+                                                        <label class="form-check-label" for="medicationStorageAvailable">
+                                                            <i class="bi bi-capsule text-primary"></i> Medication Storage Available
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6 mb-3">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="oxygenEquipment">
+                                                        <label class="form-check-label" for="oxygenEquipment">
+                                                            <i class="bi bi-airplane text-info"></i> Oxygen Equipment On-Site
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6 mb-3">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="dementiaCare">
+                                                        <label class="form-check-label" for="dementiaCare">
+                                                            <i class="bi bi-brain text-purple" style="color: #6f42c1;"></i> Dementia Care Required
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6 mb-3">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="fallRisk">
+                                                        <label class="form-check-label" for="fallRisk">
+                                                            <i class="bi bi-exclamation-circle text-warning"></i> High Fall Risk
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6 mb-3">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="woundCareRequired">
+                                                        <label class="form-check-label" for="woundCareRequired">
+                                                            <i class="bi bi-bandaid text-danger"></i> Wound Care Required
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Contact & Legal Information -->
+                                    <div class="card mb-3">
+                                        <div class="card-header">
+                                            <h6><i class="bi bi-person"></i> Primary Contact Information</h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="row">
+                                                <div class="col-md-6 mb-3">
+                                                    <label for="landownerName" class="form-label">Contact Name</label>
+                                                    <input type="text" class="form-control" id="landownerName" placeholder="Primary contact person">
                                                 </div>
                                                 <div class="col-md-6 mb-3">
                                                     <label for="landownerPhone" class="form-label">Phone</label>
-                                                    <input type="tel" class="form-control" id="landownerPhone">
+                                                    <input type="tel" class="form-control" id="landownerPhone" placeholder="+64 XX XXX XXXX">
                                                 </div>
                                             </div>
                                             <div class="row">
                                                 <div class="col-md-6 mb-3">
                                                     <label for="landownerEmail" class="form-label">Email</label>
-                                                    <input type="email" class="form-control" id="landownerEmail">
+                                                    <input type="email" class="form-control" id="landownerEmail" placeholder="contact@example.com">
                                                 </div>
                                                 <div class="col-md-6 mb-3">
-                                                    <label for="landownerAddress" class="form-label">Address</label>
-                                                    <input type="text" class="form-control" id="landownerAddress">
+                                                    <label for="landownerAddress" class="form-label">Physical Address</label>
+                                                    <input type="text" class="form-control" id="landownerAddress" placeholder="Street address">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Legal & Compliance Information -->
+                                    <div class="card mb-3">
+                                        <div class="card-header">
+                                            <h6><i class="bi bi-shield-check"></i> Legal & Compliance Information</h6>
+                                            <small class="text-muted">Required for NZ care provider compliance</small>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="row">
+                                                <div class="col-md-6 mb-3">
+                                                    <label for="hdsRegistrationNumber" class="form-label">HDS Registration Number</label>
+                                                    <input type="text" class="form-control" id="hdsRegistrationNumber" placeholder="Health & Disability Services registration">
+                                                    <div class="form-text">Required for providing health care services</div>
+                                                </div>
+                                                <div class="col-md-6 mb-3">
+                                                    <label for="registrationExpiry" class="form-label">Registration Expiry Date</label>
+                                                    <input type="date" class="form-control" id="registrationExpiry">
+                                                    <div class="form-text">Annual renewal required</div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-6 mb-3">
+                                                    <label for="insuranceProvider" class="form-label">Insurance Provider</label>
+                                                    <input type="text" class="form-control" id="insuranceProvider" placeholder="Professional indemnity insurer">
+                                                </div>
+                                                <div class="col-md-6 mb-3">
+                                                    <label for="insurancePolicyNumber" class="form-label">Insurance Policy Number</label>
+                                                    <input type="text" class="form-control" id="insurancePolicyNumber" placeholder="Policy number">
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-6 mb-3">
+                                                    <label for="insuranceExpiry" class="form-label">Insurance Expiry Date</label>
+                                                    <input type="date" class="form-control" id="insuranceExpiry">
+                                                </div>
+                                                <div class="col-md-6 mb-3">
+                                                    <label for="privacyOfficer" class="form-label">Privacy Officer</label>
+                                                    <input type="text" class="form-control" id="privacyOfficer" placeholder="Designated privacy officer name">
+                                                    <div class="form-text">Required under Privacy Act 2020</div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-6 mb-3">
+                                                    <label for="healthSafetyOfficer" class="form-label">Health & Safety Officer</label>
+                                                    <input type="text" class="form-control" id="healthSafetyOfficer" placeholder="Designated H&S officer name">
+                                                </div>
+                                                <div class="col-md-6 mb-3">
+                                                    <label for="recordRetentionYears" class="form-label">Record Retention Period (Years)</label>
+                                                    <input type="number" class="form-control" id="recordRetentionYears" value="7" min="7" max="10">
+                                                    <div class="form-text">Minimum 7 years required by law</div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-12 mb-3">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="privacyCompliance">
+                                                        <label class="form-check-label" for="privacyCompliance">
+                                                            Privacy Act 2020 Compliance Confirmed
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-12 mb-3">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="healthSafetyCompliance">
+                                                        <label class="form-check-label" for="healthSafetyCompliance">
+                                                            Health & Safety at Work Act 2015 Compliance Confirmed
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-12 mb-3">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="incidentReportingEnabled">
+                                                        <label class="form-check-label" for="incidentReportingEnabled">
+                                                            Incident Reporting System Active (24-hour reporting required)
+                                                        </label>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -2455,7 +2643,7 @@
                                         <div class="form-check">
                                             <input class="form-check-input" type="checkbox" id="hideStrengthUpdates" onchange="renderActions()">
                                             <label class="form-check-label" for="hideStrengthUpdates">
-                                                <i class="bi bi-hexagon text-success"></i> Hide Hive Strength Updates
+                                                <i class="bi bi-heart-pulse text-success"></i> Hide Client Status Updates
                                             </label>
                                         </div>
                                     </div>
@@ -2473,8 +2661,8 @@
                     <div class="text-center my-5">
                         <i class="bi bi-list-check" style="font-size: 3rem; color: #ccc;"></i>
                         <h5 class="mt-3 text-muted">No actions logged yet</h5>
-                        <p class="text-muted">Start by logging your first inspection or treatment</p>
-                        <button class="btn btn-primary" onclick="showAddActionForm()">
+                        <p class="text-muted">Start by logging your first care visit or assessment</p>
+                        <button class="btn btn-primary" onclick="showLogActionForm()">
                             <i class="bi bi-plus"></i> Log Your First Action
                         </button>
                     </div>
@@ -2505,9 +2693,9 @@
                                     </div>
                                     
                                     <div id="individualHiveSelect" class="mb-3 hidden">
-                                        <label for="actionHive" class="form-label">Specific Hive (Optional)</label>
+                                        <label for="actionHive" class="form-label">Specific Client (Optional)</label>
                                         <select class="form-select" id="actionHive">
-                                            <option value="">All hives in site</option>
+                                            <option value="">All clients at location</option>
                                         </select>
                                     </div>
                                     
@@ -3073,8 +3261,8 @@
             <div class="modal-content" style="background: var(--glass); backdrop-filter: blur(12px) saturate(1.1); border: 1px solid rgba(255,255,255,0.2);">
                 <div class="modal-header border-0">
                     <h5 class="modal-title d-flex align-items-center">
-                        <i class="bi bi-hexagon-fill me-2" style="color: var(--accent); font-size: 1.5rem;"></i>
-                        Welcome to BeeMarshall
+                        <i class="bi bi-house-heart-fill me-2" style="color: var(--accent); font-size: 1.5rem;"></i>
+                        Welcome to CareMarshall
                     </h5>
                 </div>
                 <div class="modal-body text-center">
@@ -3083,7 +3271,7 @@
                     </div>
                     <h4 class="mb-3" id="welcomeUserName">Welcome back!</h4>
                     <p class="text-muted mb-4" id="welcomeMessage">
-                        Your apiary management system is ready. All data has been synchronized and the dashboard is fully operational.
+                        Your care management system is ready. All data has been synchronized and the dashboard is fully operational.
                     </p>
                     
                     <!-- Version Tag -->
@@ -3105,9 +3293,10 @@
                     </div>
                 </div>
                 <div class="modal-footer border-0 justify-content-center">
-                    <button type="button" class="btn hexagon-button" id="welcomeContinueBtn" data-bs-dismiss="modal" onclick="dismissWelcomeModal()" style="background: #ff9800; color: white; cursor: pointer;">
-                        <div class="hexagon-content">
-                            <span class="hexagon-text" id="welcomeBtnText">Continue</span>
+                    <button type="button" class="btn care-button" id="welcomeContinueBtn" data-bs-dismiss="modal" onclick="dismissWelcomeModal()" style="background: var(--primary-blue, #1976D2); color: white; cursor: pointer;">
+                        <div class="care-content">
+                            <i class="bi bi-house-heart-fill"></i>
+                            <span class="care-text" id="welcomeBtnText">Continue</span>
                         </div>
                     </button>
                 </div>
@@ -3169,12 +3358,12 @@
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
-    <!-- BeeMarshall Modules v1.3 -->
+    <!-- CareMarshall Modules v0.7 -->
     <!-- Environment Management -->
     <script src="js/utils.js"></script>
     <!-- Form Validation System -->
     <script src="js/form-validation.js"></script>
-    <!-- BeeMarshall JavaScript Modules -->
+    <!-- CareMarshall JavaScript Modules -->
     <!-- Environment Variables (injected at build time) -->
     <script src="js/env-config.js"></script>
     <!-- bcrypt for secure password hashing -->
@@ -3191,7 +3380,7 @@
 
     <script src="js/navigation.js"></script>
     <script src="js/dashboard.js"></script>
-    <script src="js/hive-analysis.js"></script>
+    <script src="js/client-analysis.js"></script>
     <script src="js/sync-status.js"></script>
     <script src="js/core.js"></script>
     <script src="js/tasks.js"></script>
@@ -3244,7 +3433,8 @@
             document.getElementById('map').style.display = 'block';
             
             // Check if map is already initialized
-            if (window.beeMarshallMap) {
+            if (window.homeCareMap || window.beeMarshallMap) {
+                const mapInstance = window.homeCareMap || window.beeMarshallMap;
                 console.log('🗺️ Map already initialized, refreshing markers...');
                 // Clear existing markers
                 if (window.beeMarshallMarkers) {
@@ -3258,12 +3448,16 @@
             
             // Initialize Leaflet map
             if (typeof L !== 'undefined') {
-                window.beeMarshallMap = L.map('map', {
-                    center: [-40.6781, 172.6886], // Collingwood, NZ
+                // Initialize map with new name, maintain backward compatibility
+                window.homeCareMap = L.map('map', {
+                    center: [-40.8557, 172.8066], // Takaka, NZ
                     zoom: 13,
                     zoomControl: true,
                     attributionControl: true
                 });
+                
+                // Backward compatibility alias
+                window.beeMarshallMap = window.homeCareMap;
                 
                 // Add OpenStreetMap tiles with better loading
                 const tileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -3271,12 +3465,12 @@
                     maxZoom: 19,
                     tileSize: 256,
                     zoomOffset: 0
-                }).addTo(window.beeMarshallMap);
+                }).addTo(window.homeCareMap);
                 
                 console.log('🗺️ Map initialized successfully');
                 
                 // Wait for map to be ready
-                window.beeMarshallMap.whenReady(() => {
+                window.homeCareMap.whenReady(() => {
                     console.log('🗺️ Map container ready, waiting for tiles...');
                     
                     // Wait for tiles to load completely
@@ -3303,19 +3497,21 @@
         
         // Function to render sites on map with proper marker management
         function renderSitesOnMap() {
-            if (!window.beeMarshallMap) {
+            const mapInstance = window.homeCareMap || window.beeMarshallMap;
+            if (!mapInstance) {
                 console.log('🗺️ Map not initialized, skipping marker rendering');
                 return;
             }
             
-            // Clear existing markers
-            if (window.beeMarshallMarkers) {
-                window.beeMarshallMarkers.forEach(marker => marker.remove());
-                window.beeMarshallMarkers = [];
+            // Support both new and old marker array names
+            const markersArray = window.homeCareMarkers || window.beeMarshallMarkers;
+            if (markersArray) {
+                markersArray.forEach(marker => marker.remove());
             }
             
-            // Initialize markers array
-            window.beeMarshallMarkers = [];
+            // Initialize markers array with new name, maintain backward compatibility
+            window.homeCareMarkers = [];
+            window.beeMarshallMarkers = window.homeCareMarkers;
             
             // Add site markers
             if (typeof sites !== 'undefined' && sites.length > 0) {
@@ -3365,7 +3561,7 @@
                         });
                         
                         const marker = L.marker([lat, lng], { icon: customIcon })
-                            .addTo(window.beeMarshallMap)
+                            .addTo(window.homeCareMap || window.beeMarshallMap)
                             .bindPopup(`
                                 <div style="padding:10px; min-width:250px;">
                                     <h6>
@@ -3436,14 +3632,18 @@
                                 className: 'site-popup'
                             });
                         
-                        window.beeMarshallMarkers.push(marker);
+                        const markersArray = window.homeCareMarkers || window.beeMarshallMarkers;
+                        if (markersArray) {
+                            markersArray.push(marker);
+                        }
                         console.log(`✅ Added marker for ${site.name} at [${lat}, ${lng}]`);
                     } else {
                         console.log(`⚠️ Site ${site.name} missing coordinates: lat=${site.latitude}, lng=${site.longitude}`);
                     }
                 });
                 
-                console.log(`📍 Added ${window.beeMarshallMarkers.length} site markers`);
+                const markersArray = window.homeCareMarkers || window.beeMarshallMarkers;
+                console.log(`📍 Added ${markersArray ? markersArray.length : 0} site markers`);
             } else {
                 console.log('📍 No sites to render on map');
             }
@@ -3583,7 +3783,7 @@
         // CSV Export Functions
         function exportSitesCSV() {
             if (!window.sites || window.sites.length === 0) {
-                beeMarshallAlert('No site data available to export.', 'info');
+                careMarshallAlert('No site data available to export.', 'info');
                 return;
             }
             
@@ -3597,7 +3797,7 @@
             });
             
             if (activeSites.length === 0) {
-                beeMarshallAlert('No active site data available to export.', 'info');
+                careMarshallAlert('No active site data available to export.', 'info');
                 return;
             }
             
@@ -3656,7 +3856,7 @@
         
         function exportActionsCSV() {
             if (!window.actions || window.actions.length === 0) {
-                beeMarshallAlert('No action data available to export.', 'info');
+                careMarshallAlert('No action data available to export.', 'info');
                 return;
             }
             
@@ -3689,7 +3889,7 @@
             });
             
             if (activeActions.length === 0) {
-                beeMarshallAlert('No active action data available to export.', 'info');
+                careMarshallAlert('No active action data available to export.', 'info');
                 return;
             }
             
@@ -3721,7 +3921,7 @@
         
         function exportScheduledTasksCSV() {
             if (!window.scheduledTasks || window.scheduledTasks.length === 0) {
-                beeMarshallAlert('No scheduled task data available to export.', 'info');
+                careMarshallAlert('No scheduled task data available to export.', 'info');
                 return;
             }
             
@@ -3764,7 +3964,7 @@
         
         function exportIndividualHivesCSV() {
             if (!window.individualHives || window.individualHives.length === 0) {
-                beeMarshallAlert('No individual hive data available to export.', 'info');
+                careMarshallAlert('No individual hive data available to export.', 'info');
                 return;
             }
             
@@ -4018,16 +4218,16 @@
             }
             
             if (allData.length === 0) {
-                beeMarshallAlert('No data available to export.', 'info');
+                careMarshallAlert('No data available to export.', 'info');
                 return;
             }
             
-            downloadCSV(allData, `beemarshall_complete_export_${new Date().toISOString().split('T')[0]}.csv`);
+            downloadCSV(allData, `caremarshall_complete_export_${new Date().toISOString().split('T')[0]}.csv`);
         }
         
         function downloadCSV(data, filename) {
             if (!data || data.length === 0) {
-                beeMarshallAlert('No data to export.', 'info');
+                careMarshallAlert('No data to export.', 'info');
                 return;
             }
             
@@ -4039,7 +4239,7 @@
             
             // Create CSV content with header information
             const exportInfo = [
-                `BeeMarshall Data Export`,
+                `CareMarshall Data Export`,
                 `Exported By: ${typeof currentUser !== 'undefined' && currentUser ? currentUser.username : 'Unknown'}`,
                 `Export Date: ${new Date().toISOString()}`,
                 `Tenant: ${typeof currentTenantId !== 'undefined' && currentTenantId ? currentTenantId : 'N/A'}`,
@@ -4158,7 +4358,8 @@
                 missingGPS: [],
                 missingContactDetails: [],
                 invalidPhoneNumbers: [],
-                missingHoneyTypes: [],
+                missingCareServiceTypes: [],
+                missingHoneyTypes: [], // Backward compatibility
                 overdueCompliance: []
             };
             
@@ -4239,8 +4440,14 @@
                     }
                 }
                 
-                // Check 7: Missing honey types
+                // Check 7: Missing care service types (formerly honey types)
                 if (!site.honeyPotentials || !Array.isArray(site.honeyPotentials) || site.honeyPotentials.length === 0) {
+                    issues.missingCareServiceTypes.push({
+                        siteName: site.name,
+                        siteId: site.id
+                    });
+                    // Backward compatibility
+                    if (!issues.missingHoneyTypes) issues.missingHoneyTypes = [];
                     issues.missingHoneyTypes.push({
                         siteName: site.name,
                         siteId: site.id
@@ -4311,7 +4518,7 @@
                               issues.missingGPS.length + 
                               issues.missingContactDetails.length +
                               issues.invalidPhoneNumbers.length +
-                              issues.missingHoneyTypes.length +
+                              (issues.missingCareServiceTypes ? issues.missingCareServiceTypes.length : issues.missingHoneyTypes.length) +
                               issues.overdueCompliance.length;
             
             // Generate HTML report
@@ -4339,7 +4546,9 @@
                 if (issues.missingGPS.length > 0) tocItems.push(`<li><a href="#integrity-missing-gps" class="link-warning text-decoration-none">Missing GPS Coordinates (${issues.missingGPS.length})</a></li>`);
                 if (issues.missingContactDetails.length > 0) tocItems.push(`<li><a href="#integrity-missing-contact" class="link-warning text-decoration-none">Missing Contact Details (${issues.missingContactDetails.length})</a></li>`);
                 if (issues.invalidPhoneNumbers && issues.invalidPhoneNumbers.length > 0) tocItems.push(`<li><a href="#integrity-invalid-phone" class="link-warning text-decoration-none">Invalid Phone Numbers (${issues.invalidPhoneNumbers.length})</a></li>`);
-                if (issues.missingHoneyTypes.length > 0) tocItems.push(`<li><a href="#integrity-missing-honey" class="link-warning text-decoration-none">Missing Honey Types (${issues.missingHoneyTypes.length})</a></li>`);
+                const missingServiceTypesCount = (issues.missingCareServiceTypes ? issues.missingCareServiceTypes.length : issues.missingHoneyTypes.length);
+                if (missingServiceTypesCount > 0) tocItems.push(`<li><a href="#integrity-missing-service-types" class="link-warning text-decoration-none">Missing Care Service Types (${missingServiceTypesCount})</a></li>`);
+                if (issues.missingHoneyTypes && issues.missingHoneyTypes.length > 0) tocItems.push(`<li><a href="#integrity-missing-honey" class="link-warning text-decoration-none">Missing Honey Types (${issues.missingHoneyTypes.length})</a></li>`); // Backward compatibility
                 if (issues.overdueCompliance.length > 0) tocItems.push(`<li><a href="#integrity-overdue-compliance" class="link-warning text-decoration-none">Overdue Compliance (${issues.overdueCompliance.length})</a></li>`);
                 // Prefer injecting inside the Analysis card; fallback to legacy placeholder if present
                 const tocEl = document.getElementById('integrityTOCInCard') || document.getElementById('integrityTOC');
@@ -4375,7 +4584,8 @@
                                             { id: 'integrity-missing-gps', label: 'Missing GPS', count: issues.missingGPS.length },
                                             { id: 'integrity-missing-contact', label: 'Missing Contact', count: issues.missingContactDetails.length },
                                             { id: 'integrity-invalid-phone', label: 'Invalid Phone', count: issues.invalidPhoneNumbers ? issues.invalidPhoneNumbers.length : 0 },
-                                            { id: 'integrity-missing-honey', label: 'Missing Honey Types', count: issues.missingHoneyTypes.length },
+                                            { id: 'integrity-missing-service-types', label: 'Missing Care Service Types', count: (issues.missingCareServiceTypes ? issues.missingCareServiceTypes.length : issues.missingHoneyTypes.length) },
+                                            { id: 'integrity-missing-honey', label: 'Missing Honey Types', count: (issues.missingHoneyTypes ? issues.missingHoneyTypes.length : 0) }, // Backward compatibility
                                             { id: 'integrity-overdue-compliance', label: 'Overdue Compliance', count: issues.overdueCompliance.length }
                                         ].map(item => {
                                             const disabled = item.count === 0;
@@ -4575,18 +4785,19 @@
                     `;
                 }
                 
-                // Missing honey types
-                if (issues.missingHoneyTypes.length > 0) {
+                // Missing care service types (formerly honey types)
+                const missingServiceTypes = issues.missingCareServiceTypes || issues.missingHoneyTypes || [];
+                if (missingServiceTypes.length > 0) {
                     html += `
-                        <div id="integrity-missing-honey" class="card mb-3 border-warning">
+                        <div id="integrity-missing-service-types" class="card mb-3 border-warning">
                             <div class="card-header bg-warning text-dark">
-                                <i class="bi bi-flower1"></i> Missing Honey Types (${issues.missingHoneyTypes.length})
+                                <i class="bi bi-heart-pulse"></i> Missing Care Service Types (${missingServiceTypes.length})
                             </div>
                             <div class="card-body">
-                                <p class="text-muted">Sites without honey type information:</p>
+                                <p class="text-muted">Locations without care service type information:</p>
                                 <ul class="list-group">
                     `;
-                    issues.missingHoneyTypes.forEach(issue => {
+                    missingServiceTypes.forEach(issue => {
                         html += `
                             <li class="list-group-item">
                                 <strong>${issue.siteName}</strong> (ID: ${issue.siteId})

@@ -1,20 +1,20 @@
-// BeeMarshall - Interactive Hive Analysis Card
-// Functions for hive analysis card on dashboard
+// HomeCare - Interactive Client Analysis Card
+// Functions for client status analysis card on dashboard
 
-// Update hive strength breakdown
-function updateHiveStrengthBreakdown() {
+// Update client status breakdown
+function updateClientStatusBreakdown() {
     if (!window.sites || window.sites.length === 0) {
         if (typeof Logger !== 'undefined') {
-            Logger.log('📭 No sites data for hive strength breakdown');
+            Logger.log('📭 No sites data for client status breakdown');
         }
         return;
     }
     
-    let totalStrong = 0;
-    let totalMedium = 0;
-    let totalWeak = 0;
-    let totalNUC = 0;
-    let totalDead = 0;
+    let totalIndependent = 0;
+    let totalAssisted = 0;
+    let totalDependent = 0;
+    let totalRehabilitation = 0;
+    let totalHospice = 0;
     let totalQuarantine = 0;
     
     window.sites.forEach(site => {
@@ -22,12 +22,15 @@ function updateHiveStrengthBreakdown() {
         if (site.archived === true || site.archived === 'true' || site.archived === 1) return;
         if (site.deleted === true || site.deleted === 'true' || site.deleted === 1) return;
         
-        if (site.hiveStrength) {
-            totalStrong += site.hiveStrength.strong || 0;
-            totalMedium += site.hiveStrength.medium || 0;
-            totalWeak += site.hiveStrength.weak || 0;
-            totalNUC += site.hiveStrength.nuc || 0;
-            totalDead += site.hiveStrength.dead || 0;
+        // Support both old hiveStrength and new clientStatus field names for backward compatibility
+        const clientStatus = site.clientStatus || site.hiveStrength;
+        if (clientStatus) {
+            // Map old hive strength to new client status
+            totalIndependent += clientStatus.independent || clientStatus.strong || 0;
+            totalAssisted += clientStatus.assisted || clientStatus.medium || 0;
+            totalDependent += clientStatus.dependent || clientStatus.weak || 0;
+            totalRehabilitation += clientStatus.rehabilitation || clientStatus.nuc || 0;
+            totalHospice += clientStatus.hospice || clientStatus.dead || 0;
         }
         // Count quarantine sites
         if (site.isQuarantine) {
@@ -35,10 +38,10 @@ function updateHiveStrengthBreakdown() {
         }
     });
     
-    // Calculate total active hives (excluding dead)
-    const totalActiveHives = totalStrong + totalMedium + totalWeak + totalNUC;
+    // Calculate total active clients (excluding hospice)
+    const totalActiveClients = totalIndependent + totalAssisted + totalDependent + totalRehabilitation;
     
-    // Update the display
+    // Update the display - maintain backward compatibility with old IDs
     const strongEl = document.getElementById('strongCount');
     const mediumEl = document.getElementById('mediumCount');
     const weakEl = document.getElementById('weakCount');
@@ -46,24 +49,24 @@ function updateHiveStrengthBreakdown() {
     const deadEl = document.getElementById('deadCount');
     const quarantineEl = document.getElementById('quarantineCount');
     
-    if (strongEl) strongEl.textContent = totalStrong;
-    if (mediumEl) mediumEl.textContent = totalMedium;
-    if (weakEl) weakEl.textContent = totalWeak;
-    if (nucEl) nucEl.textContent = totalNUC;
-    if (deadEl) deadEl.textContent = totalDead;
+    if (strongEl) strongEl.textContent = totalIndependent;
+    if (mediumEl) mediumEl.textContent = totalAssisted;
+    if (weakEl) weakEl.textContent = totalDependent;
+    if (nucEl) nucEl.textContent = totalRehabilitation;
+    if (deadEl) deadEl.textContent = totalHospice;
     if (quarantineEl) quarantineEl.textContent = totalQuarantine;
     
     // Update correlation display if it exists
     const correlationEl = document.getElementById('hiveBreakdownTotal');
     if (correlationEl) {
-        correlationEl.textContent = totalActiveHives;
+        correlationEl.textContent = totalActiveClients;
     }
     
     // Also update equipment breakdown
     updateEquipmentBreakdown();
 }
 
-// Update equipment breakdown (hive stacks)
+// Update equipment breakdown (care equipment)
 function updateEquipmentBreakdown() {
     if (!window.sites || window.sites.length === 0) {
         if (typeof Logger !== 'undefined') {
@@ -79,15 +82,17 @@ function updateEquipmentBreakdown() {
     let totalEmpty = 0;
     
     let sitesProcessed = 0;
-    let sitesWithStacks = 0;
+    let sitesWithEquipment = 0;
     window.sites.forEach(site => {
         // Exclude archived and deleted sites from calculations (same filtering as dashboard)
         if (site.archived === true || site.archived === 'true' || site.archived === 1) return;
         if (site.deleted === true || site.deleted === 'true' || site.deleted === 1) return;
         
         sitesProcessed++;
-        if (site.hiveStacks && typeof site.hiveStacks === 'object') {
-            sitesWithStacks++;
+        // Support both old hiveStacks and new careEquipment field names for backward compatibility
+        const equipment = site.careEquipment || site.hiveStacks;
+        if (equipment && typeof equipment === 'object') {
+            sitesWithEquipment++;
             // Helper function to safely parse numeric values
             const safeParse = (val) => {
                 if (val === null || val === undefined) return 0;
@@ -95,11 +100,11 @@ function updateEquipmentBreakdown() {
                 return isNaN(parsed) ? 0 : parsed;
             };
             
-            const doubles = safeParse(site.hiveStacks.doubles);
-            const topSplits = safeParse(site.hiveStacks.topSplits);
-            const singles = safeParse(site.hiveStacks.singles);
-            const nucs = safeParse(site.hiveStacks.nucs);
-            const empty = safeParse(site.hiveStacks.empty);
+            const doubles = safeParse(equipment.doubles);
+            const topSplits = safeParse(equipment.topSplits);
+            const singles = safeParse(equipment.singles);
+            const nucs = safeParse(equipment.nucs);
+            const empty = safeParse(equipment.empty);
             
             totalDoubles += doubles;
             totalTopSplits += topSplits;
@@ -114,7 +119,7 @@ function updateEquipmentBreakdown() {
     });
     
     if (typeof Logger !== 'undefined') {
-        Logger.log('📊 Equipment breakdown - sites processed:', sitesProcessed, 'of', window.sites.length, '| sites with hiveStacks:', sitesWithStacks);
+        Logger.log('📊 Equipment breakdown - sites processed:', sitesProcessed, 'of', window.sites.length, '| sites with equipment:', sitesWithEquipment);
     }
     
     // Calculate total equipment (excluding empty)
@@ -148,6 +153,9 @@ function updateEquipmentBreakdown() {
 }
 
 // Make functions globally accessible
-window.updateHiveStrengthBreakdown = updateHiveStrengthBreakdown;
+window.updateClientStatusBreakdown = updateClientStatusBreakdown;
 window.updateEquipmentBreakdown = updateEquipmentBreakdown;
+
+// Backward compatibility aliases
+window.updateHiveStrengthBreakdown = updateClientStatusBreakdown;
 

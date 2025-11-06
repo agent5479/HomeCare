@@ -1,4 +1,4 @@
-// BeeMarshall - Employee Management Module
+// CareMarshall - Employee Management Module
 
 function showEmployees() {
     // Check permission
@@ -26,7 +26,7 @@ function handleAddEmployee(e) {
     const name = document.getElementById('newEmployeeName').value.trim();
     
     if (!name) {
-        beeMarshallAlert('Please enter employee name', 'warning');
+        homeCareAlert('Please enter employee name', 'warning');
         return;
     }
     
@@ -55,7 +55,7 @@ function handleAddEmployee(e) {
     const tenantPath = currentTenantId ? `tenants/${currentTenantId}/employees` : 'employees';
     database.ref(`${tenantPath}/${employeeId}`).set(employee)
         .then(() => {
-            beeMarshallAlert(`✅ Employee "${name}" added successfully!\n\nStatus: Pending Activation\nUsername: ${name}\nPassword: ${temporaryPassword}\n\nClick "Activate" to enable login access.`, 'success');
+            homeCareAlert(`✅ Employee "${name}" added successfully!\n\nStatus: Pending Activation\nUsername: ${name}\nPassword: ${temporaryPassword}\n\nClick "Activate" to enable login access.`, 'success');
             document.getElementById('addEmployeeForm').reset();
             loadEmployees();
         });
@@ -191,7 +191,7 @@ function activateEmployee(id) {
     
     const employee = employees.find(emp => emp.id === id);
     if (!employee) {
-        beeMarshallAlert('Employee not found', 'error');
+        homeCareAlert('Employee not found', 'error');
         return;
     }
     
@@ -212,12 +212,12 @@ function activateEmployee(id) {
     
     database.ref(`${tenantPath}/${id}`).update(updates)
         .then(() => {
-            beeMarshallAlert(`✅ Employee "${employee.username}" has been activated!\n\nPassword: ${temporaryPassword}\nExpires: ${expiryDate.toLocaleDateString()}\n\nShare this password with the employee.`, 'success');
+            homeCareAlert(`✅ Employee "${employee.username}" has been activated!\n\nPassword: ${temporaryPassword}\nExpires: ${expiryDate.toLocaleDateString()}\n\nShare this password with the employee.`, 'success');
             loadEmployees();
         })
         .catch(error => {
             console.error('Error activating employee:', error);
-            beeMarshallAlert('Failed to activate employee', 'error');
+            homeCareAlert('Failed to activate employee', 'error');
         });
 }
 
@@ -231,12 +231,12 @@ function regenerateTemporaryPassword(id) {
     
     const employee = employees.find(emp => emp.id === id);
     if (!employee) {
-        beeMarshallAlert('Employee not found', 'error');
+        homeCareAlert('Employee not found', 'error');
         return;
     }
     
     if (!employee.isActive) {
-        beeMarshallAlert('Employee must be active to regenerate password', 'error');
+        homeCareAlert('Employee must be active to regenerate password', 'error');
         return;
     }
     
@@ -256,12 +256,12 @@ function regenerateTemporaryPassword(id) {
     
     database.ref(`${tenantPath}/${id}`).update(updates)
         .then(() => {
-            beeMarshallAlert(`✅ New password generated for "${employee.username}"!\n\nNew Password: ${temporaryPassword}\nExpires: ${expiryDate.toLocaleDateString()}\n\nShare this new password with the employee.`, 'success');
+            homeCareAlert(`✅ New password generated for "${employee.username}"!\n\nNew Password: ${temporaryPassword}\nExpires: ${expiryDate.toLocaleDateString()}\n\nShare this new password with the employee.`, 'success');
             loadEmployees();
         })
         .catch(error => {
             console.error('Error regenerating password:', error);
-            beeMarshallAlert('Failed to regenerate password', 'error');
+            homeCareAlert('Failed to regenerate password', 'error');
         });
 }
 
@@ -275,7 +275,7 @@ function deactivateEmployee(id) {
     
     const employee = employees.find(emp => emp.id === id);
     if (!employee) {
-        beeMarshallAlert('Employee not found', 'error');
+        homeCareAlert('Employee not found', 'error');
         return;
     }
     
@@ -284,12 +284,12 @@ function deactivateEmployee(id) {
         const tenantPath = currentTenantId ? `tenants/${currentTenantId}/employees` : 'employees';
         database.ref(`${tenantPath}/${id}/isActive`).set(false)
             .then(() => {
-                beeMarshallAlert(`Employee "${employee.username}" has been deactivated.`, 'info');
+                homeCareAlert(`Employee "${employee.username}" has been deactivated.`, 'info');
                 loadEmployees();
             })
             .catch(error => {
                 console.error('Error deactivating employee:', error);
-                beeMarshallAlert('Failed to deactivate employee', 'error');
+                homeCareAlert('Failed to deactivate employee', 'error');
             });
     }
 }
@@ -304,7 +304,7 @@ function showEmployeeCredentials(id) {
     
     const employee = employees.find(emp => emp.id === id);
     if (!employee) {
-        beeMarshallAlert('Employee not found', 'error');
+        homeCareAlert('Employee not found', 'error');
         return;
     }
     
@@ -423,18 +423,18 @@ function copyToClipboard(elementId) {
     element.select();
     element.setSelectionRange(0, 99999); // For mobile devices
     document.execCommand('copy');
-    beeMarshallAlert('Copied to clipboard!', 'success');
+    careMarshallAlert('Copied to clipboard!', 'success');
 }
 
 // Copy complete login information for employee
 function copyLoginInfo(employeeId) {
     const employee = employees.find(emp => emp.id === employeeId);
     if (!employee) {
-        beeMarshallAlert('Employee not found', 'error');
+        homeCareAlert('Employee not found', 'error');
         return;
     }
     
-    const loginInfo = `BeeMarshall Login Information
+    const loginInfo = `CareMarshall Login Information
 
 Username: ${employee.username}
 Password: [The password you set when creating this account]
@@ -452,7 +452,7 @@ ${!employee.isActive ? '4. Contact Lars if you see "account not active" message'
 Need help? Contact Lars for assistance.`;
     
     navigator.clipboard.writeText(loginInfo).then(() => {
-        beeMarshallAlert('Login information copied to clipboard!', 'success');
+        homeCareAlert('Login information copied to clipboard!', 'success');
     }).catch(() => {
         // Fallback for older browsers
         const textArea = document.createElement('textarea');
@@ -461,7 +461,7 @@ Need help? Contact Lars for assistance.`;
         textArea.select();
         document.execCommand('copy');
         document.body.removeChild(textArea);
-        beeMarshallAlert('Login information copied to clipboard!', 'success');
+        homeCareAlert('Login information copied to clipboard!', 'success');
     });
 }
 
@@ -469,13 +469,13 @@ Need help? Contact Lars for assistance.`;
 function generateLoginMessage(employeeId) {
     const employee = employees.find(emp => emp.id === employeeId);
     if (!employee) {
-        beeMarshallAlert('Employee not found', 'error');
+        homeCareAlert('Employee not found', 'error');
         return;
     }
     
     const message = `Hi ${employee.username},
 
-Your BeeMarshall account has been created! Here are your login details:
+Your CareMarshall account has been created! Here are your login details:
 
 🔐 Login Information:
 • Username: ${employee.username}
@@ -488,7 +488,7 @@ ${employee.activationCode ? `• Activation Code: ${employee.activationCode}` : 
 • Just enter your username and password to login
 
 📱 What you can do:
-• View and manage apiary sites
+• View and manage care locations
 • Log actions and tasks
 • View reports and analytics
 • Collaborate with the team in real-time
@@ -498,7 +498,7 @@ ${!employee.isActive ? '⚠️ Note: Your account will be activated by Lars befo
 Need help? Just ask Lars!
 
 Best regards,
-Lars (BeeMarshall Admin)`;
+Jess (CareMarshall Admin)`;
     
     // Create modal to show the message
     const modal = document.createElement('div');
@@ -551,7 +551,7 @@ Lars (BeeMarshall Admin)`;
 function printLoginCard(employeeId) {
     const employee = employees.find(emp => emp.id === employeeId);
     if (!employee) {
-        beeMarshallAlert('Employee not found', 'error');
+        homeCareAlert('Employee not found', 'error');
         return;
     }
     
@@ -560,7 +560,7 @@ function printLoginCard(employeeId) {
         <!DOCTYPE html>
         <html>
         <head>
-            <title>BeeMarshall Login Card - ${employee.username}</title>
+            <title>CareMarshall Login Card - ${employee.username}</title>
             <style>
                 body { font-family: Arial, sans-serif; margin: 20px; }
                 .card { border: 2px solid #007bff; border-radius: 10px; padding: 20px; max-width: 400px; margin: 0 auto; }
@@ -578,7 +578,7 @@ function printLoginCard(employeeId) {
         <body>
             <div class="card">
                 <div class="header">
-                    <h2>🐝 BeeMarshall</h2>
+                    <h2>🏠 CareMarshall</h2>
                     <h3>Login Information</h3>
                 </div>
                 
@@ -638,7 +638,7 @@ function printLoginCard(employeeId) {
     printWindow.focus();
     printWindow.print();
     
-    beeMarshallAlert('Login card opened for printing!', 'success');
+    careMarshallAlert('Login card opened for printing!', 'success');
 }
 
 // Helper functions for message sharing
@@ -647,12 +647,12 @@ function copyMessageText() {
     messageText.select();
     messageText.setSelectionRange(0, 99999);
     document.execCommand('copy');
-    beeMarshallAlert('Message copied to clipboard!', 'success');
+    careMarshallAlert('Message copied to clipboard!', 'success');
 }
 
 function emailMessage() {
     const messageText = document.getElementById('loginMessageText').value;
-    const subject = 'BeeMarshall Login Information';
+    const subject = 'CareMarshall Login Information';
     const body = encodeURIComponent(messageText);
     const mailtoLink = `mailto:?subject=${encodeURIComponent(subject)}&body=${body}`;
     window.open(mailtoLink);

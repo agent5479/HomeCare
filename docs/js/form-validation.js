@@ -1,4 +1,4 @@
-// BeeMarshall - Form Validation System
+// HomeCare - Form Validation System
 // Enhanced form validation with real-time feedback and field grouping
 
 const FormValidator = {
@@ -25,12 +25,19 @@ const FormValidator = {
             max: 180,
             message: 'Longitude must be between -180 and 180 degrees'
         },
-        hiveCount: {
+        clientCount: {
             required: true,
             type: 'number',
             min: 0,
             max: 1000,
-            message: 'Hive count must be between 0 and 1000'
+            message: 'Client count must be between 0 and 1000'
+        },
+        hiveCount: { // Backward compatibility
+            required: true,
+            type: 'number',
+            min: 0,
+            max: 1000,
+            message: 'Client count must be between 0 and 1000'
         }
     },
     

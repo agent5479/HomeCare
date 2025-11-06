@@ -1,4 +1,4 @@
-// BeeMarshall - Calendar Feed System
+// HomeCare - Calendar Feed System
 // Server-based ICS feed for calendar applications
 
 // Generate server-based calendar feed URL
@@ -22,7 +22,7 @@ function copyServerCalendarFeedLink() {
     const feedUrl = generateServerCalendarFeed();
     
     navigator.clipboard.writeText(feedUrl).then(() => {
-        beeMarshallAlert(
+        homeCareAlert(
             `📋 Server Calendar Feed Link Copied!\n\n✅ URL: ${feedUrl}\n\n📅 Subscribe to this link in:\n• Google Calendar\n• Outlook\n• Apple Calendar\n• Any calendar app\n\n🔄 The feed updates automatically when you schedule tasks!`,
             'success'
         );
@@ -30,7 +30,7 @@ function copyServerCalendarFeedLink() {
         Logger.error('Failed to copy calendar feed link:', err);
         
         // Fallback: show the URL in an alert
-        beeMarshallAlert(
+        homeCareAlert(
             `📋 Copy this URL:\n\n${feedUrl}\n\n📅 Subscribe to this link in your calendar app to get automatic task updates.`,
             'info'
         );
@@ -49,12 +49,12 @@ function generateICSCalendarFeed() {
     let icsContent = [
         'BEGIN:VCALENDAR',
         'VERSION:2.0',
-        'PRODID:-//BeeMarshall//Task Calendar//EN',
+        'PRODID:-//HomeCare//Task Calendar//EN',
         'CALSCALE:GREGORIAN',
         'METHOD:PUBLISH',
-        'X-WR-CALNAME:BeeMarshall Scheduled Tasks',
+        'X-WR-CALNAME:HomeCare Scheduled Tasks',
         'X-WR-TIMEZONE:UTC',
-        'X-WR-CALDESC:Automatic task calendar from BeeMarshall Apiary Management',
+        'X-WR-CALDESC:Automatic task calendar from HomeCare Professional Care Management',
         `X-WR-CALID:${generateServerCalendarFeed()}`
     ];
     
@@ -86,12 +86,12 @@ function generateICSCalendarFeed() {
         const endUTC = endDate.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
         
         const summary = displayTaskName;
-        const description = `BeeMarshall Task\n\nSite: ${site?.name || 'Unknown'}\nPriority: ${task.priority || 'normal'}\nType: ${task.type || 'scheduled'}\n${task.notes ? `\nNotes: ${task.notes}` : ''}\n\nView in BeeMarshall: ${window.location.origin}`;
-        const location = site?.name || 'Apiary Location';
+        const description = `HomeCare Task\n\nLocation: ${site?.name || 'Unknown'}\nPriority: ${task.priority || 'normal'}\nType: ${task.type || 'scheduled'}\n${task.notes ? `\nNotes: ${task.notes}` : ''}\n\nView in HomeCare: ${window.location.origin}`;
+        const location = site?.name || 'Care Location';
         
         icsContent.push(
             'BEGIN:VEVENT',
-            `UID:${task.id}@beemarshall.com`,
+            `UID:${task.id}@homecare.com`,
             `DTSTART:${startUTC}`,
             `DTEND:${endUTC}`,
             `DTSTAMP:${nowUTC}`,
@@ -100,7 +100,7 @@ function generateICSCalendarFeed() {
             `LOCATION:${location}`,
             `STATUS:CONFIRMED`,
             `PRIORITY:${task.priority === 'urgent' ? '1' : task.priority === 'high' ? '2' : '3'}`,
-            `CATEGORIES:BEEKEEPING,APIARY`,
+            `CATEGORIES:HOMECARE,CARE_MANAGEMENT`,
             `CREATED:${nowUTC}`,
             `LAST-MODIFIED:${nowUTC}`,
             `SEQUENCE:0`,
@@ -121,12 +121,12 @@ function generateEmptyICS() {
     return [
         'BEGIN:VCALENDAR',
         'VERSION:2.0',
-        'PRODID:-//BeeMarshall//Task Calendar//EN',
+        'PRODID:-//HomeCare//Task Calendar//EN',
         'CALSCALE:GREGORIAN',
         'METHOD:PUBLISH',
-        'X-WR-CALNAME:BeeMarshall Scheduled Tasks',
+        'X-WR-CALNAME:HomeCare Scheduled Tasks',
         'X-WR-TIMEZONE:UTC',
-        'X-WR-CALDESC:Automatic task calendar from BeeMarshall Apiary Management',
+        'X-WR-CALDESC:Automatic task calendar from HomeCare Professional Care Management',
         'END:VCALENDAR'
     ].join('\r\n');
 }

@@ -1,4 +1,4 @@
-// BeeMarshall - Site Management Module with Custom Grouping
+// CareMarshall - Site Management Module with Custom Groupingbeemarshall setup
 
 // Global variable to track whether to show archived sites
 let showArchivedSites = false;
@@ -19,7 +19,7 @@ function invalidateSitesRenderCache() {
 
 // Site types and their associated colors
 const SITE_TYPES = {
-    'production': { name: 'Production', color: '#28a745', icon: 'bi-hexagon-fill' },
+    'production': { name: 'Production', color: '#28a745', icon: 'bi-house-heart-fill' },
     'nucleus': { name: 'Nucleus', color: '#17a2b8', icon: 'bi-circle-fill' },
     'queen-rearing': { name: 'Queen Rearing', color: '#ffc107', icon: 'bi-star-fill' },
     'research': { name: 'Research', color: '#6f42c1', icon: 'bi-flask' },
@@ -201,11 +201,48 @@ function _renderSitesInternal() {
                 // Get compact landowner/contact info for one-line display (avoid bloat)
                 const landownerName = c.landownerName || '';
                 const landownerPhone = c.landownerPhone || '';
+                const landownerEmail = c.landownerEmail || '';
                 const landownerAddress = c.landownerAddress || '';
                 const contactLine = [landownerName, landownerPhone].filter(Boolean).join(' • ');
                 const addressLine = landownerAddress;
                 const landownerDisplay = [contactLine, addressLine].filter(Boolean).join(', ');
                 const landownerTitle = [contactLine, addressLine].filter(Boolean).join(' — ');
+                
+                // Get clients at this site
+                const siteClients = (window.clients || window.individualHives || []).filter(client => client.siteId === c.id);
+                const clientCount = siteClients.length;
+                
+                // Get client status summary
+                const clientStatusSummary = {
+                    independent: siteClients.filter(c => (c.status || c.hiveStrength) === 'independent' || (c.status || c.hiveStrength) === 'strong').length,
+                    assisted: siteClients.filter(c => (c.status || c.hiveStrength) === 'assisted' || (c.status || c.hiveStrength) === 'medium').length,
+                    dependent: siteClients.filter(c => (c.status || c.hiveStrength) === 'dependent' || (c.status || c.hiveStrength) === 'weak').length,
+                    rehabilitation: siteClients.filter(c => (c.status || c.hiveStrength) === 'rehabilitation' || (c.status || c.hiveStrength) === 'nuc').length,
+                    hospice: siteClients.filter(c => (c.status || c.hiveStrength) === 'hospice' || (c.status || c.hiveStrength) === 'dead').length
+                };
+                
+                // Get pending tasks for this site
+                const siteTasks = (window.scheduledTasks || []).filter(task => 
+                    task.siteId === c.id && !task.completed
+                ).sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
+                const overdueTasks = siteTasks.filter(task => new Date(task.dueDate) < new Date());
+                const urgentTasks = siteTasks.filter(task => task.priority === 'urgent');
+                
+                // Get special needs flags
+                const specialNeeds = c.specialNeeds || {};
+                const activeFlags = [];
+                if (specialNeeds.wheelchairAccessible) activeFlags.push({ icon: 'bi-wheelchair', label: 'Wheelchair Access', color: 'primary', bg: 'bg-primary' });
+                if (specialNeeds.medicalEquipmentOnSite) activeFlags.push({ icon: 'bi-heart-pulse', label: 'Medical Equipment', color: 'danger', bg: 'bg-danger' });
+                if (specialNeeds.specialInstructionsRequired) activeFlags.push({ icon: 'bi-exclamation-triangle', label: 'Special Instructions', color: 'warning', bg: 'bg-warning text-dark' });
+                if (specialNeeds.petPresent) activeFlags.push({ icon: 'bi-heart', label: 'Pet Present', color: 'info', bg: 'bg-info' });
+                if (specialNeeds.familyMemberPresent) activeFlags.push({ icon: 'bi-people', label: 'Family Present', color: 'success', bg: 'bg-success' });
+                if (specialNeeds.restrictedAccess) activeFlags.push({ icon: 'bi-shield-lock', label: 'Restricted Access', color: 'secondary', bg: 'bg-secondary' });
+                if (specialNeeds.emergencyContactRequired) activeFlags.push({ icon: 'bi-telephone', label: 'Emergency Contact', color: 'danger', bg: 'bg-danger' });
+                if (specialNeeds.medicationStorageAvailable) activeFlags.push({ icon: 'bi-capsule', label: 'Med Storage', color: 'primary', bg: 'bg-primary' });
+                if (specialNeeds.oxygenEquipment) activeFlags.push({ icon: 'bi-airplane', label: 'Oxygen Equipment', color: 'info', bg: 'bg-info' });
+                if (specialNeeds.dementiaCare) activeFlags.push({ icon: 'bi-brain', label: 'Dementia Care', color: 'purple', bg: 'bg-purple', style: 'background-color: #6f42c1;' });
+                if (specialNeeds.fallRisk) activeFlags.push({ icon: 'bi-exclamation-circle', label: 'Fall Risk', color: 'warning', bg: 'bg-warning text-dark' });
+                if (specialNeeds.woundCareRequired) activeFlags.push({ icon: 'bi-bandaid', label: 'Wound Care', color: 'danger', bg: 'bg-danger' });
                 
                 // Check if contact before visit is required (handle both boolean and string values)
                 const needsContact = c.contactBeforeVisit === true || c.contactBeforeVisit === 'true' || c.contactBeforeVisit === 1 || c.contactBeforeVisit === '1';
@@ -274,6 +311,7 @@ function _renderSitesInternal() {
                                         </span>
                                         ${seasonalBadge}
                                         ${needsContact ? `<span class="badge bg-warning text-dark ms-2 contact-required-badge" style="font-weight: bold;" title="Contact required before visit"><i class="bi bi-telephone-fill"></i> Contact Required</span>` : ''}
+                                        ${c.isQuarantine ? `<span class="badge bg-danger ms-2" style="font-weight: bold;" title="Isolation/Quarantine required"><i class="bi bi-shield-exclamation"></i> Isolation</span>` : ''}
                                         <span class="badge ms-2" style="background-color: #ffffff; color: #000; border: 1px solid #ddd; border-radius: 4px; font-size: 1.25rem; font-weight: bold;">
                                             ${totalHiveCount}
                                         </span>
@@ -285,11 +323,76 @@ function _renderSitesInternal() {
                                     ${lastVisitDisplay}
                                 </div>
                                 
-                                <!-- Landowner contact (single truncated line: name/phone, address) -->
-                                <div class="mb-2" title="${landownerTitle}">
-                                    <i class="bi bi-person-fill text-muted me-1"></i>
-                                    <strong>Landowner:</strong> <span class="d-inline-block text-truncate" style="max-width: 100%;">${landownerDisplay || 'Not specified'}</span>
+                                <!-- Contact Information (Enhanced for employees) -->
+                                <div class="mb-2">
+                                    <div class="d-flex align-items-center justify-content-between mb-1">
+                                        <strong><i class="bi bi-person-fill text-primary me-1"></i> Contact:</strong>
+                                        ${landownerName ? `<button class="btn btn-sm btn-outline-primary" onclick="event.stopPropagation(); showContactDetails(${c.id})" title="View full contact details">
+                                            <i class="bi bi-telephone"></i> Details
+                                        </button>` : ''}
+                                    </div>
+                                    ${landownerName ? `<div class="small">
+                                        <i class="bi bi-person"></i> ${landownerName}
+                                        ${landownerPhone ? ` • <a href="tel:${landownerPhone}" onclick="event.stopPropagation();" class="text-decoration-none"><i class="bi bi-telephone"></i> ${landownerPhone}</a>` : ''}
+                                        ${landownerEmail ? ` • <a href="mailto:${landownerEmail}" onclick="event.stopPropagation();" class="text-decoration-none"><i class="bi bi-envelope"></i> Email</a>` : ''}
+                                    </div>` : '<span class="text-muted small">No contact information</span>'}
+                                    ${landownerAddress ? `<div class="small text-muted mt-1">
+                                        <i class="bi bi-geo-alt"></i> ${landownerAddress}
+                                    </div>` : ''}
                                 </div>
+                                
+                                <!-- Client Summary (if clients exist) -->
+                                ${clientCount > 0 ? `
+                                <div class="mb-2">
+                                    <div class="d-flex align-items-center justify-content-between mb-1">
+                                        <strong><i class="bi bi-house-heart text-primary me-1"></i> Clients (${clientCount}):</strong>
+                                        <button class="btn btn-sm btn-outline-info" onclick="event.stopPropagation(); showSiteClients(${c.id})" title="View client details">
+                                            <i class="bi bi-list-ul"></i> View All
+                                        </button>
+                                    </div>
+                                    <div class="d-flex flex-wrap gap-1">
+                                        ${clientStatusSummary.independent > 0 ? `<span class="badge bg-success" title="Independent clients">Ind: ${clientStatusSummary.independent}</span>` : ''}
+                                        ${clientStatusSummary.assisted > 0 ? `<span class="badge bg-info" title="Assisted clients">Asst: ${clientStatusSummary.assisted}</span>` : ''}
+                                        ${clientStatusSummary.dependent > 0 ? `<span class="badge bg-warning text-dark" title="Dependent clients">Dep: ${clientStatusSummary.dependent}</span>` : ''}
+                                        ${clientStatusSummary.rehabilitation > 0 ? `<span class="badge bg-purple" style="background-color: #6f42c1;" title="Rehabilitation clients">Rehab: ${clientStatusSummary.rehabilitation}</span>` : ''}
+                                        ${clientStatusSummary.hospice > 0 ? `<span class="badge bg-danger" title="Hospice clients">Hospice: ${clientStatusSummary.hospice}</span>` : ''}
+                                    </div>
+                                </div>
+                                ` : ''}
+                                
+                                <!-- Tasks Summary (if tasks exist) -->
+                                ${siteTasks.length > 0 ? `
+                                <div class="mb-2">
+                                    <div class="d-flex align-items-center justify-content-between mb-1">
+                                        <strong><i class="bi bi-list-check text-primary me-1"></i> Tasks (${siteTasks.length}):</strong>
+                                        <button class="btn btn-sm btn-outline-success" onclick="event.stopPropagation(); showSiteTasks(${c.id})" title="View all tasks">
+                                            <i class="bi bi-calendar-check"></i> View Tasks
+                                        </button>
+                                    </div>
+                                    <div class="small">
+                                        ${overdueTasks.length > 0 ? `<span class="badge bg-danger me-1">${overdueTasks.length} Overdue</span>` : ''}
+                                        ${urgentTasks.length > 0 ? `<span class="badge bg-warning text-dark me-1">${urgentTasks.length} Urgent</span>` : ''}
+                                        ${siteTasks.length - overdueTasks.length - urgentTasks.length > 0 ? `<span class="badge bg-secondary">${siteTasks.length - overdueTasks.length - urgentTasks.length} Pending</span>` : ''}
+                                    </div>
+                                    ${siteTasks.length > 0 ? `<div class="small text-muted mt-1">
+                                        Next: ${new Date(siteTasks[0].dueDate).toLocaleDateString()}
+                                    </div>` : ''}
+                                </div>
+                                ` : ''}
+                                
+                                <!-- Special Needs Flags -->
+                                ${activeFlags.length > 0 ? `
+                                <div class="mb-2">
+                                    <strong><i class="bi bi-flag-fill text-primary me-1"></i> Special Needs:</strong>
+                                    <div class="d-flex flex-wrap gap-1 mt-1">
+                                        ${activeFlags.map(flag => `
+                                            <span class="badge ${flag.bg} ${flag.style ? `style="${flag.style}"` : ''}" title="${flag.label}">
+                                                <i class="bi ${flag.icon}"></i> ${flag.label}
+                                            </span>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                                ` : ''}
                                 
                                 <!-- Description (truncated if too long) -->
                                 ${c.description ? `<div class="mb-2" title="${c.description}">
@@ -299,27 +402,27 @@ function _renderSitesInternal() {
                                 
                                 <!-- Hive Count Summary (Editable inline) -->
                                 <div class="mb-2">
-                                    <strong><i class="bi bi-hexagon-fill"></i> Hive Strength:</strong>
+                                    <strong><i class="bi bi-heart-pulse"></i> Client Status:</strong>
                                     <div class="d-flex flex-wrap gap-2 mt-1">
                                         <div class="badge bg-success d-flex align-items-center px-3 py-2 hive-strength-badge" onclick="quickEditHiveStrength(${c.id}, 'Strong', ${hiveStrong})" style="cursor: pointer; font-size: 1rem; font-weight: 600; min-width: 80px; justify-content: center;">
-                                            <i class="bi bi-hexagon-fill me-1"></i>
-                                            <span>Strong: <strong id="hiveStrong_${c.id}">${hiveStrong}</strong></span>
+                                            <i class="bi bi-house-check-fill me-1"></i>
+                                            <span>Independent: <strong id="hiveStrong_${c.id}">${hiveStrong}</strong></span>
                                         </div>
                                         <div class="badge bg-warning text-dark d-flex align-items-center px-3 py-2 hive-strength-badge" onclick="quickEditHiveStrength(${c.id}, 'Medium', ${hiveMedium})" style="cursor: pointer; font-size: 1rem; font-weight: 600; min-width: 80px; justify-content: center;">
-                                            <i class="bi bi-hexagon me-1"></i>
-                                            <span>Med: <strong id="hiveMedium_${c.id}">${hiveMedium}</strong></span>
+                                            <i class="bi bi-house-heart me-1"></i>
+                                            <span>Assisted: <strong id="hiveMedium_${c.id}">${hiveMedium}</strong></span>
                                         </div>
                                         <div class="badge bg-danger d-flex align-items-center px-3 py-2 hive-strength-badge" onclick="quickEditHiveStrength(${c.id}, 'Weak', ${hiveWeak})" style="cursor: pointer; font-size: 1rem; font-weight: 600; min-width: 80px; justify-content: center;">
-                                            <i class="bi bi-hexagon me-1"></i>
-                                            <span>Weak: <strong id="hiveWeak_${c.id}">${hiveWeak}</strong></span>
+                                            <i class="bi bi-heart-pulse me-1"></i>
+                                            <span>Dependent: <strong id="hiveWeak_${c.id}">${hiveWeak}</strong></span>
                                         </div>
                                         <div class="badge bg-info d-flex align-items-center px-3 py-2 hive-strength-badge" onclick="quickEditHiveStrength(${c.id}, 'NUC', ${hiveNUC})" style="cursor: pointer; font-size: 1rem; font-weight: 600; min-width: 80px; justify-content: center;">
-                                            <i class="bi bi-hexagon-half me-1"></i>
-                                            <span>NUC: <strong id="hiveNUC_${c.id}">${hiveNUC}</strong></span>
+                                            <i class="bi bi-hospital me-1"></i>
+                                            <span>Rehabilitation: <strong id="hiveNUC_${c.id}">${hiveNUC}</strong></span>
                                         </div>
                                         <div class="badge bg-secondary d-flex align-items-center px-3 py-2 hive-strength-badge" onclick="quickEditHiveStrength(${c.id}, 'Dead', ${hiveDead})" style="cursor: pointer; font-size: 1rem; font-weight: 600; min-width: 80px; justify-content: center;">
-                                            <i class="bi bi-hexagon me-1"></i>
-                                            <span>Dead: <strong id="hiveDead_${c.id}">${hiveDead}</strong></span>
+                                            <i class="bi bi-heart-fill me-1"></i>
+                                            <span>Hospice: <strong id="hiveDead_${c.id}">${hiveDead}</strong></span>
                                         </div>
                                     </div>
                                 </div>
@@ -597,7 +700,7 @@ function renderSiteTypeFilter() {
                         
                         <input type="radio" class="btn-check" name="siteTypeFilter" id="filterProduction" value="production">
                         <label class="btn btn-outline-secondary btn-sm" for="filterProduction" style="border-color: #28a745; color: #28a745;">
-                            <i class="bi bi-hexagon-fill"></i> Production
+                            <i class="bi bi-house-heart-fill"></i> Production
                         </label>
                         
                         <input type="radio" class="btn-check" name="siteTypeFilter" id="filterNucleus" value="nucleus">
@@ -691,7 +794,7 @@ function toggleSiteFilter() {
 function showAddSiteForm() {
     // Check if user has permission to add sites
     if (!isAdmin) {
-        beeMarshallAlert('Only administrators can add new sites. Contact your administrator to add new sites.', 'warning');
+        careMarshallAlert('Only administrators can add new sites. Contact your administrator to add new sites.', 'warning');
         return;
     }
     
@@ -791,7 +894,7 @@ function handleSaveSite(e) {
     const nameField = document.getElementById('siteName');
     const nameValue = nameField.value.trim();
     if (!nameValue) {
-        beeMarshallAlert('⚠️ Site name is required', 'warning');
+        careMarshallAlert('⚠️ Site name is required', 'warning');
         nameField.focus();
         nameField.scrollIntoView({ behavior: 'smooth', block: 'center' });
         return;
@@ -803,7 +906,7 @@ function handleSaveSite(e) {
     
     // Allow 0 hives for all sites (some sites may be waiting for action or new contracts)
     if (isNaN(hiveCount) || hiveCount < 0) {
-        beeMarshallAlert('⚠️ Please enter a valid hive count (0 or greater)', 'warning');
+        careMarshallAlert('⚠️ Please enter a valid hive count (0 or greater)', 'warning');
         hiveCountField.focus();
         hiveCountField.scrollIntoView({ behavior: 'smooth', block: 'center' });
         return;
@@ -816,21 +919,21 @@ function handleSaveSite(e) {
     const lng = parseFloat(lngField.value);
     
     if (isNaN(lat) || isNaN(lng)) {
-        beeMarshallAlert('⚠️ Please enter valid GPS coordinates', 'warning');
+        careMarshallAlert('⚠️ Please enter valid GPS coordinates', 'warning');
         latField.focus();
         latField.scrollIntoView({ behavior: 'smooth', block: 'center' });
         return;
     }
     
     if (lat < -90 || lat > 90) {
-        beeMarshallAlert('⚠️ Latitude must be between -90 and 90 degrees', 'warning');
+        careMarshallAlert('⚠️ Latitude must be between -90 and 90 degrees', 'warning');
         latField.focus();
         latField.scrollIntoView({ behavior: 'smooth', block: 'center' });
         return;
     }
     
     if (lng < -180 || lng > 180) {
-        beeMarshallAlert('⚠️ Longitude must be between -180 and 180 degrees', 'warning');
+        careMarshallAlert('⚠️ Longitude must be between -180 and 180 degrees', 'warning');
         lngField.focus();
         lngField.scrollIntoView({ behavior: 'smooth', block: 'center' });
         return;
@@ -886,6 +989,35 @@ function handleSaveSite(e) {
         accessType: document.getElementById('accessType').value,
         contactBeforeVisit: document.getElementById('contactBeforeVisit').checked,
         isQuarantine: document.getElementById('isQuarantine').checked,
+        // Legal & Compliance Information
+        legalCompliance: {
+            hdsRegistrationNumber: document.getElementById('hdsRegistrationNumber')?.value || '',
+            registrationExpiry: document.getElementById('registrationExpiry')?.value || '',
+            insuranceProvider: document.getElementById('insuranceProvider')?.value || '',
+            insurancePolicyNumber: document.getElementById('insurancePolicyNumber')?.value || '',
+            insuranceExpiry: document.getElementById('insuranceExpiry')?.value || '',
+            privacyOfficer: document.getElementById('privacyOfficer')?.value || '',
+            healthSafetyOfficer: document.getElementById('healthSafetyOfficer')?.value || '',
+            recordRetentionYears: parseInt(document.getElementById('recordRetentionYears')?.value) || 7,
+            privacyCompliance: document.getElementById('privacyCompliance')?.checked || false,
+            healthSafetyCompliance: document.getElementById('healthSafetyCompliance')?.checked || false,
+            incidentReportingEnabled: document.getElementById('incidentReportingEnabled')?.checked || false
+        },
+        // Special needs flags
+        specialNeeds: {
+            wheelchairAccessible: document.getElementById('wheelchairAccessible')?.checked || false,
+            medicalEquipmentOnSite: document.getElementById('medicalEquipmentOnSite')?.checked || false,
+            specialInstructionsRequired: document.getElementById('specialInstructionsRequired')?.checked || false,
+            petPresent: document.getElementById('petPresent')?.checked || false,
+            familyMemberPresent: document.getElementById('familyMemberPresent')?.checked || false,
+            restrictedAccess: document.getElementById('restrictedAccess')?.checked || false,
+            emergencyContactRequired: document.getElementById('emergencyContactRequired')?.checked || false,
+            medicationStorageAvailable: document.getElementById('medicationStorageAvailable')?.checked || false,
+            oxygenEquipment: document.getElementById('oxygenEquipment')?.checked || false,
+            dementiaCare: document.getElementById('dementiaCare')?.checked || false,
+            fallRisk: document.getElementById('fallRisk')?.checked || false,
+            woundCareRequired: document.getElementById('woundCareRequired')?.checked || false
+        },
         // Get selected honey potentials from checkboxes
         honeyPotentials: getSelectedHoneyPotentials(),
         lastModifiedBy: currentUser.username,
@@ -913,7 +1045,7 @@ function handleSaveSite(e) {
     if (navigator.onLine && window.database) {
         database.ref(`${tenantPath}/${site.id}`).set(site)
             .then(() => {
-                beeMarshallAlert(`✅ Site "${site.name}" has been saved successfully!`, 'success');
+                careMarshallAlert(`✅ Site "${site.name}" has been saved successfully!`, 'success');
                 if (window.syncStatusManager) {
                     window.syncStatusManager.updateSyncStatus('synced');
                 }
@@ -940,7 +1072,7 @@ function handleSaveSite(e) {
                         method: 'set'
                     });
                 }
-                beeMarshallAlert('⚠️ Site saved locally. Will sync when connection is restored.', 'warning');
+                careMarshallAlert('⚠️ Site saved locally. Will sync when connection is restored.', 'warning');
                 // Close the form and return to sites view, then scroll to the site card
                 setTimeout(() => {
                     showSites();
@@ -963,7 +1095,7 @@ function handleSaveSite(e) {
                 method: 'set'
             });
         }
-        beeMarshallAlert('⚠️ Site saved locally. Will sync when connection is restored.', 'warning');
+        careMarshallAlert('⚠️ Site saved locally. Will sync when connection is restored.', 'warning');
         // Close the form and return to sites view
         setTimeout(() => {
             showSites();
@@ -975,7 +1107,7 @@ function handleSaveSite(e) {
 window.editSite = function(id) {
     // Check if user has permission to edit sites
     if (!isAdmin) {
-        beeMarshallAlert('Only administrators can edit site details. You can update hive strength and hive boxes from the summary cards.', 'warning');
+        careMarshallAlert('Only administrators can edit site details. You can update hive strength and hive boxes from the summary cards.', 'warning');
         return;
     }
     
@@ -1034,6 +1166,44 @@ window.editSite = function(id) {
     document.getElementById('accessType').value = site.accessType || '';
     document.getElementById('contactBeforeVisit').checked = site.contactBeforeVisit || false;
     document.getElementById('isQuarantine').checked = site.isQuarantine || false;
+    
+    // Populate legal & compliance information
+    const legalCompliance = site.legalCompliance || {};
+    if (document.getElementById('hdsRegistrationNumber')) document.getElementById('hdsRegistrationNumber').value = legalCompliance.hdsRegistrationNumber || '';
+    if (document.getElementById('registrationExpiry')) document.getElementById('registrationExpiry').value = legalCompliance.registrationExpiry || '';
+    if (document.getElementById('insuranceProvider')) document.getElementById('insuranceProvider').value = legalCompliance.insuranceProvider || '';
+    if (document.getElementById('insurancePolicyNumber')) document.getElementById('insurancePolicyNumber').value = legalCompliance.insurancePolicyNumber || '';
+    if (document.getElementById('insuranceExpiry')) document.getElementById('insuranceExpiry').value = legalCompliance.insuranceExpiry || '';
+    if (document.getElementById('privacyOfficer')) document.getElementById('privacyOfficer').value = legalCompliance.privacyOfficer || '';
+    if (document.getElementById('healthSafetyOfficer')) document.getElementById('healthSafetyOfficer').value = legalCompliance.healthSafetyOfficer || '';
+    if (document.getElementById('recordRetentionYears')) document.getElementById('recordRetentionYears').value = legalCompliance.recordRetentionYears || 7;
+    if (document.getElementById('privacyCompliance')) document.getElementById('privacyCompliance').checked = legalCompliance.privacyCompliance || false;
+    if (document.getElementById('healthSafetyCompliance')) document.getElementById('healthSafetyCompliance').checked = legalCompliance.healthSafetyCompliance || false;
+    if (document.getElementById('incidentReportingEnabled')) document.getElementById('incidentReportingEnabled').checked = legalCompliance.incidentReportingEnabled || false;
+    
+    // Populate special needs flags
+    const specialNeeds = site.specialNeeds || {};
+    const flagCheckboxes = {
+        'wheelchairAccessible': specialNeeds.wheelchairAccessible || false,
+        'medicalEquipmentOnSite': specialNeeds.medicalEquipmentOnSite || false,
+        'specialInstructionsRequired': specialNeeds.specialInstructionsRequired || false,
+        'petPresent': specialNeeds.petPresent || false,
+        'familyMemberPresent': specialNeeds.familyMemberPresent || false,
+        'restrictedAccess': specialNeeds.restrictedAccess || false,
+        'emergencyContactRequired': specialNeeds.emergencyContactRequired || false,
+        'medicationStorageAvailable': specialNeeds.medicationStorageAvailable || false,
+        'oxygenEquipment': specialNeeds.oxygenEquipment || false,
+        'dementiaCare': specialNeeds.dementiaCare || false,
+        'fallRisk': specialNeeds.fallRisk || false,
+        'woundCareRequired': specialNeeds.woundCareRequired || false
+    };
+    
+    Object.keys(flagCheckboxes).forEach(flagId => {
+        const checkbox = document.getElementById(flagId);
+        if (checkbox) {
+            checkbox.checked = flagCheckboxes[flagId];
+        }
+    });
     
     // Populate hive strength breakdown
     if (site.hiveStrength) {
@@ -1126,12 +1296,16 @@ function renderHoneyPotentials(selectedPotentials = []) {
     const container = document.getElementById('honeyPotentialsContainer');
     if (!container) return;
     
-    if (!HONEY_TYPES || HONEY_TYPES.length === 0) {
-        container.innerHTML = '<p class="text-muted small">No honey types available. Add honey types in Task Management.</p>';
+    // Support both CARE_SERVICE_TYPES and HONEY_TYPES for backward compatibility
+    const serviceTypes = (typeof CARE_SERVICE_TYPES !== 'undefined' && CARE_SERVICE_TYPES.length > 0) ? CARE_SERVICE_TYPES :
+                         (typeof HONEY_TYPES !== 'undefined' && HONEY_TYPES.length > 0) ? HONEY_TYPES : [];
+    
+    if (serviceTypes.length === 0) {
+        container.innerHTML = '<p class="text-muted small">No care service types available. Add care service types in Task Management.</p>';
         return;
     }
     
-    container.innerHTML = HONEY_TYPES.map(type => {
+    container.innerHTML = serviceTypes.map(type => {
         const isChecked = selectedPotentials.includes(type);
         return `
             <div class="form-check">
@@ -1167,7 +1341,7 @@ function addHarvestRecord() {
     const notes = document.getElementById('harvestNotes').value;
     
     if (!date || !quantity) {
-        beeMarshallAlert('Please enter a date and quantity', 'warning');
+        careMarshallAlert('Please enter a date and quantity', 'warning');
         return;
     }
     
@@ -1193,7 +1367,7 @@ function addHarvestRecord() {
             modifiedBy: currentUser.username,
             modifiedAt: new Date().toISOString()
         };
-        beeMarshallAlert('✅ Harvest record updated', 'success');
+        careMarshallAlert('✅ Harvest record updated', 'success');
     } else {
         // Add new record
         const recordToSave = {
@@ -1204,7 +1378,7 @@ function addHarvestRecord() {
             addedAt: new Date().toISOString()
         };
         harvestRecords.push(recordToSave);
-        beeMarshallAlert('✅ Harvest record added', 'success');
+        careMarshallAlert('✅ Harvest record added', 'success');
     }
     
     // Sort by date (newest first)
@@ -1240,13 +1414,13 @@ function addHarvestRecord() {
 function editHarvestRecord(index) {
     const siteId = document.getElementById('siteId').value;
     if (!siteId) {
-        beeMarshallAlert('No site selected', 'error');
+        careMarshallAlert('No site selected', 'error');
         return;
     }
     
     const existingSite = window.sites.find(c => c.id === parseInt(siteId));
     if (!existingSite || !existingSite.harvestRecords || !existingSite.harvestRecords[index]) {
-        beeMarshallAlert('Record not found', 'error');
+        careMarshallAlert('Record not found', 'error');
         return;
     }
     
@@ -1350,13 +1524,13 @@ function removeHarvestRecord(index) {
     
     const siteId = document.getElementById('siteId').value;
     if (!siteId) {
-        beeMarshallAlert('No site selected', 'error');
+        careMarshallAlert('No site selected', 'error');
         return;
     }
     
     const siteIndex = window.sites.findIndex(c => c.id === parseInt(siteId));
     if (siteIndex === -1) {
-        beeMarshallAlert('Site not found', 'error');
+        careMarshallAlert('Site not found', 'error');
         return;
     }
     
@@ -1382,7 +1556,7 @@ function removeHarvestRecord(index) {
     
     renderHarvestRecords(window.sites[siteIndex].harvestRecords);
     
-    beeMarshallAlert('Harvest record removed', 'info');
+    careMarshallAlert('Harvest record removed', 'info');
 }
 
 function viewSiteDetails(id) {
@@ -1417,22 +1591,82 @@ function viewSiteDetails(id) {
                                     </button>
                                 </div>
                                 
-                                <h6 class="mt-3">Landowner Information</h6>
+                                <h6 class="mt-3">Contact Information</h6>
                                 ${site.landownerName ? `<p><strong>Name:</strong> ${site.landownerName}</p>` : ''}
-                                ${site.landownerPhone ? `<p><strong>Phone:</strong> ${site.landownerPhone}</p>` : ''}
-                                ${site.landownerEmail ? `<p><strong>Email:</strong> ${site.landownerEmail}</p>` : ''}
+                                ${site.landownerPhone ? `<p><strong>Phone:</strong> <a href="tel:${site.landownerPhone}" class="btn btn-sm btn-outline-primary"><i class="bi bi-telephone-fill"></i> ${site.landownerPhone}</a></p>` : ''}
+                                ${site.landownerEmail ? `<p><strong>Email:</strong> <a href="mailto:${site.landownerEmail}" class="btn btn-sm btn-outline-primary"><i class="bi bi-envelope-fill"></i> ${site.landownerEmail}</a></p>` : ''}
                                 ${site.landownerAddress ? `<p><strong>Address:</strong> ${site.landownerAddress}</p>` : ''}
+                                
+                                <!-- Clients at this site -->
+                                ${(() => {
+                                    const siteClients = (window.clients || window.individualHives || []).filter(client => client.siteId === site.id);
+                                    if (siteClients.length === 0) return '';
+                                    return `
+                                        <h6 class="mt-3">Clients (${siteClients.length})</h6>
+                                        <div style="max-height: 200px; overflow-y: auto;">
+                                            ${siteClients.slice(0, 5).map(client => {
+                                                const clientName = client.clientName || client.hiveName || `Client ${client.id}`;
+                                                const status = client.status || client.hiveStrength || 'unknown';
+                                                return `<p class="mb-1"><i class="bi bi-house-heart"></i> ${clientName} <span class="badge bg-secondary">${status}</span></p>`;
+                                            }).join('')}
+                                            ${siteClients.length > 5 ? `<p class="text-muted small">... and ${siteClients.length - 5} more clients</p>` : ''}
+                                        </div>
+                                        <button class="btn btn-sm btn-outline-info mt-2" onclick="showSiteClients(${site.id})">
+                                            <i class="bi bi-list-ul"></i> View All Clients
+                                        </button>
+                                    `;
+                                })()}
+                                
+                                <!-- Pending Tasks -->
+                                ${(() => {
+                                    const siteTasks = (window.scheduledTasks || []).filter(task => 
+                                        task.siteId === site.id && !task.completed
+                                    ).sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
+                                    if (siteTasks.length === 0) return '';
+                                    const overdueTasks = siteTasks.filter(task => new Date(task.dueDate) < new Date());
+                                    return `
+                                        <h6 class="mt-3">Pending Tasks (${siteTasks.length})</h6>
+                                        <div style="max-height: 200px; overflow-y: auto;">
+                                            ${siteTasks.slice(0, 5).map(task => {
+                                                const taskName = typeof getTaskDisplayName === 'function' ? getTaskDisplayName(null, task.taskId) : (task.taskName || 'Unknown Task');
+                                                const dueDate = new Date(task.dueDate);
+                                                const isOverdue = dueDate < new Date();
+                                                return `<p class="mb-1 ${isOverdue ? 'text-danger' : ''}">
+                                                    <i class="bi bi-calendar"></i> ${taskName}
+                                                    ${isOverdue ? '<span class="badge bg-danger">OVERDUE</span>' : ''}
+                                                    <small class="text-muted"> - ${dueDate.toLocaleDateString()}</small>
+                                                </p>`;
+                                            }).join('')}
+                                            ${siteTasks.length > 5 ? `<p class="text-muted small">... and ${siteTasks.length - 5} more tasks</p>` : ''}
+                                        </div>
+                                        <button class="btn btn-sm btn-outline-success mt-2" onclick="showSiteTasks(${site.id})">
+                                            <i class="bi bi-list-check"></i> View All Tasks
+                                        </button>
+                                    `;
+                                })()}
                             </div>
                             <div class="col-md-6">
                                 <h6>Site Details</h6>
                                 <p><strong>Site Type:</strong> ${site.siteType || 'Not specified'}</p>
                                 <p><strong>Access Type:</strong> ${site.accessType || 'Not specified'}</p>
                                 <p><strong>Contact Before Visit:</strong> ${site.contactBeforeVisit ? 'Yes' : 'No'}</p>
-                                <p><strong>Quarantine Status:</strong> ${site.isQuarantine ? 'Yes' : 'No'}</p>
+                                <p><strong>Isolation/Quarantine:</strong> ${site.isQuarantine ? 'Yes' : 'No'}</p>
                                 
-                                <h6 class="mt-3">Timeline & Requirements</h6>
-                                ${site.harvestTimeline ? `<p><strong>Harvest Timeline:</strong> ${site.harvestTimeline}</p>` : ''}
-                                ${site.sugarRequirements ? `<p><strong>Sugar Requirements:</strong> ${site.sugarRequirements}</p>` : ''}
+                                <!-- Legal & Compliance Information -->
+                                ${site.legalCompliance ? `
+                                    <h6 class="mt-3"><i class="bi bi-shield-check"></i> Legal & Compliance</h6>
+                                    ${site.legalCompliance.hdsRegistrationNumber ? `<p><strong>HDS Registration:</strong> ${site.legalCompliance.hdsRegistrationNumber}</p>` : ''}
+                                    ${site.legalCompliance.registrationExpiry ? `<p><strong>Registration Expires:</strong> ${new Date(site.legalCompliance.registrationExpiry).toLocaleDateString()}</p>` : ''}
+                                    ${site.legalCompliance.insuranceProvider ? `<p><strong>Insurance:</strong> ${site.legalCompliance.insuranceProvider}${site.legalCompliance.insurancePolicyNumber ? ` (${site.legalCompliance.insurancePolicyNumber})` : ''}</p>` : ''}
+                                    ${site.legalCompliance.insuranceExpiry ? `<p><strong>Insurance Expires:</strong> ${new Date(site.legalCompliance.insuranceExpiry).toLocaleDateString()}</p>` : ''}
+                                    ${site.legalCompliance.privacyOfficer ? `<p><strong>Privacy Officer:</strong> ${site.legalCompliance.privacyOfficer}</p>` : ''}
+                                    ${site.legalCompliance.healthSafetyOfficer ? `<p><strong>H&S Officer:</strong> ${site.legalCompliance.healthSafetyOfficer}</p>` : ''}
+                                    <div class="mt-2">
+                                        ${site.legalCompliance.privacyCompliance ? `<span class="badge bg-success me-1"><i class="bi bi-check-circle"></i> Privacy Act Compliant</span>` : ''}
+                                        ${site.legalCompliance.healthSafetyCompliance ? `<span class="badge bg-success me-1"><i class="bi bi-check-circle"></i> H&S Act Compliant</span>` : ''}
+                                        ${site.legalCompliance.incidentReportingEnabled ? `<span class="badge bg-info me-1"><i class="bi bi-exclamation-triangle"></i> Incident Reporting Active</span>` : ''}
+                                    </div>
+                                ` : ''}
                                 
                                 ${site.notes ? `
                                     <h6 class="mt-3">Notes</h6>
@@ -1445,9 +1679,9 @@ function viewSiteDetails(id) {
                         ${isAdmin ? `<button type="button" class="btn btn-primary" onclick="editSite(${site.id}); bootstrap.Modal.getInstance(document.getElementById('siteDetailsModal')).hide();">
                             <i class="bi bi-pencil"></i> Edit Site
                         </button>` : ''}
-                        <button type="button" class="btn btn-success" onclick="scheduleTaskForSite(${site.id}); bootstrap.Modal.getInstance(document.getElementById('siteDetailsModal')).hide();">
+                        ${isAdmin ? `<button type="button" class="btn btn-success" onclick="scheduleTaskForSite(${site.id}); bootstrap.Modal.getInstance(document.getElementById('siteDetailsModal')).hide();">
                             <i class="bi bi-calendar-plus"></i> Schedule Task
-                        </button>
+                        </button>` : ''}
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     </div>
                 </div>
@@ -1488,7 +1722,7 @@ function scheduleTaskForSite(siteId) {
 function archiveSite(id) {
     const site = window.sites.find(c => c.id === id);
     if (!site) {
-        beeMarshallAlert('Site not found', 'error');
+        careMarshallAlert('Site not found', 'error');
         return;
     }
     
@@ -1501,7 +1735,7 @@ function archiveSite(id) {
             lastModified: new Date().toISOString(),
             lastModifiedBy: currentUser.username
         }).then(() => {
-            beeMarshallAlert(`✅ "${site.name}" has been archived`, 'success');
+            careMarshallAlert(`✅ "${site.name}" has been archived`, 'success');
             
             // Log as action
             const actionText = `Archived site: ${site.name}`;
@@ -1524,20 +1758,20 @@ function archiveSite(id) {
             });
         }).catch(error => {
             console.error('Error archiving site:', error);
-            beeMarshallAlert('❌ Error archiving site. Please try again.', 'error');
+            careMarshallAlert('❌ Error archiving site. Please try again.', 'error');
         });
     }
 }
 
 function unarchiveSite(id) {
     if (!isAdmin) {
-        beeMarshallAlert('Only administrators can unarchive sites', 'error');
+        careMarshallAlert('Only administrators can unarchive sites', 'error');
         return;
     }
     
     const site = window.sites.find(c => c.id === id);
     if (!site) {
-        beeMarshallAlert('Site not found', 'error');
+        careMarshallAlert('Site not found', 'error');
         return;
     }
     
@@ -1550,7 +1784,7 @@ function unarchiveSite(id) {
             lastModified: new Date().toISOString(),
             lastModifiedBy: currentUser.username
         }).then(() => {
-            beeMarshallAlert(`✅ "${site.name}" has been unarchived`, 'success');
+            careMarshallAlert(`✅ "${site.name}" has been unarchived`, 'success');
             
             // Log as action
             const actionText = `Unarchived site: ${site.name}`;
@@ -1573,7 +1807,7 @@ function unarchiveSite(id) {
             });
         }).catch(error => {
             console.error('Error unarchiving site:', error);
-            beeMarshallAlert('❌ Error unarchiving site. Please try again.', 'error');
+            careMarshallAlert('❌ Error unarchiving site. Please try again.', 'error');
         });
     }
 }
@@ -1581,18 +1815,18 @@ function unarchiveSite(id) {
 function deleteSite(id) {
     // Only admins can delete, and only from archived state
     if (!isAdmin) {
-        beeMarshallAlert('Only administrators can delete sites', 'error');
+        careMarshallAlert('Only administrators can delete sites', 'error');
         return;
     }
     
     const site = window.sites.find(c => c.id === id);
     if (!site) {
-        beeMarshallAlert('Site not found', 'error');
+        careMarshallAlert('Site not found', 'error');
         return;
     }
     
     if (!site.archived) {
-        beeMarshallAlert('⚠️ Sites must be archived before they can be permanently deleted.\n\nPlease archive the site first, then use the "Show Archived Sites" button to delete it.', 'warning');
+        careMarshallAlert('⚠️ Sites must be archived before they can be permanently deleted.\n\nPlease archive the site first, then use the "Show Archived Sites" button to delete it.', 'warning');
         return;
     }
     
@@ -1603,12 +1837,12 @@ function deleteSite(id) {
         if (confirm('This is your last chance. Permanently delete this site? This action CANNOT be undone.')) {
             const tenantPath = currentTenantId ? `tenants/${currentTenantId}/sites` : 'sites';
             database.ref(`${tenantPath}/${id}`).remove().then(() => {
-                beeMarshallAlert(`🗑️ Site "${site.name}" has been permanently deleted`, 'success');
+                careMarshallAlert(`🗑️ Site "${site.name}" has been permanently deleted`, 'success');
                 // Refresh the sites list to update the UI
                 renderSites();
             }).catch(error => {
                 console.error('Error deleting site:', error);
-                beeMarshallAlert('❌ Error deleting site. Please try again.', 'error');
+                careMarshallAlert('❌ Error deleting site. Please try again.', 'error');
             });
         }
     }
@@ -1621,7 +1855,7 @@ function deleteSite(id) {
 function openInMaps(siteId) {
     const site = window.sites.find(c => c.id === siteId);
     if (!site) {
-        beeMarshallAlert('Site not found', 'error');
+        careMarshallAlert('Site not found', 'error');
         return;
     }
     
@@ -1716,18 +1950,23 @@ function initMap() {
         return;
     }
     
-    // Always use Collingwood, NZ as default center
-    const center = [-40.6764, 172.6856]; // Collingwood, NZ
-    console.log('📍 Map center set to Collingwood, NZ');
+    // Always use Takaka, NZ as default center
+    const center = [-40.8557, 172.8066]; // Takaka, NZ
+    console.log('📍 Map center set to Takaka, NZ');
     
-    // Use global map if it exists, otherwise skip
-    if (!window.beeMarshallMap) {
+    // Use global map if it exists, otherwise skip (support both new and old names)
+    const globalMap = window.homeCareMap || window.beeMarshallMap;
+    if (!globalMap) {
         console.log('🗺️ Global map not initialized, skipping site rendering');
         return;
     }
     
     // Use the global map
-    map = window.beeMarshallMap;
+    map = globalMap;
+    // Maintain backward compatibility
+    if (!window.homeCareMap && window.beeMarshallMap) {
+        window.homeCareMap = window.beeMarshallMap;
+    }
     
     // Clear existing markers
     if (map._layers) {
@@ -1781,16 +2020,32 @@ function initMap() {
                 .bindPopup(`
                     <div style="padding:10px; min-width:250px;">
                         <h6>
-                            <a href="#" onclick="event.stopPropagation(); const mapInstance = window.beeMarshallMap; if (mapInstance) { mapInstance.closePopup(); } setTimeout(() => viewSiteDetails(${site.id}), 100); return false;" style="color: ${typeInfo.color}; text-decoration: none; font-weight: bold; cursor: pointer;">
+                            <a href="#" onclick="event.stopPropagation(); const mapInstance = window.homeCareMap || window.beeMarshallMap; if (mapInstance) { mapInstance.closePopup(); } setTimeout(() => viewSiteDetails(${site.id}), 100); return false;" style="color: ${typeInfo.color}; text-decoration: none; font-weight: bold; cursor: pointer;">
                                 <i class="bi ${typeInfo.icon}"></i> ${site.name}
                             </a>
                         </h6>
                         <p class="mb-1"><small>${site.description || 'No description'}</small></p>
                         <p class="mb-1"><strong>Type:</strong> <span style="color: ${typeInfo.color};">${typeInfo.name}</span></p>
-                        <p class="mb-1"><strong>Hives:</strong> ${site.hiveCount}</p>
-                        ${site.harvestTimeline ? `<p class="mb-1"><strong>Harvest:</strong> ${site.harvestTimeline}</p>` : ''}
-                        ${site.sugarRequirements ? `<p class="mb-1"><strong>Sugar:</strong> ${site.sugarRequirements}</p>` : ''}
-                        ${site.landownerName ? `<p class="mb-1"><strong>Landowner:</strong> ${site.landownerName}</p>` : ''}
+                        <p class="mb-1"><strong>Clients:</strong> ${site.hiveCount || 0}</p>
+                        ${site.landownerName ? `<p class="mb-1"><strong>Contact:</strong> ${site.landownerName}${site.landownerPhone ? ` • ${site.landownerPhone}` : ''}</p>` : ''}
+                        ${site.legalCompliance?.hdsRegistrationNumber ? `<p class="mb-1"><small><strong>HDS Reg:</strong> ${site.legalCompliance.hdsRegistrationNumber}</small></p>` : ''}
+                        ${site.legalCompliance?.insuranceProvider ? `<p class="mb-1"><small><strong>Insurance:</strong> ${site.legalCompliance.insuranceProvider}</small></p>` : ''}
+                        ${site.legalCompliance?.privacyCompliance ? `<p class="mb-1"><small><span class="badge bg-success"><i class="bi bi-check-circle"></i> Privacy Compliant</span></small></p>` : ''}
+                        ${site.legalCompliance?.healthSafetyCompliance ? `<p class="mb-1"><small><span class="badge bg-success"><i class="bi bi-check-circle"></i> H&S Compliant</span></small></p>` : ''}
+                        
+                        <!-- Clients at this site -->
+                        ${(() => {
+                            const siteClients = (window.clients || window.individualHives || []).filter(client => client.siteId === site.id);
+                            if (siteClients.length > 0) {
+                                const statusCounts = {
+                                    independent: siteClients.filter(c => (c.status || c.hiveStrength) === 'independent' || (c.status || c.hiveStrength) === 'strong').length,
+                                    assisted: siteClients.filter(c => (c.status || c.hiveStrength) === 'assisted' || (c.status || c.hiveStrength) === 'medium').length,
+                                    dependent: siteClients.filter(c => (c.status || c.hiveStrength) === 'dependent' || (c.status || c.hiveStrength) === 'weak').length
+                                };
+                                return `<p class="mb-1"><small><strong>Client Status:</strong> Ind: ${statusCounts.independent}, Asst: ${statusCounts.assisted}, Dep: ${statusCounts.dependent}</small></p>`;
+                            }
+                            return '';
+                        })()}
                         
                         ${siteTasks.length > 0 ? `
                             <div class="mt-3">
@@ -1825,7 +2080,7 @@ function initMap() {
                         `}
                         
                         <div class="mt-3 d-grid gap-1">
-                            <button class="btn btn-sm btn-primary" onclick="event.stopPropagation(); const mapInstance = window.beeMarshallMap; if (mapInstance) { mapInstance.closePopup(); } scrollToSiteCard(${site.id}); return false;">
+                            <button class="btn btn-sm btn-primary" onclick="event.stopPropagation(); const mapInstance = window.homeCareMap || window.beeMarshallMap; if (mapInstance) { mapInstance.closePopup(); } scrollToSiteCard(${site.id}); return false;">
                                 <i class="bi bi-eye"></i> View Details
                             </button>
                             <button class="btn btn-sm btn-outline-primary" onclick="openInMaps(${site.id}); return false;">
@@ -1875,8 +2130,117 @@ function initMap() {
     }
 }
 
-// Make initMap globally available
+/**
+ * Complete a task from the site tasks modal
+ * Available to all users (employees and admins)
+ */
+function completeTaskFromSite(taskId, siteId) {
+    const task = (window.scheduledTasks || []).find(t => t.id === taskId);
+    if (!task) {
+        careMarshallAlert('Task not found', 'error');
+        return;
+    }
+    
+    const taskName = typeof getTaskDisplayName === 'function' ? getTaskDisplayName(null, task.taskId) : (task.taskName || 'Unknown Task');
+    const site = window.sites.find(s => s.id === siteId);
+    const siteName = site ? site.name : 'Unknown Site';
+    
+    // Confirm completion
+    if (confirm(`Mark task as complete?\n\nTask: ${taskName}\nSite: ${siteName}\nDue: ${new Date(task.dueDate).toLocaleDateString()}`)) {
+        // Use tenant-specific path for data isolation
+        const tenantPath = currentTenantId ? `tenants/${currentTenantId}/scheduledTasks` : 'scheduledTasks';
+        const actionsPath = currentTenantId ? `tenants/${currentTenantId}/actions` : 'actions';
+        
+        // Find the task name from the comprehensive tasks list
+        const taskObj = (window.COMPREHENSIVE_TASKS || []).find(t => t.id === task.taskId);
+        const fullTaskName = taskObj ? taskObj.name : taskName;
+        const taskCategory = taskObj ? taskObj.category : 'Task';
+        
+        // Create an action record for the completed task
+        const action = {
+            id: `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+            siteId: task.siteId,
+            individualHiveId: task.individualHiveId || null,
+            taskId: task.taskId,
+            taskName: fullTaskName,
+            taskCategory: taskCategory,
+            date: new Date().toISOString().split('T')[0],
+            notes: task.notes || '',
+            flag: '',
+            loggedBy: currentUser ? currentUser.username : 'Unknown',
+            createdAt: new Date().toISOString(),
+            fromScheduledTask: true,
+            originalScheduledTaskId: taskId
+        };
+        
+        const updates = {
+            completed: true,
+            completedAt: new Date().toISOString(),
+            completedBy: currentUser ? currentUser.username : 'Unknown'
+        };
+        
+        // Show sync status
+        if (window.syncStatusManager) {
+            window.syncStatusManager.updateSyncStatus('syncing', 'Completing task...');
+        }
+        
+        if (navigator.onLine && window.database) {
+            // Save the action first, then mark task as completed
+            database.ref(`${actionsPath}/${action.id}`).set(action)
+                .then(() => database.ref(`${tenantPath}/${taskId}`).update(updates))
+                .then(() => {
+                    if (window.syncStatusManager) {
+                        window.syncStatusManager.updateSyncStatus('synced');
+                    }
+                    careMarshallAlert(`✅ Task completed successfully!\n\nTask: ${fullTaskName}\nCompleted by: ${currentUser ? currentUser.username : 'Unknown'}`, 'success');
+                    // Refresh the task modal
+                    showSiteTasks(siteId);
+                    // Refresh scheduled tasks if function exists
+                    if (typeof renderScheduledTasks === 'function') {
+                        renderScheduledTasks();
+                    }
+                    // Refresh dashboard if function exists
+                    if (typeof updateDashboard === 'function') {
+                        updateDashboard();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error completing task:', error);
+                    if (window.syncStatusManager) {
+                        window.syncStatusManager.updateSyncStatus('error', 'Error completing task');
+                    }
+                    careMarshallAlert('Error completing task. Please try again.', 'error');
+                });
+        } else {
+            // Offline - queue changes
+            if (window.syncStatusManager) {
+                window.syncStatusManager.addPendingChange({
+                    type: 'action_log',
+                    path: `${actionsPath}/${action.id}`,
+                    data: action,
+                    method: 'set'
+                });
+                window.syncStatusManager.addPendingChange({
+                    type: 'task_complete',
+                    path: `${tenantPath}/${taskId}`,
+                    data: updates,
+                    method: 'update'
+                });
+                window.syncStatusManager.updateSyncStatus('offline', 'Saved locally, will sync later');
+            }
+            careMarshallAlert('⚠️ Task completion saved locally. Will sync when connection is restored.', 'warning');
+            // Refresh the task modal
+            showSiteTasks(siteId);
+        }
+    }
+}
+
+// Make functions globally available
 window.initMap = initMap;
+window.showContactDetails = showContactDetails;
+window.showSiteClients = showSiteClients;
+window.showSiteTasks = showSiteTasks;
+window.completeTaskFromSite = completeTaskFromSite;
 
 // GPS Location
 function getCurrentLocation() {
@@ -1902,7 +2266,7 @@ function getCurrentLocation() {
         },
         (error) => {
             showSyncStatus('<i class="bi bi-x"></i> GPS error', 'error');
-            beeMarshallAlert('Could not get location: ' + error.message, 'error');
+            careMarshallAlert('Could not get location: ' + error.message, 'error');
         },
         { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
     );
@@ -1921,8 +2285,8 @@ function showMapPicker() {
     
     if (!container.classList.contains('hidden')) {
         setTimeout(() => {
-            const lat = parseFloat(document.getElementById('siteLat').value) || -40.6764; // Collingwood, NZ
-            const lng = parseFloat(document.getElementById('siteLng').value) || 172.6856;
+            const lat = parseFloat(document.getElementById('siteLat').value) || -40.8557; // Takaka, NZ
+            const lng = parseFloat(document.getElementById('siteLng').value) || 172.8066; // Takaka, NZ
             
             // Clear existing map if any
             if (mapPicker) {
@@ -2092,8 +2456,8 @@ function renderVisualHiveGrid() {
             <div class="col-12">
                 <div class="alert alert-success d-flex align-items-center justify-content-between">
                     <div>
-                        <i class="bi bi-hexagon-fill me-2"></i>
-                        <strong>Total Active Hives:</strong> <span id="totalActiveHives" class="badge bg-success ms-2" style="font-size: 1.2rem;">${totalHives}</span>
+                        <i class="bi bi-house-heart-fill me-2"></i>
+                        <strong>Total Active Clients:</strong> <span id="totalActiveHives" class="badge bg-success ms-2" style="font-size: 1.2rem;">${totalHives}</span>
                     </div>
                     <small class="text-muted">Click any box above to update counts</small>
                 </div>
@@ -2232,13 +2596,13 @@ function updateHiveCount(type) {
 function saveVisualHiveChanges() {
     const siteId = document.getElementById('siteId')?.value;
     if (!siteId) {
-        beeMarshallAlert('No site selected', 'warning');
+        careMarshallAlert('No site selected', 'warning');
         return;
     }
     
     const site = window.sites.find(c => c.id === parseInt(siteId));
     if (!site) {
-        beeMarshallAlert('Site not found', 'error');
+        careMarshallAlert('Site not found', 'error');
         return;
     }
     
@@ -2269,7 +2633,7 @@ function saveVisualHiveChanges() {
     }
     
     if (changes.length === 0) {
-        beeMarshallAlert('No changes detected', 'info');
+        careMarshallAlert('No changes detected', 'info');
         return;
     }
     
@@ -2296,10 +2660,10 @@ function saveVisualHiveChanges() {
         const actionText = `Site visit and inventory update at ${site.name}. Changes: ${changes.join('; ')}`;
         logSiteVisitAction(site.id, actionText);
         
-        beeMarshallAlert('✅ Site inventory updated and logged as action!', 'success');
+        careMarshallAlert('✅ Site inventory updated and logged as action!', 'success');
     }).catch(error => {
         console.error('Error saving visual hive changes:', error);
-        beeMarshallAlert('❌ Error saving changes', 'error');
+        careMarshallAlert('❌ Error saving changes', 'error');
     });
 }
 
@@ -2328,14 +2692,14 @@ function logSiteVisitAction(siteId, notes) {
 function editHiveStateCount(state) {
     const siteId = document.getElementById('siteId')?.value;
     if (!siteId) {
-        beeMarshallAlert('No site selected', 'warning');
+        careMarshallAlert('No site selected', 'warning');
         return;
     }
     
     // Get the site
     const site = window.sites.find(c => c.id === parseInt(siteId));
     if (!site) {
-        beeMarshallAlert('Site not found', 'error');
+        careMarshallAlert('Site not found', 'error');
         return;
     }
     
@@ -2387,7 +2751,7 @@ function editHiveStateCount(state) {
         const newStateTotal = otherStateTotal + newValue;
         
         if (newStateTotal !== currentHiveBoxTotal) {
-            beeMarshallAlert(`⚠️ Warning: State total (${newStateTotal}) does not match Hive Box total (${currentHiveBoxTotal})\n\nPlease adjust other state counts or update the Hive Box totals first.`, 'warning');
+            careMarshallAlert(`⚠️ Warning: State total (${newStateTotal}) does not match Hive Box total (${currentHiveBoxTotal})\n\nPlease adjust other state counts or update the Hive Box totals first.`, 'warning');
             return;
         }
     }
@@ -2427,7 +2791,7 @@ function editHiveStateCount(state) {
         return database.ref(`${actionPath}/${newAction.id}`).set(newAction);
     }).then(() => {
         console.log(`✅ ${state} hive count updated: ${currentValue} → ${newValue}`);
-        beeMarshallAlert(`✅ ${state} hive count updated: ${currentValue} → ${newValue}`, 'success');
+        careMarshallAlert(`✅ ${state} hive count updated: ${currentValue} → ${newValue}`, 'success');
         
         // Trigger recalculation of totals
         if (typeof updateHiveStrengthTotals === 'function') {
@@ -2435,7 +2799,7 @@ function editHiveStateCount(state) {
         }
     }).catch(error => {
         console.error('Error updating hive state:', error);
-        beeMarshallAlert(`❌ Error updating ${state} hive count: ${error.message}`, 'error');
+        careMarshallAlert(`❌ Error updating ${state} hive count: ${error.message}`, 'error');
     });
 }
 
@@ -2475,7 +2839,7 @@ function updateArchivedButtonText() {
 function quickEditHiveStrength(siteId, state, currentValue) {
     const site = window.sites.find(c => c.id === siteId);
     if (!site) {
-        beeMarshallAlert('Site not found', 'error');
+        careMarshallAlert('Site not found', 'error');
         return;
     }
     
@@ -2486,7 +2850,7 @@ function quickEditHiveStrength(siteId, state, currentValue) {
     const newValue = parseInt(newValueStr) || 0;
     
     if (newValue < 0) {
-        beeMarshallAlert('Count cannot be negative. Use 0 for empty or waiting sites.', 'warning');
+        careMarshallAlert('Count cannot be negative. Use 0 for empty or waiting sites.', 'warning');
         return;
     }
     
@@ -2532,7 +2896,7 @@ function quickEditHiveStrength(siteId, state, currentValue) {
                 if (window.syncStatusManager) {
                     window.syncStatusManager.updateSyncStatus('synced');
                 }
-                beeMarshallAlert(`✅ ${state} hive count updated: ${currentValue} → ${newValue}`, 'success');
+                careMarshallAlert(`✅ ${state} hive count updated: ${currentValue} → ${newValue}`, 'success');
             })
             .catch(error => {
                 console.error('Error updating hive strength (online path):', error);
@@ -2554,7 +2918,7 @@ function quickEditHiveStrength(siteId, state, currentValue) {
                 }
                 if (element) element.textContent = newValue;
                 actions.push(newAction);
-                beeMarshallAlert('⚠️ Saved locally. Will sync when connection is restored.', 'warning');
+                careMarshallAlert('⚠️ Saved locally. Will sync when connection is restored.', 'warning');
             });
     } else {
         // Offline: queue changes and update UI immediately
@@ -2575,7 +2939,7 @@ function quickEditHiveStrength(siteId, state, currentValue) {
         }
         if (element) element.textContent = newValue;
         actions.push(newAction);
-        beeMarshallAlert('⚠️ Saved locally. Will sync when connection is restored.', 'warning');
+        careMarshallAlert('⚠️ Saved locally. Will sync when connection is restored.', 'warning');
     }
 }
 
@@ -2587,7 +2951,7 @@ function quickEditHiveStrength(siteId, state, currentValue) {
 function updateSiteVisitDate(siteId) {
     const site = window.sites.find(s => s.id === siteId);
     if (!site) {
-        beeMarshallAlert('Site not found', 'error');
+        careMarshallAlert('Site not found', 'error');
         return;
     }
     
@@ -2620,6 +2984,57 @@ function updateSiteVisitDate(siteId) {
     modal.show();
 }
 
+/**
+ * Helper function to log an action to Firebase
+ * @param {Object} actionData - Action data object
+ */
+function logAction(actionData) {
+    const action = {
+        id: `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        siteId: actionData.siteId || null,
+        individualHiveId: actionData.individualHiveId || null,
+        taskId: actionData.taskId || null,
+        taskName: actionData.taskName || 'Action',
+        taskCategory: actionData.taskCategory || 'General',
+        date: actionData.date || new Date().toISOString().split('T')[0],
+        notes: actionData.notes || '',
+        flag: actionData.flag || '',
+        loggedBy: currentUser ? currentUser.username : 'Unknown',
+        createdAt: new Date().toISOString(),
+        ...(actionData.extraFields || {})
+    };
+    
+    const actionsPath = currentTenantId ? `tenants/${currentTenantId}/actions` : 'actions';
+    
+    if (navigator.onLine && window.database) {
+        return database.ref(`${actionsPath}/${action.id}`).set(action)
+            .catch(error => {
+                console.error('Error logging action:', error);
+                // Queue for later sync
+                if (window.syncStatusManager) {
+                    window.syncStatusManager.addPendingChange({
+                        type: 'action_log',
+                        path: `${actionsPath}/${action.id}`,
+                        data: action,
+                        method: 'set'
+                    });
+                }
+                return Promise.reject(error);
+            });
+    } else {
+        // Offline - queue for later sync
+        if (window.syncStatusManager) {
+            window.syncStatusManager.addPendingChange({
+                type: 'action_log',
+                path: `${actionsPath}/${action.id}`,
+                data: action,
+                method: 'set'
+            });
+        }
+        return Promise.resolve();
+    }
+}
+
 // Save site visit date
 function saveSiteVisitDate() {
     const visitDateInput = document.getElementById('visitDateInput');
@@ -2627,13 +3042,13 @@ function saveSiteVisitDate() {
     const siteId = parseInt(visitDateInput.dataset.siteId);
     
     if (!siteId) {
-        beeMarshallAlert('Site ID not found', 'error');
+        careMarshallAlert('Site ID not found', 'error');
         return;
     }
     
     const site = window.sites.find(s => s.id === siteId);
     if (!site) {
-        beeMarshallAlert('Site not found', 'error');
+        careMarshallAlert('Site not found', 'error');
         return;
     }
     
@@ -2642,14 +3057,18 @@ function saveSiteVisitDate() {
         lastModifiedAt: new Date().toISOString()
     };
     
+    const previousVisitDate = site.lastVisitDate;
+    let actionNotes = '';
+    
     if (clearCheckbox.checked) {
         // Clear visit date
         updateData.lastVisitDate = null;
+        actionNotes = 'Visit date cleared';
     } else {
         // Set visit date
         const dateValue = visitDateInput.value;
         if (!dateValue) {
-            beeMarshallAlert('Please select a date', 'warning');
+            careMarshallAlert('Please select a date', 'warning');
             return;
         }
         
@@ -2657,6 +3076,7 @@ function saveSiteVisitDate() {
         const date = new Date(dateValue);
         date.setHours(0, 0, 0, 0);
         updateData.lastVisitDate = date.toISOString();
+        actionNotes = `Visit date set to ${date.toLocaleDateString()}`;
     }
     
     // Show sync status
@@ -2679,6 +3099,18 @@ function saveSiteVisitDate() {
                 site.lastModifiedBy = updateData.lastModifiedBy;
                 site.lastModifiedAt = updateData.lastModifiedAt;
                 
+                // Log action for visit date update
+                logAction({
+                    siteId: siteId,
+                    taskName: 'Site Visit Recorded',
+                    taskCategory: 'Site Management',
+                    date: updateData.lastVisitDate ? new Date(updateData.lastVisitDate).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+                    notes: actionNotes + (previousVisitDate ? ` (Previous: ${new Date(previousVisitDate).toLocaleDateString()})` : '')
+                }).catch(error => {
+                    console.error('Error logging visit date action:', error);
+                    // Don't fail the whole operation if action logging fails
+                });
+                
                 // Re-render sites to show updated badge
                 if (typeof renderSites === 'function') {
                     renderSites();
@@ -2694,14 +3126,14 @@ function saveSiteVisitDate() {
                     modal.hide();
                 }
                 
-                beeMarshallAlert(`✅ Visit date ${clearCheckbox.checked ? 'cleared' : 'updated'} successfully`, 'success');
+                careMarshallAlert(`✅ Visit date ${clearCheckbox.checked ? 'cleared' : 'updated'} successfully`, 'success');
             })
             .catch(error => {
                 console.error('Error updating visit date:', error);
                 if (window.syncStatusManager) {
                     window.syncStatusManager.updateSyncStatus('error', 'Failed to update visit date');
                 }
-                beeMarshallAlert(`❌ Error updating visit date: ${error.message}`, 'error');
+                careMarshallAlert(`❌ Error updating visit date: ${error.message}`, 'error');
             });
     } else {
         // Offline - add to pending changes
@@ -2734,7 +3166,7 @@ function saveSiteVisitDate() {
             modal.hide();
         }
         
-        beeMarshallAlert('⚠️ Visit date saved locally. Will sync when connection is restored.', 'warning');
+        careMarshallAlert('⚠️ Visit date saved locally. Will sync when connection is restored.', 'warning');
     }
 }
 
@@ -2745,7 +3177,7 @@ window.saveSiteVisitDate = saveSiteVisitDate;
 function quickEditHiveBox(siteId, boxType, currentValue) {
     const site = window.sites.find(c => c.id === siteId);
     if (!site) {
-        beeMarshallAlert('Site not found', 'error');
+        careMarshallAlert('Site not found', 'error');
         return;
     }
     
@@ -2759,7 +3191,7 @@ function quickEditHiveBox(siteId, boxType, currentValue) {
     const newValue = parseInt(newValueStr) || 0;
     
     if (newValue < 0) {
-        beeMarshallAlert('Count cannot be negative. Use 0 for empty or waiting sites.', 'warning');
+        careMarshallAlert('Count cannot be negative. Use 0 for empty or waiting sites.', 'warning');
         return;
     }
     
@@ -2812,7 +3244,7 @@ function quickEditHiveBox(siteId, boxType, currentValue) {
                 if (window.syncStatusManager) {
                     window.syncStatusManager.updateSyncStatus('synced');
                 }
-                beeMarshallAlert(`✅ ${boxTypeLabel} count updated: ${currentValue} → ${newValue}`, 'success');
+                careMarshallAlert(`✅ ${boxTypeLabel} count updated: ${currentValue} → ${newValue}`, 'success');
                 if (typeof updateDashboard === 'function') {
                     updateDashboard();
                 }
@@ -2837,7 +3269,7 @@ function quickEditHiveBox(siteId, boxType, currentValue) {
                 }
                 if (element) element.textContent = newValue;
                 actions.push(newAction);
-                beeMarshallAlert('⚠️ Saved locally. Will sync when connection is restored.', 'warning');
+                careMarshallAlert('⚠️ Saved locally. Will sync when connection is restored.', 'warning');
                 if (typeof updateDashboard === 'function') {
                     updateDashboard();
                 }
@@ -2861,7 +3293,7 @@ function quickEditHiveBox(siteId, boxType, currentValue) {
         }
         if (element) element.textContent = newValue;
         actions.push(newAction);
-        beeMarshallAlert('⚠️ Saved locally. Will sync when connection is restored.', 'warning');
+        careMarshallAlert('⚠️ Saved locally. Will sync when connection is restored.', 'warning');
         if (typeof updateDashboard === 'function') {
             updateDashboard();
         }
@@ -2875,7 +3307,7 @@ function quickEditHiveBox(siteId, boxType, currentValue) {
 function quickEditSiteNote(siteId) {
     const site = window.sites.find(c => c.id === siteId);
     if (!site) {
-        beeMarshallAlert('Site not found', 'error');
+        careMarshallAlert('Site not found', 'error');
         return;
     }
     
@@ -2887,6 +3319,7 @@ function quickEditSiteNote(siteId) {
     
     // Update site data
     const updatedNote = newNote.trim();
+    const previousNote = site.notes || '';
     site.notes = updatedNote || null;
     
     // Prepare references and payloads
@@ -2905,10 +3338,25 @@ function quickEditSiteNote(siteId) {
     if (navigator.onLine && window.database) {
         database.ref(`${tenantPath}/${siteId}`).update(updateData)
             .then(() => {
+                // Log action for note update
+                const actionNotes = updatedNote 
+                    ? (previousNote ? 'Note updated' : 'Note added')
+                    : 'Note removed';
+                logAction({
+                    siteId: siteId,
+                    taskName: 'Site Notes Updated',
+                    taskCategory: 'Site Management',
+                    date: new Date().toISOString().split('T')[0],
+                    notes: `${actionNotes}${updatedNote ? `: ${updatedNote.substring(0, 100)}${updatedNote.length > 100 ? '...' : ''}` : ''}`
+                }).catch(error => {
+                    console.error('Error logging note update action:', error);
+                    // Don't fail the whole operation if action logging fails
+                });
+                
                 if (window.syncStatusManager) {
                     window.syncStatusManager.updateSyncStatus('synced');
                 }
-                beeMarshallAlert(updatedNote ? `✅ Note updated for ${site.name}` : `✅ Note removed from ${site.name}`, 'success');
+                careMarshallAlert(updatedNote ? `✅ Note updated for ${site.name}` : `✅ Note removed from ${site.name}`, 'success');
                 // Re-render sites to update the display
                 renderSites();
             })
@@ -2924,7 +3372,7 @@ function quickEditSiteNote(siteId) {
                     });
                     window.syncStatusManager.updateSyncStatus('offline', 'Saved locally, will sync later');
                 }
-                beeMarshallAlert('⚠️ Saved locally. Will sync when connection is restored.', 'warning');
+                careMarshallAlert('⚠️ Saved locally. Will sync when connection is restored.', 'warning');
                 // Re-render sites to update the display
                 renderSites();
             });
@@ -2939,10 +3387,241 @@ function quickEditSiteNote(siteId) {
             });
             window.syncStatusManager.updateSyncStatus('offline', 'Saved locally, will sync later');
         }
-        beeMarshallAlert('⚠️ Saved locally. Will sync when connection is restored.', 'warning');
+        careMarshallAlert('⚠️ Saved locally. Will sync when connection is restored.', 'warning');
         // Re-render sites to update the display
         renderSites();
     }
+}
+
+// Show contact details modal
+function showContactDetails(siteId) {
+    const site = window.sites.find(s => s.id === siteId);
+    if (!site) {
+        careMarshallAlert('Site not found', 'error');
+        return;
+    }
+    
+    const modalHtml = `
+        <div class="modal fade" id="contactDetailsModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title"><i class="bi bi-telephone"></i> Contact Information - ${site.name}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        ${site.landownerName ? `
+                            <div class="mb-3">
+                                <h6><i class="bi bi-person"></i> Contact Name</h6>
+                                <p class="mb-0">${site.landownerName}</p>
+                            </div>
+                        ` : ''}
+                        ${site.landownerPhone ? `
+                            <div class="mb-3">
+                                <h6><i class="bi bi-telephone"></i> Phone</h6>
+                                <p class="mb-0">
+                                    <a href="tel:${site.landownerPhone}" class="btn btn-outline-primary">
+                                        <i class="bi bi-telephone-fill"></i> ${site.landownerPhone}
+                                    </a>
+                                </p>
+                            </div>
+                        ` : ''}
+                        ${site.landownerEmail ? `
+                            <div class="mb-3">
+                                <h6><i class="bi bi-envelope"></i> Email</h6>
+                                <p class="mb-0">
+                                    <a href="mailto:${site.landownerEmail}" class="btn btn-outline-primary">
+                                        <i class="bi bi-envelope-fill"></i> ${site.landownerEmail}
+                                    </a>
+                                </p>
+                            </div>
+                        ` : ''}
+                        ${site.landownerAddress ? `
+                            <div class="mb-3">
+                                <h6><i class="bi bi-geo-alt"></i> Address</h6>
+                                <p class="mb-0">${site.landownerAddress}</p>
+                                <button class="btn btn-sm btn-outline-primary mt-2" onclick="openInMaps(${site.id})">
+                                    <i class="bi bi-map"></i> View on Map
+                                </button>
+                            </div>
+                        ` : ''}
+                        ${site.contactBeforeVisit ? `
+                            <div class="alert alert-warning">
+                                <i class="bi bi-exclamation-triangle"></i> <strong>Important:</strong> Contact required before visit
+                            </div>
+                        ` : ''}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    const existingModal = document.getElementById('contactDetailsModal');
+    if (existingModal) existingModal.remove();
+    
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    setTimeout(() => {
+        const modalElement = document.getElementById('contactDetailsModal');
+        if (modalElement && typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+            const modal = new bootstrap.Modal(modalElement);
+            modal.show();
+        }
+    }, 100);
+}
+
+// Show site clients modal
+function showSiteClients(siteId) {
+    const site = window.sites.find(s => s.id === siteId);
+    if (!site) {
+        careMarshallAlert('Site not found', 'error');
+        return;
+    }
+    
+    const siteClients = (window.clients || window.individualHives || []).filter(client => client.siteId === siteId);
+    
+    const clientsHtml = siteClients.length > 0 ? siteClients.map(client => {
+        const status = client.status || client.hiveStrength || 'unknown';
+        const statusColors = {
+            'independent': 'success', 'strong': 'success',
+            'assisted': 'info', 'medium': 'info',
+            'dependent': 'warning', 'weak': 'warning',
+            'rehabilitation': 'purple', 'nuc': 'purple',
+            'hospice': 'danger', 'dead': 'danger'
+        };
+        const statusColor = statusColors[status.toLowerCase()] || 'secondary';
+        const clientName = client.clientName || client.hiveName || `Client ${client.id}`;
+        const needs = client.needs || client.notes || 'No special needs noted';
+        
+        return `
+            <div class="card mb-2">
+                <div class="card-body p-2">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div class="flex-grow-1">
+                            <h6 class="mb-1">
+                                <i class="bi bi-house-heart"></i> ${clientName}
+                                <span class="badge bg-${statusColor} ms-2">${status}</span>
+                            </h6>
+                            <p class="mb-0 small text-muted">${needs.length > 100 ? needs.substring(0, 100) + '...' : needs}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('') : '<p class="text-muted text-center">No clients at this location</p>';
+    
+    const modalHtml = `
+        <div class="modal fade" id="siteClientsModal" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title"><i class="bi bi-house-heart"></i> Clients at ${site.name}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body" style="max-height: 500px; overflow-y: auto;">
+                        ${clientsHtml}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    const existingModal = document.getElementById('siteClientsModal');
+    if (existingModal) existingModal.remove();
+    
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    setTimeout(() => {
+        const modalElement = document.getElementById('siteClientsModal');
+        if (modalElement && typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+            const modal = new bootstrap.Modal(modalElement);
+            modal.show();
+        }
+    }, 100);
+}
+
+// Show site tasks modal
+function showSiteTasks(siteId) {
+    const site = window.sites.find(s => s.id === siteId);
+    if (!site) {
+        careMarshallAlert('Site not found', 'error');
+        return;
+    }
+    
+    const siteTasks = (window.scheduledTasks || []).filter(task => 
+        task.siteId === site.id && !task.completed
+    ).sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
+    
+    const tasksHtml = siteTasks.length > 0 ? siteTasks.map(task => {
+        const taskName = typeof getTaskDisplayName === 'function' ? getTaskDisplayName(null, task.taskId) : (task.taskName || 'Unknown Task');
+        const dueDate = new Date(task.dueDate);
+        const isOverdue = dueDate < new Date();
+        const priorityClass = task.priority === 'urgent' ? 'danger' : task.priority === 'high' ? 'warning' : 'secondary';
+        const priorityBadge = task.priority !== 'normal' ? `<span class="badge bg-${priorityClass}">${task.priority.toUpperCase()}</span>` : '';
+        
+        return `
+            <div class="card mb-2 ${isOverdue ? 'border-danger' : ''}">
+                <div class="card-body p-2">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div class="flex-grow-1">
+                            <h6 class="mb-1">
+                                ${taskName}
+                                ${isOverdue ? '<span class="badge bg-danger ms-2">OVERDUE</span>' : ''}
+                                ${priorityBadge}
+                            </h6>
+                            <p class="mb-0 small">
+                                <i class="bi bi-calendar"></i> Due: ${dueDate.toLocaleDateString()}
+                                ${task.notes ? ` • ${task.notes}` : ''}
+                            </p>
+                        </div>
+                        <div class="ms-2">
+                            <button class="btn btn-sm btn-success" onclick="completeTaskFromSite('${task.id}', ${site.id})" title="Mark task as complete">
+                                <i class="bi bi-check-circle"></i> Complete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('') : '<p class="text-muted text-center">No pending tasks for this location</p>';
+    
+    const modalHtml = `
+        <div class="modal fade" id="siteTasksModal" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title"><i class="bi bi-list-check"></i> Tasks for ${site.name}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body" style="max-height: 500px; overflow-y: auto;">
+                        ${tasksHtml}
+                    </div>
+                    <div class="modal-footer">
+                        ${isAdmin ? `<button type="button" class="btn btn-success" onclick="scheduleTaskForSite(${site.id}); bootstrap.Modal.getInstance(document.getElementById('siteTasksModal')).hide();">
+                            <i class="bi bi-calendar-plus"></i> Schedule New Task
+                        </button>` : ''}
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    const existingModal = document.getElementById('siteTasksModal');
+    if (existingModal) existingModal.remove();
+    
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    setTimeout(() => {
+        const modalElement = document.getElementById('siteTasksModal');
+        if (modalElement && typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+            const modal = new bootstrap.Modal(modalElement);
+            modal.show();
+        }
+    }, 100);
 }
 
 /**
@@ -2953,7 +3632,7 @@ function scrollToSiteCard(siteId) {
     console.log(`🔍 scrollToSiteCard called for site ID: ${siteId}`);
     
     // Close map popup if it's open
-    const mapInstance = window.beeMarshallMap;
+    const mapInstance = window.homeCareMap || window.beeMarshallMap;
     if (mapInstance) {
         mapInstance.closePopup();
     }

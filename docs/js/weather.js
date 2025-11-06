@@ -1,4 +1,4 @@
-// BeeMarshall - Weather Widget Module
+// HomeCare - Weather Widget Module
 // Fetches weather data based on average site GPS coordinates
 
 // OpenWeatherMap API configuration

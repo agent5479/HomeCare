@@ -1,4 +1,4 @@
-// BeeMarshall - Actions Management Module
+// HomeCare - Actions Management Module
 
 function showLogActionForm() {
     hideAllViews();
@@ -42,14 +42,19 @@ function filterTaskCheckboxes(filter) {
     });
 }
 
-function loadSiteHives() {
-    const siteId = parseInt(document.getElementById('actionSite').value);
-    const hives = individualHives.filter(h => h.siteId === siteId);
+function loadSiteClients() {
+    // Backward compatibility alias
+    if (typeof loadSiteHives === 'undefined') {
+        window.loadSiteHives = loadSiteClients;
+    }
     
-    if (hives.length > 0) {
-        const select = document.getElementById('actionHive');
-        select.innerHTML = '<option value="">All hives in site</option>' +
-            hives.map(h => `<option value="${h.id}">${h.hiveName} (${h.status})</option>`).join('');
+    const siteId = parseInt(document.getElementById('actionSite').value);
+    const clients = (window.clients || window.individualHives || []).filter(h => h.siteId === siteId);
+    
+    if (clients.length > 0) {
+        const select = document.getElementById('actionHive'); // Keep ID for backward compatibility
+        select.innerHTML = '<option value="">All clients at location</option>' +
+            clients.map(h => `<option value="${h.id}">${h.hiveName || h.clientName || `Client ${h.id}`} (${h.status})</option>`).join('');
         document.getElementById('individualHiveSelect').classList.remove('hidden');
     } else {
         document.getElementById('individualHiveSelect').classList.add('hidden');
@@ -128,7 +133,7 @@ function handleLogAction(e) {
                     });
                 }
             });
-            beeMarshallAlert('⚠️ Actions saved locally. Will sync when connection is restored.', 'warning');
+            careMarshallAlert('⚠️ Actions saved locally. Will sync when connection is restored.', 'warning');
             document.getElementById('actionForm').reset();
             document.getElementById('actionDate').valueAsDate = new Date();
             showActions();
@@ -145,7 +150,7 @@ function handleLogAction(e) {
                 });
             }
         });
-        beeMarshallAlert('⚠️ Actions saved locally. Will sync when connection is restored.', 'warning');
+        careMarshallAlert('⚠️ Actions saved locally. Will sync when connection is restored.', 'warning');
         document.getElementById('actionForm').reset();
         document.getElementById('actionDate').valueAsDate = new Date();
         showActions();
@@ -229,8 +234,8 @@ function renderActions() {
     // Apply action type filters with robust keyword matching
     const getName = (a) => (a.taskName || a.task || a.name || '').toString().toLowerCase();
     const deleteKeywords = ['delete', 'deleted', 'deleting', 'remove', 'removed', 'removing', 'archive', 'archived', 'archiving', 'permanently deleted', 'has been deleted', 'was deleted', 'will be deleted'];
-    const moveKeywords = ['move', 'moved', 'relocation', 'relocate', 'transfer'];
-    const strengthKeywords = ['strong', 'medium', 'weak', 'nuc', 'dead', 'hive state', 'strength'];
+    const moveKeywords = ['move', 'moved', 'relocation', 'relocate', 'transfer', 'discharge', 'admission', 'placement'];
+    const strengthKeywords = ['strong', 'medium', 'weak', 'nuc', 'dead', 'hive state', 'strength', 'independent', 'assisted', 'dependent', 'rehabilitation', 'hospice', 'client status', 'status update'];
 
     if (hideDeletes) {
         filtered = filtered.filter(a => {
@@ -275,6 +280,7 @@ function renderActions() {
     if (hideStrengthUpdates) {
         filtered = filtered.filter(a => {
             const name = getName(a);
+            // Hide both old hive strength updates and new client status updates
             return !strengthKeywords.some(k => name.includes(k));
         });
     }
@@ -300,12 +306,12 @@ function renderActions() {
     });
     
     const sitesArray = Array.isArray(window.sites) ? window.sites : [];
-    const hivesArray = Array.isArray(window.individualHives) ? window.individualHives : [];
+    const clientsArray = Array.isArray(window.clients) ? window.clients : (Array.isArray(window.individualHives) ? window.individualHives : []);
 
     const html = filtered.length > 0
         ? filtered.map(a => {
             const site = sitesArray.find(s => s.id === a.siteId);
-            const hive = hivesArray.find(h => h.id === a.individualHiveId);
+            const client = clientsArray.find(h => h.id === a.individualHiveId);
             const flagIcon = a.flag === 'urgent' ? '🚨' : a.flag === 'warning' ? '⚠️' : a.flag === 'info' ? 'ℹ️' : '';
             const deleteBtn = canDeleteAction() ? `
                 <button class="btn btn-sm btn-outline-danger" onclick="deleteAction('${a.id}')">
@@ -326,7 +332,7 @@ function renderActions() {
                             </div>
                             <div class="text-muted small">
                                 <i class="bi bi-geo-alt"></i> ${site?.name || 'Unknown'}
-                                ${hive ? ` • <i class=\"bi bi-hexagon\"></i> ${hive.hiveName || hive.hiveNumber || ''}` : ''}
+                                ${client ? ` • <i class=\"bi bi-house-heart\"></i> ${client.hiveName || client.clientName || `Client ${client.id}`}` : ''}
                                 <br>
                                 <i class="bi bi-calendar"></i> ${a.date || ''} • 
                                 <i class="bi bi-person"></i> ${a.loggedBy || a.completedBy || a.employee || 'Unknown'}
@@ -486,7 +492,7 @@ function rescheduleTask(taskId) {
         const task = window.scheduledTasks.find(t => t.id === taskId);
         if (task) {
             // Open the reschedule modal or form
-            beeMarshallAlert(`Reschedule task: ${window.getTaskDisplayName(null, task.taskId)}\n\nDue: ${new Date(task.dueDate).toLocaleDateString()}\n\nUse the scheduling section to reschedule this task.`, 'info');
+            careMarshallAlert(`Reschedule task: ${window.getTaskDisplayName(null, task.taskId)}\n\nDue: ${new Date(task.dueDate).toLocaleDateString()}\n\nUse the scheduling section to reschedule this task.`, 'info');
         }
     }, 500);
 }
@@ -496,7 +502,7 @@ function completeTask(taskId) {
     
     const task = window.scheduledTasks.find(t => t.id === taskId);
     if (!task) {
-        beeMarshallAlert('Task not found', 'error');
+        careMarshallAlert('Task not found', 'error');
         return;
     }
     
@@ -514,13 +520,13 @@ function completeTask(taskId) {
         database.ref(`${tenantPath}/${taskId}`).update(updates)
             .then(() => {
                 console.log('✅ Task completed successfully');
-                beeMarshallAlert(`Task completed successfully!\n\nTask: ${window.getTaskDisplayName(null, task.taskId)}\nCompleted by: ${currentUser ? currentUser.username : 'Unknown'}`, 'success');
+                careMarshallAlert(`Task completed successfully!\n\nTask: ${window.getTaskDisplayName(null, task.taskId)}\nCompleted by: ${currentUser ? currentUser.username : 'Unknown'}`, 'success');
                 // Refresh the flagged items list
                 renderFlaggedItems();
             })
             .catch(error => {
                 console.error('❌ Error completing task:', error);
-                beeMarshallAlert('Error completing task. Please try again.', 'error');
+                careMarshallAlert('Error completing task. Please try again.', 'error');
             });
     }
 }
@@ -534,12 +540,12 @@ function unflagAction(id) {
     database.ref(`${tenantPath}/${id}/flag`).set('')
         .then(() => {
             console.log('✅ Action unflagged successfully');
-            beeMarshallAlert('Action unflagged successfully', 'success');
+            careMarshallAlert('Action unflagged successfully', 'success');
             // Refresh the flagged items list
             renderFlaggedItems();
         })
         .catch(error => {
             console.error('❌ Error unflagging action:', error);
-            beeMarshallAlert('Error unflagging action. Please try again.', 'error');
+            careMarshallAlert('Error unflagging action. Please try again.', 'error');
         });
 }

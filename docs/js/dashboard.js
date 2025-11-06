@@ -1,4 +1,4 @@
-// BeeMarshall - Dashboard Module with Calendar Widget
+// CareMarshall - Dashboard Module with Calendar Widget
 
 // Helper function to update active navigation state
 function updateActiveNav(section) {
@@ -126,7 +126,8 @@ function updateDashboard() {
         sites: window.sites ? window.sites.length : 'undefined',
         actions: window.actions ? window.actions.length : 'undefined',
         scheduledTasks: window.scheduledTasks ? window.scheduledTasks.length : 'undefined',
-        individualHives: window.individualHives ? window.individualHives.length : 'undefined',
+        clients: window.clients ? window.clients.length : (window.individualHives ? window.individualHives.length : 'undefined'),
+        individualHives: window.individualHives ? window.individualHives.length : (window.clients ? window.clients.length : 'undefined'), // Backward compatibility
         tasks: window.tasks ? window.tasks.length : 'undefined',
         globalTasks: tasks ? tasks.length : 'undefined'
     });
@@ -137,8 +138,10 @@ function updateDashboard() {
         return;
     }
     
-    // Update hive analysis card if it exists
-    if (typeof updateHiveStrengthBreakdown === 'function') {
+    // Update client status analysis card if it exists (backward compatibility)
+    if (typeof updateClientStatusBreakdown === 'function') {
+        updateClientStatusBreakdown();
+    } else if (typeof updateHiveStrengthBreakdown === 'function') {
         updateHiveStrengthBreakdown();
     }
     
@@ -160,9 +163,11 @@ function updateDashboard() {
         console.error('❌ Scheduled tasks array is undefined!');
         window.scheduledTasks = [];
     }
-    if (!window.individualHives) {
-        console.error('❌ Individual hives array is undefined!');
-        window.individualHives = [];
+    // Support both new clients array and old individualHives for backward compatibility
+    if (!window.clients && !window.individualHives) {
+        console.error('❌ Clients array is undefined!');
+        window.clients = [];
+        window.individualHives = window.clients; // Backward compatibility alias
     }
     
     // Filter out archived and deleted sites for statistics
@@ -175,8 +180,9 @@ function updateDashboard() {
         return true;
     }) : [];
     
-    // Calculate total hives from hiveStacks (cumulative total of all hive boxes/platforms)
-    // Always calculate from hiveStacks to exactly match equipment breakdown card
+    // Calculate total clients from care equipment (cumulative total of all equipment)
+    // Always calculate from careEquipment/hiveStacks to exactly match equipment breakdown card
+    // Support both new careEquipment and old hiveStacks field names for backward compatibility
     // Use same parsing logic as equipment breakdown (parseInt) to handle string numbers
     const safeParse = (val) => {
         if (val === null || val === undefined) return 0;
@@ -184,19 +190,21 @@ function updateDashboard() {
         return isNaN(parsed) ? 0 : parsed;
     };
     
-    const totalHives = activeSites.reduce((sum, s) => {
-        // Only count sites with hiveStacks data (same logic as equipment breakdown)
-        if (s.hiveStacks && typeof s.hiveStacks === 'object') {
-            const doubles = safeParse(s.hiveStacks.doubles);
-            const singles = safeParse(s.hiveStacks.singles);
-            const nucs = safeParse(s.hiveStacks.nucs);
-            const topSplits = safeParse(s.hiveStacks.topSplits);
+    const totalClients = activeSites.reduce((sum, s) => {
+        // Support both new careEquipment and old hiveStacks field names
+        const equipment = s.careEquipment || s.hiveStacks;
+        // Only count sites with equipment data (same logic as equipment breakdown)
+        if (equipment && typeof equipment === 'object') {
+            const doubles = safeParse(equipment.doubles);
+            const singles = safeParse(equipment.singles);
+            const nucs = safeParse(equipment.nucs);
+            const topSplits = safeParse(equipment.topSplits);
             return sum + doubles + singles + nucs + topSplits;
         }
         // Don't use hiveCount fallback - only count sites with hiveStacks data
         return sum;
     }, 0);
-    console.log('📊 Total hives calculated (cumulative total from hiveCount/hiveStacks):', totalHives);
+    console.log('📊 Total clients calculated (cumulative total from equipment):', totalClients);
     
     // Check for overdue tasks and update flagged count
     checkAndFlagOverdueTasks();
@@ -238,7 +246,8 @@ function updateDashboard() {
     
     // Set numbers directly without animation (active sites only)
     document.getElementById('statSites').textContent = activeSites.length;
-    document.getElementById('statHives').textContent = totalHives;
+    const statHivesEl = document.getElementById('statHives');
+    if (statHivesEl) statHivesEl.textContent = totalClients;
     document.getElementById('statActions').textContent = activeActions.length;
     document.getElementById('statFlagged').textContent = flaggedCount;
     // Emphasize flagged card severity by count with progressive transition
@@ -317,7 +326,8 @@ function updateDashboard() {
     
     console.log('📊 Dashboard cards updated:', {
         sites: activeSites.length,
-        hives: totalHives,
+        clients: totalClients,
+        hives: totalClients, // Backward compatibility
         actions: (window.actions && Array.isArray(window.actions)) ? window.actions.length : 0,
         flagged: flaggedCount
     });
@@ -818,7 +828,7 @@ function makeDashboardCardsClickable() {
             let tooltipText = '';
             switch(target) {
                 case 'sites':
-                    tooltipText = `View and manage all ${window.sites.length} apiary sites`;
+                    tooltipText = `View and manage all ${window.sites.length} care locations`;
                     break;
                 case 'actions':
                     tooltipText = `View and manage all ${window.actions.length} logged actions`;
@@ -1012,7 +1022,7 @@ function handleUrgentItemAction(action, itemId) {
         if (typeof completeScheduledTask === 'function') {
             completeScheduledTask(itemId);
         } else {
-            beeMarshallAlert('Task management not available', 'error');
+            careMarshallAlert('Task management not available', 'error');
         }
     } else if (action === 'action') {
         // For actions - open scheduling for follow-up
@@ -1020,7 +1030,7 @@ function handleUrgentItemAction(action, itemId) {
         if (actionObj && typeof showScheduleTaskModal === 'function') {
             showScheduleTaskModal();
         } else {
-            beeMarshallAlert('Scheduling not available', 'error');
+            careMarshallAlert('Scheduling not available', 'error');
         }
     }
 }
@@ -1043,7 +1053,7 @@ function handleHarvestAction(siteId, harvestDate, markAddressed = false) {
             const tenantPath = currentTenantId ? `tenants/${currentTenantId}/sites` : 'sites';
             database.ref(`${tenantPath}/${site.id}`).update({ harvestTimeline: '' })
                 .then(() => {
-                    beeMarshallAlert('✅ Harvest marked as addressed', 'success');
+                    careMarshallAlert('✅ Harvest marked as addressed', 'success');
                     updateDashboard();
                 });
         }
@@ -1070,10 +1080,10 @@ function handleHarvestAction(siteId, harvestDate, markAddressed = false) {
                 showScheduleTaskModal();
                 document.getElementById('scheduleSite').value = siteId;
                 document.getElementById('scheduleDueDate').value = harvestDate;
-                beeMarshallAlert('📅 Please select a harvest task to schedule', 'info');
+                careMarshallAlert('📅 Please select a harvest task to schedule', 'info');
             }
         } else {
-            beeMarshallAlert('Scheduling not available', 'error');
+            careMarshallAlert('Scheduling not available', 'error');
         }
     }
 }

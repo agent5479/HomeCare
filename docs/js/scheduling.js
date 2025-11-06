@@ -1,4 +1,4 @@
-// BeeMarshall - Enhanced Scheduling Module
+// HomeCare - Enhanced Scheduling Module
 
 // Check for overdue tasks and automatically flag them as urgent
 function checkAndFlagOverdueTasks() {
@@ -102,7 +102,7 @@ function renderScheduledTasks() {
                                 </h5>
                                 <p class="mb-1">
                                     <i class="bi bi-geo-alt"></i> ${site?.name || 'Site Not Found'}
-                                    ${hive ? ` • <i class="bi bi-hexagon"></i> ${hive.hiveName}` : ''}
+                                    ${hive ? ` • <i class="bi bi-house-heart"></i> ${hive.hiveName || hive.clientName || `Client ${hive.id}`}` : ''}
                                     ${!site ? ` <small class="text-warning">(ID: ${t.siteId || t.clusterId || 'N/A'})</small>` : ''}
                                 </p>
                                 <p class="mb-1">
@@ -260,7 +260,7 @@ function renderScheduleTimeline() {
                                     </div>
                                     <p class="mb-1">
                                         <i class="bi bi-geo-alt"></i> ${site?.name || 'Unknown'}
-                                        ${hive ? ` • <i class="bi bi-hexagon"></i> ${hive.hiveName}` : ''}
+                                        ${hive ? ` • <i class="bi bi-house-heart"></i> ${hive.hiveName || hive.clientName || `Client ${hive.id}`}` : ''}
                                     </p>
                                     ${task.scheduledTime ? `<p class="mb-1"><i class="bi bi-clock"></i> ${task.scheduledTime}</p>` : ''}
                                     ${task.notes ? `<p class="mb-0"><small>${task.notes}</small></p>` : ''}
@@ -300,7 +300,7 @@ function renderScheduleTimeline() {
                 ${isCompleted ? '<span class="badge bg-success ms-1">Completed</span>' : ''}
                 <br><small class="text-muted">
                                         <i class="bi bi-geo-alt"></i> ${site?.name || 'Unknown'}
-                    ${hive ? ` • <i class="bi bi-hexagon"></i> ${hive.hiveName}` : ''}
+                    ${hive ? ` • <i class="bi bi-house-heart"></i> ${hive.hiveName || hive.clientName || `Client ${hive.id}`}` : ''}
                     ${task.scheduledTime ? ` • <i class="bi bi-clock"></i> ${task.scheduledTime}` : ''}
                 </small>
                 ${!isCompleted ? `
@@ -381,7 +381,7 @@ function handleScheduleTask(e) {
     const tasksPath = currentTenantId ? `tenants/${currentTenantId}/scheduledTasks` : 'scheduledTasks';
     database.ref(`${tasksPath}/${task.id}`).set(task)
         .then(() => {
-            beeMarshallAlert('✅ Task scheduled successfully!', 'success');
+            careMarshallAlert('✅ Task scheduled successfully!', 'success');
             bootstrap.Modal.getInstance(document.getElementById('scheduleTaskModal')).hide();
             document.getElementById('scheduleTaskForm').reset();
             renderScheduledTasks();
@@ -492,7 +492,7 @@ function updateScheduledTask(id) {
     const tasksPath = currentTenantId ? `tenants/${currentTenantId}/scheduledTasks` : 'scheduledTasks';
     database.ref(`${tasksPath}/${id}`).update(updates)
         .then(() => {
-            beeMarshallAlert('✅ Task updated successfully!', 'success');
+            careMarshallAlert('✅ Task updated successfully!', 'success');
             bootstrap.Modal.getInstance(document.getElementById('scheduleTaskModal')).hide();
             document.getElementById('scheduleTaskForm').reset();
             renderScheduledTasks();
@@ -719,7 +719,7 @@ function rescheduleOverdueTask(taskId) {
         renderScheduledTasks();
         renderScheduleTimeline();
         
-        beeMarshallAlert(`Task rescheduled successfully to ${newDateObj.toLocaleDateString()}!`, 'success');
+        careMarshallAlert(`Task rescheduled successfully to ${newDateObj.toLocaleDateString()}!`, 'success');
     }
 }
 
@@ -820,7 +820,7 @@ function handleEditScheduledTask() {
         refreshCalendar();
     }
     
-    beeMarshallAlert('Task updated successfully!', 'success');
+    careMarshallAlert('Task updated successfully!', 'success');
 }
 
 // Calendar Feed Generation
@@ -838,7 +838,7 @@ function generateCalendarFeed() {
     }
     
     const icsContent = generateICS(futureTasks);
-    downloadICS(icsContent, 'BeeMarshall-Scheduled-Tasks.ics');
+    downloadICS(icsContent, 'CareMarshall-Scheduled-Tasks.ics');
 }
 
 function generateEnhancedICS(tasks) {
@@ -847,14 +847,14 @@ function generateEnhancedICS(tasks) {
     
     let icsContent = [
         'BEGIN:VCALENDAR',
-        'VERSION:2.0',
-        'PRODID:-//BeeMarshall//Scheduled Tasks//EN',
+        'VERSION:0.7',
+        'PRODID:-//CareMarshall//Scheduled Tasks//EN',
         'CALSCALE:GREGORIAN',
         'METHOD:PUBLISH',
-        'X-WR-CALNAME:BeeMarshall Scheduled Tasks',
+        'X-WR-CALNAME:CareMarshall Scheduled Tasks',
         'X-WR-TIMEZONE:UTC',
-        'X-WR-CALDESC:Scheduled beekeeping tasks from BeeMarshall',
-        'X-WR-RELCALID:beemarshall-tasks'
+        'X-WR-CALDESC:Scheduled care management tasks from CareMarshall',
+        'X-WR-RELCALID:caremarshall-tasks'
     ];
     
     tasks.forEach(task => {
@@ -878,11 +878,11 @@ function generateEnhancedICS(tasks) {
         
         const summary = displayTaskName;
         const description = `Site: ${site?.name || 'Unknown'}\nPriority: ${task.priority || 'normal'}\nType: ${task.type || 'scheduled'}\n${task.notes ? `Notes: ${task.notes}` : ''}`;
-        const location = site?.name || 'Apiary Location';
+        const location = site?.name || 'Care Location';
         
         icsContent.push(
             'BEGIN:VEVENT',
-            `UID:${task.id}@beemarshall.com`,
+            `UID:${task.id}@caremarshall.com`,
             `DTSTART:${startUTC}`,
             `DTEND:${endUTC}`,
             `DTSTAMP:${nowUTC}`,
@@ -891,10 +891,10 @@ function generateEnhancedICS(tasks) {
             `LOCATION:${location}`,
             `STATUS:CONFIRMED`,
             `PRIORITY:${task.priority === 'urgent' ? '1' : task.priority === 'high' ? '2' : '3'}`,
-            `CATEGORIES:BEEKEEPING`,
+            `CATEGORIES:HOMECARE,CARE_MANAGEMENT`,
             `CREATED:${nowUTC}`,
             `LAST-MODIFIED:${nowUTC}`,
-            `URL:https://beemarshall.com/task/${task.id}`,
+            `URL:https://caremarshall.com/task/${task.id}`,
             'END:VEVENT'
         );
     });
@@ -910,13 +910,13 @@ function generateICS(tasks) {
     
     let icsContent = [
         'BEGIN:VCALENDAR',
-        'VERSION:2.0',
-        'PRODID:-//BeeMarshall//Scheduled Tasks//EN',
+        'VERSION:0.7',
+        'PRODID:-//CareMarshall//Scheduled Tasks//EN',
         'CALSCALE:GREGORIAN',
         'METHOD:PUBLISH',
-        'X-WR-CALNAME:BeeMarshall Scheduled Tasks',
+        'X-WR-CALNAME:CareMarshall Scheduled Tasks',
         'X-WR-TIMEZONE:UTC',
-        'X-WR-CALDESC:Scheduled beekeeping tasks from BeeMarshall'
+        'X-WR-CALDESC:Scheduled care management tasks from CareMarshall'
     ];
     
     tasks.forEach(task => {
@@ -940,11 +940,11 @@ function generateICS(tasks) {
         
         const summary = displayTaskName;
         const description = `Site: ${site?.name || 'Unknown'}\nPriority: ${task.priority || 'normal'}\nType: ${task.type || 'scheduled'}\n${task.notes ? `Notes: ${task.notes}` : ''}`;
-        const location = site?.name || 'Apiary Location';
+        const location = site?.name || 'Care Location';
         
         icsContent.push(
             'BEGIN:VEVENT',
-            `UID:${task.id}@beemarshall.com`,
+            `UID:${task.id}@caremarshall.com`,
             `DTSTART:${startUTC}`,
             `DTEND:${endUTC}`,
             `DTSTAMP:${nowUTC}`,
@@ -953,7 +953,7 @@ function generateICS(tasks) {
             `LOCATION:${location}`,
             `STATUS:CONFIRMED`,
             `PRIORITY:${task.priority === 'urgent' ? '1' : task.priority === 'high' ? '2' : '3'}`,
-            `CATEGORIES:BEEKEEPING`,
+            `CATEGORIES:HOMECARE,CARE_MANAGEMENT`,
             `CREATED:${nowUTC}`,
             `LAST-MODIFIED:${nowUTC}`,
             'END:VEVENT'
@@ -1001,12 +1001,12 @@ function copyCalendarFeedLink() {
     
     // Copy the data URL to clipboard
     navigator.clipboard.writeText(dataUrl).then(() => {
-        beeMarshallAlert(`📋 Calendar Feed Link Copied!\n\n✅ Share this link with your team!\n\n📅 Staff can:\n• Import directly to Google Calendar, Outlook, etc.\n• Bookmark for automatic updates\n• Use as a live calendar feed\n\n📊 The link contains ${futureTasks.length} scheduled task(s) and will always show current data.`, 'success');
+        careMarshallAlert(`📋 Calendar Feed Link Copied!\n\n✅ Share this link with your team!\n\n📅 Staff can:\n• Import directly to Google Calendar, Outlook, etc.\n• Bookmark for automatic updates\n• Use as a live calendar feed\n\n📊 The link contains ${futureTasks.length} scheduled task(s) and will always show current data.`, 'success');
     }).catch(err => {
         console.log('Clipboard copy failed, falling back to download:', err);
         // Fallback: download the file instead
-        downloadICS(icsContent, `BeeMarshall-Scheduled-Tasks-${new Date().toISOString().split('T')[0]}.ics`);
-        beeMarshallAlert('📋 Calendar file downloaded!\n\n✅ Share this .ics file with your team!\n\n📅 Staff can import it into their calendar applications.\n\n📱 For Google Calendar: Import from file\n📱 For Apple Calendar: Double-click the file', 'success');
+        downloadICS(icsContent, `CareMarshall-Scheduled-Tasks-${new Date().toISOString().split('T')[0]}.ics`);
+        careMarshallAlert('📋 Calendar file downloaded!\n\n✅ Share this .ics file with your team!\n\n📅 Staff can import it into their calendar applications.\n\n📱 For Google Calendar: Import from file\n📱 For Apple Calendar: Double-click the file', 'success');
     });
 }
 
@@ -1317,7 +1317,7 @@ function exportToGoogleCalendar() {
     });
     
     if (futureTasks.length === 0) {
-        beeMarshallAlert('No scheduled tasks to export.', 'info');
+        careMarshallAlert('No scheduled tasks to export.', 'info');
         return;
     }
     
@@ -1328,10 +1328,10 @@ function exportToGoogleCalendar() {
     const enhancedICS = generateEnhancedICS(futureTasks);
     
     // Download the ICS file
-    downloadICS(enhancedICS, `BeeMarshall-Tasks-${new Date().toISOString().split('T')[0]}.ics`);
+    downloadICS(enhancedICS, `CareMarshall-Tasks-${new Date().toISOString().split('T')[0]}.ics`);
     
     // Show instructions
-    beeMarshallAlert(`📅 Calendar Export Ready!\n\n✅ ICS file downloaded with ${futureTasks.length} scheduled task(s)\n\n📋 To import into Google Calendar:\n1. Open Google Calendar\n2. Click the "+" button\n3. Select "Import from file"\n4. Choose the downloaded .ics file\n\n📱 For Apple Calendar:\n1. Double-click the .ics file\n2. It will open in Calendar app automatically`, 'success');
+    careMarshallAlert(`📅 Calendar Export Ready!\n\n✅ ICS file downloaded with ${futureTasks.length} scheduled task(s)\n\n📋 To import into Google Calendar:\n1. Open Google Calendar\n2. Click the "+" button\n3. Select "Import from file"\n4. Choose the downloaded .ics file\n\n📱 For Apple Calendar:\n1. Double-click the .ics file\n2. It will open in Calendar app automatically`, 'success');
 }
 
 // Save scheduled tasks to Firebase

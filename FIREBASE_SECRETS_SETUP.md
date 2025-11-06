@@ -8,6 +8,13 @@ All Firebase configuration has been moved to GitHub Secrets for security. The fo
 - ✅ `docs/js/env-config.js` - Development environment secured
 - ✅ `docs/js/config.js` - Fallback values removed
 
+## 🔥 **HomeCare Firebase Project**
+
+**Project ID**: `homecare-ca5ce`  
+**Database URL**: `https://homecare-ca5ce-default-rtdb.firebaseio.com`  
+**Auth Domain**: `homecare-ca5ce.firebaseapp.com`  
+**Storage Bucket**: `homecare-ca5ce.appspot.com`
+
 ## 🔧 **GitHub Secrets Required**
 
 Go to your repository → **Settings** → **Secrets and variables** → **Actions**
@@ -15,10 +22,15 @@ Go to your repository → **Settings** → **Secrets and variables** → **Actio
 ### **Admin Credentials (Required)**
 | Secret Name | Description | Example Value |
 |-------------|-------------|---------------|
-| `GBTECH_USERNAME` | GBTech admin username | `GBTech` |
-| `GBTECH_PASSWORD` | GBTech admin password | `YourSecurePassword123!` |
-| `LARS_USERNAME` | Lars admin username | `Lars` |
-| `LARS_PASSWORD` | Lars admin password | `YourSecurePassword456!` |
+| `JESS_USERNAME` | Primary admin username | `Jess` |
+| `JESS_PASSWORD` | Primary admin password | `YourSecurePassword123!` |
+
+### **Tenant Configuration (Optional)**
+| Secret Name | Description | Example Value |
+|-------------|-------------|---------------|
+| `DEFAULT_TENANT_ID` | Default tenant identifier for data isolation | `default` |
+
+**Note**: The system supports backward compatibility with `GBTECH_USERNAME`, `GBTECH_PASSWORD`, `LARS_USERNAME`, and `LARS_PASSWORD` if you need to migrate from an older setup.
 
 ### **Firebase Configuration (Required)**
 | Secret Name | Description | Example Value |
@@ -42,12 +54,18 @@ Go to your repository → **Settings** → **Secrets and variables** → **Actio
 ### **Step 1: Get Your Firebase Configuration**
 
 1. Go to [Firebase Console](https://console.firebase.google.com/)
-2. Select your project: `[Your Firebase Project ID]`
+2. Select your project: `homecare-ca5ce`
 3. Click the **⚙️ Settings** gear icon
 4. Select **Project settings**
 5. Scroll down to **Your apps** section
 6. Click on your web app or create a new one
 7. Copy the configuration values
+
+**Expected values for homecare-ca5ce:**
+- **Project ID**: `homecare-ca5ce`
+- **Database URL**: `https://homecare-ca5ce-default-rtdb.firebaseio.com`
+- **Auth Domain**: `homecare-ca5ce.firebaseapp.com`
+- **Storage Bucket**: `homecare-ca5ce.appspot.com`
 
 ### **Step 2: Set GitHub Secrets**
 

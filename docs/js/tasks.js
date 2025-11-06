@@ -1,10 +1,11 @@
-// BeeMarshall - Task Management Module
+// CareMarshall - Task Management Module
 
 // Note: COMPREHENSIVE_TASKS is defined in core.js
 // This module uses the global COMPREHENSIVE_TASKS variable
 
 // Helper function to safely get task name (handles deleted tasks)
-function getTaskDisplayName(taskName, taskId) {
+// Make getTaskDisplayName globally available (also defined in dashboard.js, but this is the canonical version)
+window.getTaskDisplayName = function getTaskDisplayName(taskName, taskId) {
     // Check both window.tasks and global tasks
     const windowTasks = window.tasks || [];
     const globalTasks = (typeof tasks !== 'undefined') ? tasks : [];
@@ -243,12 +244,12 @@ function handleAddTask(e) {
     const common = document.getElementById('newTaskCommon').checked;
     
     if (!category) {
-        beeMarshallAlert('Please select or enter a category.', 'warning');
+        careMarshallAlert('Please select or enter a category.', 'warning');
         return false;
     }
     
     if (!name) {
-        beeMarshallAlert('Please enter a task name.', 'warning');
+        careMarshallAlert('Please enter a task name.', 'warning');
         return false;
     }
     
@@ -275,7 +276,7 @@ function handleAddTask(e) {
     
     // Save to Firebase
     database.ref(`${tasksPath}/${newId}`).set(newTask).then(() => {
-        beeMarshallAlert(`✅ Task "${name}" added successfully!`, 'success');
+        careMarshallAlert(`✅ Task "${name}" added successfully!`, 'success');
         
         // Reset form
         const form = document.getElementById('addTaskForm');
@@ -293,7 +294,7 @@ function handleAddTask(e) {
         return false;
     }).catch(error => {
         console.error('Error adding task:', error);
-        beeMarshallAlert('❌ Error adding task. Please try again.', 'error');
+        careMarshallAlert('❌ Error adding task. Please try again.', 'error');
         return false;
     });
     
@@ -306,7 +307,7 @@ function editTask(taskId) {
     // Only allow this function when in the task management view
     const tasksView = document.getElementById('tasksView');
     if (!tasksView || tasksView.classList.contains('hidden')) {
-        beeMarshallAlert('Please navigate to Task Management to edit tasks.', 'info');
+        careMarshallAlert('Please navigate to Task Management to edit tasks.', 'info');
         // Switch to task management view
         showTasks();
         return;
@@ -325,7 +326,7 @@ function editTask(taskId) {
     
     if (!task) {
         console.log('❌ Task not found with ID:', taskId);
-        beeMarshallAlert('Task not found. Please refresh the page and try again.', 'error');
+        careMarshallAlert('Task not found. Please refresh the page and try again.', 'error');
         return;
     }
     
@@ -425,7 +426,7 @@ function handleEditTask(e) {
     
     const taskIdInput = document.getElementById('editTaskId');
     if (!taskIdInput) {
-        beeMarshallAlert('Task ID not found. Please try again.', 'error');
+        careMarshallAlert('Task ID not found. Please try again.', 'error');
         return false;
     }
     
@@ -440,12 +441,12 @@ function handleEditTask(e) {
     const common = document.getElementById('editTaskCommon').checked;
     
     if (!category) {
-        beeMarshallAlert('Please select or enter a category.', 'warning');
+        careMarshallAlert('Please select or enter a category.', 'warning');
         return false;
     }
     
     if (!name) {
-        beeMarshallAlert('Please enter a task name.', 'warning');
+        careMarshallAlert('Please enter a task name.', 'warning');
         return false;
     }
     
@@ -462,7 +463,7 @@ function handleEditTask(e) {
     
     // Update in Firebase
     database.ref(`${tasksPath}/${taskId}`).update(updates).then(() => {
-        beeMarshallAlert('✅ Task updated successfully!', 'success');
+        careMarshallAlert('✅ Task updated successfully!', 'success');
         
         // Close modal
         const modal = bootstrap.Modal.getInstance(document.getElementById('editTaskModal'));
@@ -474,7 +475,7 @@ function handleEditTask(e) {
         return false;
     }).catch(error => {
         console.error('Error updating task:', error);
-        beeMarshallAlert('❌ Error updating task. Please try again.', 'error');
+        careMarshallAlert('❌ Error updating task. Please try again.', 'error');
         return false;
     });
     
@@ -485,7 +486,7 @@ function deleteTask(taskId) {
     // Only allow this function when in the task management view
     const tasksView = document.getElementById('tasksView');
     if (!tasksView || tasksView.classList.contains('hidden')) {
-        beeMarshallAlert('Please navigate to Task Management to delete tasks.', 'info');
+        careMarshallAlert('Please navigate to Task Management to delete tasks.', 'info');
         // Switch to task management view
         showTasks();
         return;
@@ -501,7 +502,7 @@ function deleteTask(taskId) {
     });
     
     if (!task) {
-        beeMarshallAlert('Task not found. Please refresh the page and try again.', 'error');
+        careMarshallAlert('Task not found. Please refresh the page and try again.', 'error');
         return;
     }
     
@@ -549,12 +550,12 @@ function deleteTask(taskId) {
             if (totalAffected > 0) {
                 alert(`✅ Task deleted.\n\n${totalAffected} historical record(s) will now show as "[Deleted: ${task.name}]"`);
             } else {
-                beeMarshallAlert('✅ Task deleted successfully!', 'success');
+                careMarshallAlert('✅ Task deleted successfully!', 'success');
             }
             // Tasks will be reloaded automatically from Firebase listener
         }).catch(error => {
             console.error('Error deleting task:', error);
-            beeMarshallAlert('❌ Error deleting task. Please try again.', 'error');
+            careMarshallAlert('❌ Error deleting task. Please try again.', 'error');
         });
     }
 }
@@ -564,7 +565,7 @@ function showAddTaskForm() {
     // Only allow this function when in the task management view
     const tasksView = document.getElementById('tasksView');
     if (!tasksView || tasksView.classList.contains('hidden')) {
-        beeMarshallAlert('Please navigate to Task Management to add tasks.', 'info');
+        careMarshallAlert('Please navigate to Task Management to add tasks.', 'info');
         // Switch to task management view
         showTasks();
         return;
@@ -675,17 +676,23 @@ function setupTaskDisplayToggles() {
     }
 }
 
-// Honey Type Management Functions
+// Care Service Type Management Functions (formerly Honey Types)
 function loadHoneyTypes() {
-    if (typeof HONEY_TYPES === 'undefined') {
-        console.error('HONEY_TYPES not defined');
+    // Support both new CARE_SERVICE_TYPES and old HONEY_TYPES for backward compatibility
+    const serviceTypes = typeof CARE_SERVICE_TYPES !== 'undefined' ? CARE_SERVICE_TYPES : 
+                         (typeof HONEY_TYPES !== 'undefined' ? HONEY_TYPES : []);
+    
+    if (serviceTypes.length === 0) {
+        console.error('Care service types not defined');
         return;
     }
     
     const container = document.getElementById('honeyTypesList');
     if (!container) return;
     
-    container.innerHTML = HONEY_TYPES.map((type, index) => `
+    // Use the appropriate array (CARE_SERVICE_TYPES or HONEY_TYPES)
+    const serviceTypes = typeof CARE_SERVICE_TYPES !== 'undefined' ? CARE_SERVICE_TYPES : HONEY_TYPES;
+    container.innerHTML = serviceTypes.map((type, index) => `
         <div class="list-group-item d-flex justify-content-between align-items-center">
             <div class="d-flex align-items-center">
                 <span class="me-2">${type}</span>
@@ -708,80 +715,124 @@ function addHoneyType() {
     const newType = input.value.trim();
     
     if (!newType) {
-        beeMarshallAlert('Please enter a honey type name.', 'warning');
+        homeCareAlert('Please enter a care service type name.', 'warning');
         return;
     }
     
-    if (HONEY_TYPES.includes(newType)) {
-        beeMarshallAlert('This honey type already exists.', 'warning');
+    // Support both new and old array names
+    const serviceTypes = typeof CARE_SERVICE_TYPES !== 'undefined' ? CARE_SERVICE_TYPES : HONEY_TYPES;
+    if (serviceTypes.includes(newType)) {
+        homeCareAlert('This care service type already exists.', 'warning');
         return;
     }
     
-    // Add to global array
-    HONEY_TYPES.push(newType);
+    // Add to global array (prefer CARE_SERVICE_TYPES, fallback to HONEY_TYPES)
+    if (typeof CARE_SERVICE_TYPES !== 'undefined') {
+        CARE_SERVICE_TYPES.push(newType);
+        if (typeof HONEY_TYPES !== 'undefined') HONEY_TYPES.push(newType); // Sync for compatibility
+    } else {
+        HONEY_TYPES.push(newType);
+    }
     
-    // Save to Firebase
-    const tenantPath = currentTenantId ? `tenants/${currentTenantId}/honeyTypes` : 'honeyTypes';
-    database.ref(tenantPath).set(HONEY_TYPES).then(() => {
-        beeMarshallAlert(`✅ Honey type "${newType}" added successfully!`, 'success');
+    // Save to Firebase (support both new and old field names)
+    const serviceTypesArray = typeof CARE_SERVICE_TYPES !== 'undefined' ? CARE_SERVICE_TYPES : HONEY_TYPES;
+    const tenantPath = currentTenantId ? `tenants/${currentTenantId}/careServiceTypes` : 'careServiceTypes';
+    const fallbackPath = currentTenantId ? `tenants/${currentTenantId}/honeyTypes` : 'honeyTypes';
+    
+    // Save to new path, also save to old path for backward compatibility
+    database.ref(tenantPath).set(serviceTypesArray).then(() => {
+        // Also save to old path for backward compatibility
+        if (typeof HONEY_TYPES !== 'undefined') {
+            database.ref(fallbackPath).set(HONEY_TYPES);
+        }
+        homeCareAlert(`✅ Care service type "${newType}" added successfully!`, 'success');
         input.value = '';
         loadHoneyTypes();
     }).catch(error => {
-        console.error('Error adding honey type:', error);
-        beeMarshallAlert('❌ Error adding honey type. Please try again.', 'error');
+        console.error('Error adding care service type:', error);
+        homeCareAlert('❌ Error adding care service type. Please try again.', 'error');
     });
 }
 
 function editHoneyType(index) {
-    const currentType = HONEY_TYPES[index];
-    const newType = prompt('Edit honey type name:', currentType);
+    const serviceTypes = typeof CARE_SERVICE_TYPES !== 'undefined' ? CARE_SERVICE_TYPES : HONEY_TYPES;
+    const currentType = serviceTypes[index];
+    const newType = prompt('Edit care service type name:', currentType);
     
     if (newType === null) return; // User cancelled
     
     const trimmedType = newType.trim();
     if (!trimmedType) {
-        beeMarshallAlert('Honey type name cannot be empty.', 'warning');
+        homeCareAlert('Care service type name cannot be empty.', 'warning');
         return;
     }
     
     if (trimmedType === currentType) return; // No change
     
-    if (HONEY_TYPES.includes(trimmedType)) {
-        beeMarshallAlert('This honey type name already exists.', 'warning');
+    if (serviceTypes.includes(trimmedType)) {
+        homeCareAlert('This care service type name already exists.', 'warning');
         return;
     }
     
-    // Update the array
-    HONEY_TYPES[index] = trimmedType;
+    // Update the array (prefer CARE_SERVICE_TYPES, sync to HONEY_TYPES for compatibility)
+    if (typeof CARE_SERVICE_TYPES !== 'undefined') {
+        CARE_SERVICE_TYPES[index] = trimmedType;
+        if (typeof HONEY_TYPES !== 'undefined' && HONEY_TYPES[index]) {
+            HONEY_TYPES[index] = trimmedType;
+        }
+    } else {
+        HONEY_TYPES[index] = trimmedType;
+    }
     
-    // Save to Firebase
-    const tenantPath = currentTenantId ? `tenants/${currentTenantId}/honeyTypes` : 'honeyTypes';
-    database.ref(tenantPath).set(HONEY_TYPES).then(() => {
-        beeMarshallAlert(`✅ Honey type updated: "${currentType}" → "${trimmedType}"`, 'success');
+    // Save to Firebase (support both new and old field names)
+    const serviceTypesArray = typeof CARE_SERVICE_TYPES !== 'undefined' ? CARE_SERVICE_TYPES : HONEY_TYPES;
+    const tenantPath = currentTenantId ? `tenants/${currentTenantId}/careServiceTypes` : 'careServiceTypes';
+    const fallbackPath = currentTenantId ? `tenants/${currentTenantId}/honeyTypes` : 'honeyTypes';
+    
+    database.ref(tenantPath).set(serviceTypesArray).then(() => {
+        if (typeof HONEY_TYPES !== 'undefined') {
+            database.ref(fallbackPath).set(HONEY_TYPES);
+        }
+        homeCareAlert(`✅ Care service type updated: "${currentType}" → "${trimmedType}"`, 'success');
         loadHoneyTypes();
     }).catch(error => {
-        console.error('Error updating honey type:', error);
-        beeMarshallAlert('❌ Error updating honey type. Please try again.', 'error');
+        console.error('Error updating care service type:', error);
+        homeCareAlert('❌ Error updating care service type. Please try again.', 'error');
     });
 }
 
 function toggleHoneyType(index) {
-    const honeyType = HONEY_TYPES[index];
+    const serviceTypes = typeof CARE_SERVICE_TYPES !== 'undefined' ? CARE_SERVICE_TYPES : HONEY_TYPES;
+    const serviceType = serviceTypes[index];
     const isActive = true; // For now, we'll implement deactivation later
     
     if (isActive) {
-        if (confirm(`Deactivate honey type "${honeyType}"?\n\nThis will hide it from new site selections but won't affect existing sites.`)) {
+        if (confirm(`Deactivate care service type "${serviceType}"?\n\nThis will hide it from new selections but won't affect existing records.`)) {
             // For now, just remove from the list
             // In a full implementation, you'd mark it as inactive instead
-            HONEY_TYPES.splice(index, 1);
+            if (typeof CARE_SERVICE_TYPES !== 'undefined') {
+                CARE_SERVICE_TYPES.splice(index, 1);
+                if (typeof HONEY_TYPES !== 'undefined' && HONEY_TYPES[index]) {
+                    HONEY_TYPES.splice(index, 1);
+                }
+            } else {
+                HONEY_TYPES.splice(index, 1);
+            }
             
-            const tenantPath = currentTenantId ? `tenants/${currentTenantId}/honeyTypes` : 'honeyTypes';
-            database.ref(tenantPath).set(HONEY_TYPES).then(() => {
-                beeMarshallAlert(`✅ Honey type "${honeyType}" deactivated.`, 'success');
+            // Save to Firebase (support both new and old field names)
+            const serviceTypesArray = typeof CARE_SERVICE_TYPES !== 'undefined' ? CARE_SERVICE_TYPES : HONEY_TYPES;
+            const tenantPath = currentTenantId ? `tenants/${currentTenantId}/careServiceTypes` : 'careServiceTypes';
+            const fallbackPath = currentTenantId ? `tenants/${currentTenantId}/honeyTypes` : 'honeyTypes';
+            
+            database.ref(tenantPath).set(serviceTypesArray).then(() => {
+                if (typeof HONEY_TYPES !== 'undefined') {
+                    database.ref(fallbackPath).set(HONEY_TYPES);
+                }
+                homeCareAlert(`✅ Care service type "${serviceType}" deactivated.`, 'success');
                 loadHoneyTypes();
             }).catch(error => {
-                console.error('Error deactivating honey type:', error);
-                beeMarshallAlert('❌ Error deactivating honey type. Please try again.', 'error');
+                console.error('Error deactivating care service type:', error);
+                homeCareAlert('❌ Error deactivating care service type. Please try again.', 'error');
             });
         }
     }

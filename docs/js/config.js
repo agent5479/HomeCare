@@ -1,4 +1,4 @@
-// BeeMarshall - Secure Configuration Module
+// HomeCare - Secure Configuration Module
 // This file handles secure loading of configuration from environment variables
 // Updated: 2025-01-28 - Enhanced for GitHub Secrets integration
 // Trigger: GitHub Actions workflow to inject secrets
@@ -36,33 +36,47 @@ class SecureConfig {
         // These should be set as GitHub Secrets in production
         const accounts = {};
         
+        // Get default tenant ID from environment or use 'default'
+        const defaultTenantId = window.ENV_DEFAULT_TENANT_ID || 'default';
+        
         // SECURITY: Hash admin passwords immediately when loaded
-        // GBTech account
+        // Jess account (primary admin)
+        if (window.ENV_JESS_USERNAME && window.ENV_JESS_PASSWORD && 
+            window.ENV_JESS_USERNAME !== '[SET_YOUR_JESS_PASSWORD]' && 
+            window.ENV_JESS_PASSWORD !== '[SET_YOUR_JESS_PASSWORD]') {
+            accounts[window.ENV_JESS_USERNAME] = {
+                username: window.ENV_JESS_USERNAME,
+                passwordHash: this.hashPassword(window.ENV_JESS_PASSWORD),
+                tenantId: defaultTenantId,
+                role: 'master_admin'
+            };
+            console.log(`✅ Admin account loaded: ${window.ENV_JESS_USERNAME}`);
+        } else {
+            console.warn('⚠️ Jess credentials not found in environment variables');
+        }
+        
+        // Backward compatibility: Support old GBTech account if present
         if (window.ENV_GBTECH_USERNAME && window.ENV_GBTECH_PASSWORD && 
             window.ENV_GBTECH_USERNAME !== '[SET_YOUR_GBTECH_PASSWORD]' && 
             window.ENV_GBTECH_PASSWORD !== '[SET_YOUR_GBTECH_PASSWORD]') {
             accounts['GBTech'] = {
                 username: window.ENV_GBTECH_USERNAME,
                 passwordHash: this.hashPassword(window.ENV_GBTECH_PASSWORD),
-                tenantId: 'gbtech',
+                tenantId: defaultTenantId,
                 role: 'master_admin'
             };
-        } else {
-            console.warn('⚠️ GBTech credentials not found in environment variables');
         }
         
-        // Lars account
+        // Backward compatibility: Support old Lars account if present
         if (window.ENV_LARS_USERNAME && window.ENV_LARS_PASSWORD && 
             window.ENV_LARS_USERNAME !== '[SET_YOUR_LARS_PASSWORD]' && 
             window.ENV_LARS_PASSWORD !== '[SET_YOUR_LARS_PASSWORD]') {
             accounts['Lars'] = {
                 username: window.ENV_LARS_USERNAME,
                 passwordHash: this.hashPassword(window.ENV_LARS_PASSWORD),
-                tenantId: 'lars',
+                tenantId: defaultTenantId,
                 role: 'admin'
             };
-        } else {
-            console.warn('⚠️ Lars credentials not found in environment variables');
         }
         
         // Demo account (also hash this for consistency)
@@ -144,22 +158,34 @@ class SecureConfig {
 
     // Method to validate that required environment variables are set
     validateConfig() {
+        // Primary required variables
         const requiredVars = [
-            'ENV_GBTECH_USERNAME',
-            'ENV_GBTECH_PASSWORD',
-            'ENV_LARS_USERNAME',
-            'ENV_LARS_PASSWORD'
+            'ENV_JESS_USERNAME',
+            'ENV_JESS_PASSWORD',
+            'ENV_FIREBASE_API_KEY',
+            'ENV_FIREBASE_PROJECT_ID'
         ];
         
         const missing = requiredVars.filter(varName => !window[varName]);
         
         if (missing.length > 0) {
-            console.warn('⚠️ Missing environment variables:', missing);
+            console.warn('⚠️ Missing required environment variables:', missing);
             console.warn('⚠️ Some admin accounts may not be available');
-            return false;
+            
+            // Check if at least one admin account is available (including backward compatibility)
+            const hasAdmin = window.ENV_JESS_USERNAME || window.ENV_GBTECH_USERNAME || window.ENV_LARS_USERNAME;
+            if (!hasAdmin) {
+                console.error('❌ No admin accounts available! System may not function correctly.');
+                return false;
+            }
         }
         
         return true;
+    }
+    
+    // Get default tenant ID from environment
+    getDefaultTenantId() {
+        return window.ENV_DEFAULT_TENANT_ID || 'default';
     }
 }
 

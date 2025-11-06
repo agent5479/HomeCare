@@ -1,6 +1,6 @@
 @echo off
 echo ==========================================
-echo  BeeMarshall - GitHub Deployment Script
+echo  HomeCare - GitHub Deployment Script
 echo ==========================================
 echo.
 
@@ -17,7 +17,7 @@ echo.
 
 echo Enter commit message (or press Enter for default):
 set /p COMMIT_MSG="Commit message: "
-if "%COMMIT_MSG%"=="" set COMMIT_MSG=Update BeeMarshall Apiary Management System
+if "%COMMIT_MSG%"=="" set COMMIT_MSG=Update HomeCare Professional Care Management System
 
 echo.
 echo Committing changes...
@@ -28,7 +28,7 @@ REM Check if remote exists
 git remote | findstr origin >nul 2>&1
 if errorlevel 1 (
     echo Adding remote repository...
-    git remote add origin https://github.com/agent5479/BeeMarshall.git
+    git remote add origin https://github.com/agent5479/HomeCare.git
     echo.
 )
 
@@ -45,15 +45,15 @@ echo  Deployment Complete!
 echo ==========================================
 echo.
 echo Next steps:
-echo 1. Go to https://github.com/agent5479/BeeMarshall/settings/pages
+echo 1. Go to https://github.com/agent5479/HomeCare/settings/pages
 echo 2. Under "Build and deployment":
 echo    - Source: Deploy from a branch
 echo    - Branch: main
-echo    - Folder: /docs
+echo    - Folder: /Example/docs
 echo 3. Click "Save"
 echo.
 echo Your site will be live at:
-echo https://agent5479.github.io/BeeMarshall/
+echo https://agent5479.github.io/HomeCare/
 echo.
 echo (Wait 1-2 minutes for GitHub to build the site)
 echo.

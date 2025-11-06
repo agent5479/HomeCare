@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BeeMarshall - Reports Dashboard</title>
+    <title>CareMarshall - Reports Dashboard</title>
     
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -11,33 +11,33 @@
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     
-    <!-- BeeMarshall Branding System -->
+    <!-- HomeCare Branding System -->
     <link rel="stylesheet" href="css/brand.css" />
     
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <style>
-        /* BeeMarshall Enhanced UI - Honey Theme */
+        /* HomeCare Enhanced UI - Blue Theme */
         :root {
-            /* Enhanced Honey Design System */
-            --brand: #8B4513;
-            --muted: #A0522D;
-            --accent: #FFC107;
-            --bg: #FFF8DC;
-            --glass: rgba(255,248,220,0.95);
-            --shadow: 0 8px 32px rgba(139,69,19,0.15);
+            /* Enhanced HomeCare Design System */
+            --brand: #1976D2;
+            --muted: #42A5F5;
+            --accent: #42A5F5;
+            --bg: #E3F2FD;
+            --glass: rgba(227, 242, 253, 0.95);
+            --shadow: 0 8px 32px rgba(25, 118, 210, 0.15);
             --radius: 12px;
             --transition: all .22s cubic-bezier(.4,0,.2,1);
             
-            /* Honey Color Palette */
+            /* HomeCare Color Palette */
             --primary-bg: var(--bg);
-            --primary-accent: #FFC107; /* Honey yellow */
+            --primary-accent: #42A5F5; /* HomeCare blue */
             --secondary-accent: #FFF8DC;
             --text-primary: var(--brand);
             --text-secondary: var(--muted);
             --success: #8FBC8F;
-            --warning: #DAA520;
+            --warning: #ffc107; /* Keep yellow for warning semantic only */
             --danger: #CD853F;
             --info: #DEB887;
         }
@@ -52,10 +52,10 @@
         }
         
         .navbar {
-            background: linear-gradient(180deg, rgba(255,248,220,0.95), rgba(255,193,7,0.85));
+            background: linear-gradient(180deg, rgba(227,242,253,0.95), rgba(25,118,210,0.85));
             backdrop-filter: blur(12px) saturate(1.1);
             border-bottom: 2px solid var(--accent);
-            box-shadow: 0 6px 20px rgba(139,69,19,0.15);
+            box-shadow: 0 6px 20px rgba(25,118,210,0.15);
             transition: var(--transition);
         }
         
@@ -91,7 +91,7 @@
         
         .report-card:hover {
             transform: translateY(-4px);
-            box-shadow: 0 12px 40px rgba(139,69,19,0.1);
+            box-shadow: 0 12px 40px rgba(25,118,210,0.1);
         }
         
         /* Button Styles to match main app */
@@ -99,20 +99,20 @@
             border-radius: var(--radius);
             font-weight: 600;
             transition: var(--transition);
-            box-shadow: 0 8px 22px rgba(139,69,19,0.1);
+            box-shadow: 0 8px 22px rgba(25,118,210,0.1);
         }
         
         .btn-primary {
-            background: linear-gradient(135deg, var(--accent), #DAA520);
-            color: var(--brand);
+            background: linear-gradient(135deg, var(--accent), var(--primary-blue));
+            color: var(--white);
             border: 2px solid var(--accent);
             font-weight: 600;
         }
         
         .btn-primary:hover {
             transform: translateY(-1px) scale(1.02);
-            box-shadow: 0 12px 28px rgba(139,69,19,0.25);
-            background: linear-gradient(135deg, #DAA520, var(--accent));
+            box-shadow: 0 12px 28px rgba(25,118,210,0.25);
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent));
         }
         
         .btn-outline-primary {
@@ -319,11 +319,11 @@
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
         <div class="container-fluid">
-            <a class="navbar-brand" href="beemarshall-full.html">
-                <i class="bi bi-graph-up"></i> BeeMarshall Reports
+            <a class="navbar-brand" href="caremarshall-full.html">
+                <i class="bi bi-graph-up"></i> CareMarshall Reports
             </a>
             <div class="navbar-nav ms-auto">
-                <a class="nav-link" href="beemarshall-full.html">
+                <a class="nav-link" href="caremarshall-full.html">
                     <i class="bi bi-arrow-left"></i> Back to Main App
                 </a>
             </div>
@@ -339,7 +339,7 @@
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
                         <h1 class="h3 mb-1"><i class="bi bi-graph-up"></i> Reports Dashboard</h1>
-                        <p class="text-muted mb-0">Analytics and insights for your beekeeping operations</p>
+                        <p class="text-muted mb-0">Analytics and insights for your care management operations</p>
                         <div id="syncTimestamp" class="mt-1">
                             <small class="text-muted">
                                 <i class="bi bi-arrow-clockwise text-primary me-1"></i>
@@ -348,7 +348,7 @@
                         </div>
                         <div class="alert alert-info border-0 mt-2" style="background: rgba(13, 202, 240, 0.1); padding: 0.5rem 0.75rem;">
                             <small>
-                                <strong>Data-Driven Beekeeping:</strong> Visual analytics for hive performance, health trends, and operational efficiency<br>
+                                <strong>Data-Driven Care Management:</strong> Visual analytics for client care performance, health trends, and operational efficiency<br>
                                 <em>Reports integrate with your Dashboard → Sites → Actions → Schedule workflow</em>
                             </small>
                         </div>
@@ -357,49 +357,49 @@
             </div>
         </div>
 
-        <!-- Hives of Concern -->
+        <!-- Clients Requiring Attention -->
         <div class="row mb-4">
             <div class="col-12">
                 <div class="report-card">
                     <div class="card-header">
-                        <h5 class="mb-0"><i class="bi bi-exclamation-triangle-fill"></i> Hives of Concern</h5>
-                        <small class="text-muted">Click on hive categories to see affected sites and schedule tasks</small>
+                        <h5 class="mb-0"><i class="bi bi-exclamation-triangle-fill"></i> Clients Requiring Attention</h5>
+                        <small class="text-muted">Click on client status categories to see affected locations and schedule care tasks</small>
                     </div>
                     <div class="card-body">
                         <div class="row g-2">
-                            <!-- Weak Hives -->
+                            <!-- Dependent Clients -->
                             <div class="col-6 col-sm-4 col-md-2 mb-2">
                                 <div class="hive-category-card clickable" data-category="weak" onclick="showSitesByCategory('weak')">
                                     <div class="hive-icon weak">
-                                        <i class="bi bi-hexagon"></i>
+                                        <i class="bi bi-heart-pulse"></i>
                                     </div>
                                     <div class="hive-count" id="weakCount">0</div>
-                                    <div class="hive-label">Weak</div>
+                                    <div class="hive-label">Dependent</div>
                                     <div class="hive-description">Need Attention</div>
                                 </div>
                             </div>
                             
-                            <!-- NUC Hives -->
+                            <!-- Rehabilitation Clients -->
                             <div class="col-6 col-sm-4 col-md-2 mb-2">
                                 <div class="hive-category-card clickable" data-category="nuc" onclick="showSitesByCategory('nuc')">
                                     <div class="hive-icon nuc">
-                                        <i class="bi bi-hexagon-half"></i>
+                                        <i class="bi bi-hospital"></i>
                                     </div>
                                     <div class="hive-count" id="nucCount">0</div>
-                                    <div class="hive-label">NUC</div>
-                                    <div class="hive-description">Nucleus Colonies</div>
+                                    <div class="hive-label">Rehabilitation</div>
+                                    <div class="hive-description">Active Recovery</div>
                                 </div>
                             </div>
                             
-                            <!-- Dead Hives -->
+                            <!-- Hospice Clients -->
                             <div class="col-6 col-sm-4 col-md-2 mb-2">
                                 <div class="hive-category-card clickable" data-category="dead" onclick="showSitesByCategory('dead')">
                                     <div class="hive-icon dead">
-                                        <i class="bi bi-hexagon"></i>
+                                        <i class="bi bi-heart-fill"></i>
                                     </div>
                                     <div class="hive-count" id="deadCount">0</div>
-                                    <div class="hive-label">Dead</div>
-                                    <div class="hive-description">Failed Colonies</div>
+                                    <div class="hive-label">Hospice</div>
+                                    <div class="hive-description">End-of-Life Care</div>
                                 </div>
                             </div>
                             
@@ -796,7 +796,7 @@
                                 </small>
                             </td>
                             <td>
-                                <button class="btn btn-sm btn-primary" onclick="window.location.href='beemarshall-full.html#site-${issue.siteId}'">
+                                <button class="btn btn-sm btn-primary" onclick="window.location.href='caremarshall-full.html#site-${issue.siteId}'">
                                     <i class="bi bi-pencil"></i> Fix
                                 </button>
                             </td>
@@ -897,19 +897,21 @@
             }
         }
         
-        // BeeMarshall alert function for branded messages
-        function beeMarshallAlert(message, type = 'info') {
-            // Create custom modal for BeeMarshall alerts
+        // CareMarshall alert function for branded messages
+        function careMarshallAlert(message, type = 'info') {
+            // Create custom modal for CareMarshall alerts
             const alertModal = document.createElement('div');
             alertModal.className = 'modal fade';
-            alertModal.id = 'beeMarshallAlert';
+            alertModal.id = 'careMarshallAlert';
+            // Backward compatibility aliases
+            window.homeCareAlert = careMarshallAlert;
             alertModal.innerHTML = `
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content" style="background: var(--glass); backdrop-filter: blur(12px) saturate(1.1); border: 1px solid rgba(255,255,255,0.2);">
                         <div class="modal-header border-0">
                             <h5 class="modal-title d-flex align-items-center">
-                                <i class="bi bi-hexagon-fill me-2" style="color: var(--accent); font-size: 1.2rem;"></i>
-                                BeeMarshall says
+                                <i class="bi bi-house-heart-fill me-2" style="color: var(--accent); font-size: 1.2rem;"></i>
+                                CareMarshall says
                             </h5>
                         </div>
                         <div class="modal-body text-center">
@@ -988,7 +990,11 @@
                 try {
                     window.sites = snapshot.val() ? Object.values(snapshot.val()) : [];
                     Logger.log('📊 Reports sites loaded for', currentTenantId + ':', window.sites.length);
-                        updateHiveStrengthBreakdown();
+                        if (typeof updateClientStatusBreakdown === 'function') {
+                        updateClientStatusBreakdown();
+                    } else if (typeof updateHiveStrengthBreakdown === 'function') {
+                        updateHiveStrengthBreakdown(); // Backward compatibility
+                    }
                         checkAllDataLoaded();
                     } catch (error) {
                         Logger.error('❌ Error processing sites data:', error);
@@ -1233,7 +1239,7 @@
                 if (isGeneratingReports) {
                     Logger.error('⏱️ Report generation timeout - exceeded 10 seconds');
                     hideAllSkeletonLoaders(); // Hide all loading skeletons on timeout
-                    beeMarshallAlert('⏱️ Report Generation Timeout\n\nThe report generation took longer than expected.\n\nSome reports may be incomplete. Please refresh the page or try again.', 'warning');
+                    careMarshallAlert('⏱️ Report Generation Timeout\n\nThe report generation took longer than expected.\n\nSome reports may be incomplete. Please refresh the page or try again.', 'warning');
                     isGeneratingReports = false;
                 }
             }, 10000);
@@ -1257,7 +1263,11 @@
                 
                 try {
                     if (window.sites && window.sites.length > 0) {
-                        generateHivePerformanceReport();
+                        if (typeof generateClientCarePerformanceReport === 'function') {
+                            generateClientCarePerformanceReport();
+                        } else if (typeof generateHivePerformanceReport === 'function') {
+                            generateHivePerformanceReport(); // Backward compatibility
+                        }
                         generateHarvestHistoryReport();
                         generateHoneyPotentialsReport();
                     }
@@ -1277,18 +1287,18 @@
                 } catch (error) {
                     Logger.error('❌ Error during report generation:', error);
                     hideAllSkeletonLoaders(); // Hide all loading skeletons
-                    beeMarshallAlert('❌ Report Generation Error\n\nAn error occurred while generating reports.\n\nPlease refresh the page and try again.', 'error');
+                    careMarshallAlert('❌ Report Generation Error\n\nAn error occurred while generating reports.\n\nPlease refresh the page and try again.', 'error');
                     isGeneratingReports = false;
                 }
             }, 1000);
         }
         
-        function generateHivePerformanceReport() {
+        function generateClientCarePerformanceReport() {
             console.log('📊 generateHivePerformanceReport called');
             try {
                 if (!window.sites || window.sites.length === 0) {
                     console.log('📊 No sites data available');
-                    beeMarshallAlert('📊 No site data available for hive performance analysis.\n\nGet started by adding your first apiary site to see performance insights.', 'info');
+                    careMarshallAlert('📊 No site data available for client care performance analysis.\n\nGet started by adding your first client location to see performance insights.', 'info');
                     return;
                 }
                 
@@ -1422,7 +1432,7 @@
                 if (hivePerformanceSkeleton) {
                     hivePerformanceSkeleton.remove(); // Remove the element entirely
                 }
-                beeMarshallAlert('❌ Error generating hive performance report.\n\nPlease refresh the page and try again.', 'error');
+                homeCareAlert('❌ Error generating client care performance report.\n\nPlease refresh the page and try again.', 'error');
             }
         }
         
@@ -1434,7 +1444,7 @@
                     if (healthMortalitySkeleton) {
                         healthMortalitySkeleton.remove(); // Remove the element entirely
                     }
-                    beeMarshallAlert('📊 No action data available for health analysis.\n\nStart logging inspections and treatments to see health insights and trends.', 'info');
+                    careMarshallAlert('📊 No action data available for health analysis.\n\nStart logging inspections and treatments to see health insights and trends.', 'info');
                     return;
                 }
                 
@@ -1555,7 +1565,7 @@
                 if (healthMortalitySkeleton) {
                     healthMortalitySkeleton.remove(); // Remove the element entirely
                 }
-                beeMarshallAlert('❌ Error generating health and mortality report.\n\nPlease refresh the page and try again.', 'error');
+                homeCareAlert('❌ Error generating health and mortality report.\n\nPlease refresh the page and try again.', 'error');
             }
         }
         
@@ -1567,7 +1577,7 @@
                     if (operationsSkeleton) {
                         operationsSkeleton.remove(); // Remove the element entirely
                     }
-                    beeMarshallAlert('📊 No operational data available for analysis.\n\nSchedule tasks and log actions to see operational insights and efficiency metrics.', 'info');
+                    careMarshallAlert('📊 No operational data available for analysis.\n\nSchedule tasks and log actions to see operational insights and efficiency metrics.', 'info');
                     return;
                 }
                 
@@ -1780,7 +1790,7 @@
                 if (operationsSkeleton) {
                     operationsSkeleton.remove(); // Remove the element entirely
                 }
-                beeMarshallAlert('❌ Error generating operations report.\n\nPlease refresh the page and try again.', 'error');
+                homeCareAlert('❌ Error generating operations report.\n\nPlease refresh the page and try again.', 'error');
             }
         }
         
@@ -2185,10 +2195,11 @@
             }
         }
         
-        // Function to show sites by honey type
+        // Function to show sites by care service type (formerly honey type)
         function showSitesByHoneyType(honeyType) {
+            // Backward compatibility - function name kept for existing references
             if (!window.sites || window.sites.length === 0) {
-                beeMarshallAlert('📊 No site data available.', 'info');
+                homeCareAlert('📊 No site data available.', 'info');
                 return;
             }
             
@@ -2209,7 +2220,11 @@
         
         
         // Hives of Concern Functions
-        function updateHiveStrengthBreakdown() {
+        function updateClientStatusBreakdown() {
+            // Backward compatibility alias
+            if (typeof window.updateHiveStrengthBreakdown === 'undefined') {
+                window.updateHiveStrengthBreakdown = updateClientStatusBreakdown;
+            }
             if (!window.sites || window.sites.length === 0) {
                 Logger.log('📭 No sites data for hive strength breakdown');
                 return;
@@ -2278,7 +2293,7 @@
         
         function showSitesByCategory(category) {
             if (!window.sites || window.sites.length === 0) {
-                beeMarshallAlert('📊 No site data available.\n\nAdd your first apiary site to start generating reports and insights.', 'info');
+                careMarshallAlert('📊 No site data available.\n\nAdd your first client location to start generating reports and insights.', 'info');
                 return;
             }
             
@@ -2383,7 +2398,7 @@
             // Store site ID for navigation
             localStorage.setItem('navigateToSite', siteId);
             // Redirect to main app
-            window.location.href = 'beemarshall-full.html';
+            window.location.href = 'caremarshall-full.html';
         }
         
         function scheduleTaskForSpecificSite(siteId, category) {
@@ -2394,7 +2409,7 @@
                 suggestedTasks: getSuggestedTasksForCategory(category)
             }));
             // Redirect to main app
-            window.location.href = 'beemarshall-full.html';
+            window.location.href = 'caremarshall-full.html';
         }
         
         function getSuggestedTasksForCategory(category) {
@@ -2415,7 +2430,7 @@
             // This will be called from the modal footer
             const siteId = localStorage.getItem('navigateToSite');
             if (siteId) {
-                window.location.href = `beemarshall-full.html#site-${siteId}`;
+                window.location.href = `caremarshall-full.html#site-${siteId}`;
             }
         }
         
@@ -2424,7 +2439,7 @@
             const taskData = localStorage.getItem('scheduleTaskForSite');
             if (taskData) {
                 const data = JSON.parse(taskData);
-                window.location.href = `beemarshall-full.html#schedule-task-${data.siteId}`;
+                window.location.href = `caremarshall-full.html#schedule-task-${data.siteId}`;
             }
         }
         
@@ -2514,8 +2529,14 @@
                     });
                 }
                 
-                // Check 6: Missing honey types
+                // Check 6: Missing care service types (formerly honey types)
                 if (!site.honeyPotentials || !Array.isArray(site.honeyPotentials) || site.honeyPotentials.length === 0) {
+                    issues.missingCareServiceTypes.push({
+                        siteName: site.name,
+                        siteId: site.id
+                    });
+                    // Backward compatibility
+                    if (!issues.missingHoneyTypes) issues.missingHoneyTypes = [];
                     issues.missingHoneyTypes.push({
                         siteName: site.name,
                         siteId: site.id
@@ -2585,7 +2606,7 @@
                               issues.missingAccessInfo.length + 
                               issues.missingGPS.length + 
                               issues.missingContactDetails.length +
-                              issues.missingHoneyTypes.length +
+                              (issues.missingCareServiceTypes ? issues.missingCareServiceTypes.length : issues.missingHoneyTypes.length) +
                               (issues.missingContactBeforeVisit ? issues.missingContactBeforeVisit.length : 0) +
                               issues.overdueCompliance.length;
             
@@ -2693,18 +2714,18 @@
                                     `).join('')}
                                     ${integrityResults.issues.missingContactDetails.length > 0 ? '</ul></div></div>' : ''}
                                     
-                                    ${integrityResults.issues.missingHoneyTypes.length > 0 ? `
+                                    ${(integrityResults.issues.missingCareServiceTypes ? integrityResults.issues.missingCareServiceTypes.length : integrityResults.issues.missingHoneyTypes.length) > 0 ? `
                                         <div class="card mb-2 border-warning">
                                             <div class="card-header bg-warning text-dark">
-                                                <i class="bi bi-flower1"></i> Missing Honey Types (${integrityResults.issues.missingHoneyTypes.length})
+                                                <i class="bi bi-heart-pulse"></i> Missing Care Service Types (${integrityResults.issues.missingCareServiceTypes ? integrityResults.issues.missingCareServiceTypes.length : integrityResults.issues.missingHoneyTypes.length})
                                             </div>
                                             <div class="card-body">
                                                 <ul class="list-group small">
                                     ` : ''}
-                                    ${integrityResults.issues.missingHoneyTypes.map(issue => `
+                                    ${(integrityResults.issues.missingCareServiceTypes || integrityResults.issues.missingHoneyTypes || []).map(issue => `
                                         <li class="list-group-item">${issue.siteName} (ID: ${issue.siteId})</li>
                                     `).join('')}
-                                    ${integrityResults.issues.missingHoneyTypes.length > 0 ? '</ul></div></div>' : ''}
+                                    ${(integrityResults.issues.missingCareServiceTypes ? integrityResults.issues.missingCareServiceTypes.length : integrityResults.issues.missingHoneyTypes.length) > 0 ? '</ul></div></div>' : ''}
                                     
                                     ${integrityResults.issues.overdueCompliance.length > 0 ? `
                                         <div class="card mb-2 border-danger">
@@ -2900,8 +2921,14 @@
                     });
                 }
                 
-                // Check 6: Missing honey types
+                // Check 6: Missing care service types (formerly honey types)
                 if (!site.honeyPotentials || !Array.isArray(site.honeyPotentials) || site.honeyPotentials.length === 0) {
+                    issues.missingCareServiceTypes.push({
+                        siteName: site.name,
+                        siteId: site.id
+                    });
+                    // Backward compatibility
+                    if (!issues.missingHoneyTypes) issues.missingHoneyTypes = [];
                     issues.missingHoneyTypes.push({
                         siteName: site.name,
                         siteId: site.id
@@ -2980,7 +3007,7 @@
                               issues.missingAccessInfo.length + 
                               issues.missingGPS.length + 
                               issues.missingContactDetails.length +
-                              issues.missingHoneyTypes.length +
+                              (issues.missingCareServiceTypes ? issues.missingCareServiceTypes.length : issues.missingHoneyTypes.length) +
                               (issues.missingContactBeforeVisit ? issues.missingContactBeforeVisit.length : 0) +
                               issues.overdueCompliance.length;
             
@@ -3146,18 +3173,19 @@
                     `;
                 }
                 
-                // Missing honey types
-                if (issues.missingHoneyTypes.length > 0) {
+                // Missing care service types (formerly honey types)
+                const missingServiceTypes = issues.missingCareServiceTypes || issues.missingHoneyTypes || [];
+                if (missingServiceTypes.length > 0) {
                     html += `
                         <div class="card mb-3 border-warning">
                             <div class="card-header bg-warning text-dark">
-                                <i class="bi bi-flower1"></i> Missing Honey Types (${issues.missingHoneyTypes.length})
+                                <i class="bi bi-heart-pulse"></i> Missing Care Service Types (${missingServiceTypes.length})
                             </div>
                             <div class="card-body">
-                                <p class="text-muted">Sites without honey type information:</p>
+                                <p class="text-muted">Locations without care service type information:</p>
                                 <ul class="list-group">
                     `;
-                    issues.missingHoneyTypes.forEach(issue => {
+                    missingServiceTypes.forEach(issue => {
                         html += `
                             <li class="list-group-item">
                                 <strong>${issue.siteName}</strong> (ID: ${issue.siteId})

@@ -1,4 +1,4 @@
-// BeeMarshall - Sync Status Management Module
+// HomeCare - Sync Status Management Module
 // Handles real-time sync status display and offline change queuing
 
 class SyncStatusManager {
@@ -205,7 +205,7 @@ class SyncStatusManager {
     // Save pending changes to localStorage
     savePendingChanges() {
         try {
-            localStorage.setItem('beeMarshallPendingChanges', JSON.stringify(this.pendingChanges));
+            localStorage.setItem('homeCarePendingChanges', JSON.stringify(this.pendingChanges));
         } catch (error) {
             console.error('Failed to save pending changes:', error);
         }
@@ -214,7 +214,7 @@ class SyncStatusManager {
     // Load pending changes from localStorage
     loadPendingChanges() {
         try {
-            const stored = localStorage.getItem('beeMarshallPendingChanges');
+            const stored = localStorage.getItem('homeCarePendingChanges') || localStorage.getItem('beeMarshallPendingChanges'); // Backward compatibility
             if (stored) {
                 this.pendingChanges = JSON.parse(stored);
                 console.log(`📦 Loaded ${this.pendingChanges.length} pending changes from storage`);

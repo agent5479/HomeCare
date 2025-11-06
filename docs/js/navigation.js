@@ -1,4 +1,4 @@
-// BeeMarshall - Navigation Module
+// HomeCare - Navigation Module
 
 // Universal minimal scroll-to-top function
 function scrollToTop() {

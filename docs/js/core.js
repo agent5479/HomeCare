@@ -1,9 +1,9 @@
-// BeeMarshall - Core Application Logic
-// Master User: Lars (can add employees, delete records)
+// HomeCare - Core Application Logic
+// Master User: Jess (can add employees, delete records)
 // Employees: Can add/view, cannot delete
 
 // Version Management
-const APP_VERSION = '1.78';
+const APP_VERSION = '0.7';
 const VERSION_HISTORY = [
     { version: '0.91', date: '2024-12-19', changes: ['Fixed dashboard loading issue', 'Enhanced login system', 'Added welcome popup', 'Improved map initialization'] },
     { version: '0.92', date: '2024-12-19', changes: ['Added version tag to login screen', 'Implemented lazy map loading', 'Enhanced error prevention', 'Improved user experience'] },
@@ -14,19 +14,19 @@ const VERSION_HISTORY = [
 // Master account credentials - now loaded from secure configuration
 // See config.js for secure credential management
 
-// Custom alert function with BeeMarshall branding
-function beeMarshallAlert(message, type = 'info') {
-    // Create custom modal for BeeMarshall alerts
+// Custom alert function with CareMarshall branding
+function careMarshallAlert(message, type = 'info') {
+    // Create custom modal for CareMarshall alerts
     const alertModal = document.createElement('div');
     alertModal.className = 'modal fade';
-    alertModal.id = 'beeMarshallAlert';
+    alertModal.id = 'careMarshallAlert';
     alertModal.innerHTML = `
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content" style="background: var(--glass); backdrop-filter: blur(12px) saturate(1.1); border: 1px solid rgba(255,255,255,0.2);">
                 <div class="modal-header border-0">
                     <h5 class="modal-title d-flex align-items-center">
-                        <i class="bi bi-hexagon-fill me-2" style="color: var(--accent); font-size: 1.2rem;"></i>
-                        BeeMarshall says
+                        <i class="bi bi-house-heart-fill me-2" style="color: var(--accent); font-size: 1.2rem;"></i>
+                        CareMarshall says
                     </h5>
                 </div>
                 <div class="modal-body text-center">
@@ -55,7 +55,10 @@ function beeMarshallAlert(message, type = 'info') {
 }
 
 // Override default alert function
-window.alert = beeMarshallAlert;
+// Backward compatibility aliases
+window.alert = careMarshallAlert;
+const beeMarshallAlert = careMarshallAlert; // Backward compatibility
+const homeCareAlert = careMarshallAlert; // Alias for consistency
 
 // Admin accounts are now loaded securely from environment variables
 // See config.js for configuration management
@@ -90,67 +93,116 @@ var currentTenantId = null; // For data isolation
 var database = null; // Will be set when Firebase initializes
 var sites = [];
 var actions = [];
-var individualHives = [];
+var clients = []; // Renamed from individualHives for backward compatibility
+var individualHives = clients; // Backward compatibility alias
 var scheduledTasks = [];
 var employees = [];
-// Comprehensive task list for the system
+// Comprehensive task list for the HomeCare system
 const COMPREHENSIVE_TASKS = [
-    { id: 'task_1', name: 'Hive Inspection', category: 'Inspection', description: 'Regular hive health and productivity check' },
-    { id: 'task_2', name: 'Honey Harvest', category: 'Harvest', description: 'Collect honey from productive hives' },
-    { id: 'task_3', name: 'Queen Check', category: 'Inspection', description: 'Verify queen presence and health' },
-    { id: 'task_4', name: 'Disease Check', category: 'Health', description: 'Screen for diseases and pests' },
-    { id: 'task_5', name: 'Swarm Prevention', category: 'Management', description: 'Manage hive space to prevent swarming' },
-    { id: 'task_6', name: 'Equipment Maintenance', category: 'Maintenance', description: 'Clean and maintain hive equipment' },
-    { id: 'task_7', name: 'Record Keeping', category: 'Administration', description: 'Update hive records and logs' },
-    { id: 'task_8', name: 'Weather Protection', category: 'Management', description: 'Ensure hives are protected from weather' },
-    { id: 'task_9', name: 'Pest Control', category: 'Health', description: 'Monitor and control hive pests' },
-    { id: 'task_10', name: 'Hive Expansion', category: 'Management', description: 'Add supers or frames as needed' },
-    { id: 'task_11', name: 'Colony Splitting', category: 'Management', description: 'Create new colonies from strong hives' },
-    { id: 'task_12', name: 'Winter Preparation', category: 'Seasonal', description: 'Prepare hives for winter months' },
-    { id: 'task_13', name: 'Spring Build-up', category: 'Seasonal', description: 'Help colonies build up for spring' },
-    { id: 'task_14', name: 'Varroa Treatment', category: 'Health', description: 'Apply varroa mite treatment' },
-    { id: 'task_15', name: 'Hive Relocation', category: 'Management', description: 'Move hives to new locations' },
-    { id: 'task_16', name: 'Equipment Sanitization', category: 'Health', description: 'Clean and sanitize hive equipment' },
-    { id: 'task_17', name: 'Emergency Response', category: 'Emergency', description: 'Respond to hive emergencies' },
-    { id: 'site_visit_inventory', name: 'Site Visit & Inventory', category: 'Management', description: 'Site visit with hive count and inventory updates' },
-    { id: 'hive_state_update', name: 'Hive State Update', category: 'Management', description: 'Update hive strength and state information' },
-    { id: 'hive_box_update', name: 'Hive Box Update', category: 'Management', description: 'Update hive box counts and inventory' },
-    { id: 'task_18', name: 'Queen Replacement', category: 'Management', description: 'Replace failing or missing queens' },
-    { id: 'task_19', name: 'Hive Monitoring', category: 'Inspection', description: 'Regular monitoring of hive activity' },
-    // Feeding category tasks
-    { id: 'task_20', name: 'Sugar Syrup Feeding', category: 'Feeding', description: 'Provide sugar syrup for colony nourishment' },
-    { id: 'task_21', name: 'Feed Dry Sugar', category: 'Feeding', description: 'Provide dry sugar as an alternative feeding method' },
-    { id: 'task_22', name: 'Pollen Patty', category: 'Feeding', description: 'Provide pollen patties for protein supplementation' },
-    { id: 'task_23', name: 'Emergency Feeding', category: 'Feeding', description: 'Provide emergency feeding when hive is low on stores' },
+    // Client Care & Assessment
+    { id: 'task_1', name: 'Client Health Assessment', category: 'Assessment', description: 'Regular client health and wellbeing check' },
+    { id: 'task_2', name: 'Medication Management', category: 'Health', description: 'Administer and monitor client medications' },
+    { id: 'task_3', name: 'Vital Signs Check', category: 'Health', description: 'Monitor blood pressure, temperature, pulse, and other vital signs' },
+    { id: 'task_4', name: 'Health Screening', category: 'Health', description: 'Screen for health conditions and concerns' },
+    { id: 'task_5', name: 'Care Plan Review', category: 'Administration', description: 'Review and update individual care plans' },
+    { id: 'task_6', name: 'Equipment Maintenance', category: 'Maintenance', description: 'Clean and maintain care equipment and aids' },
+    { id: 'task_7', name: 'Record Keeping', category: 'Administration', description: 'Update client records and care logs' },
+    { id: 'task_8', name: 'Home Safety Check', category: 'Safety', description: 'Ensure home environment is safe and accessible', common: true },
+    { id: 'task_9', name: 'Infection Control', category: 'Health', description: 'Monitor and control infection risks' },
+    { id: 'task_10', name: 'Care Coordination', category: 'Management', description: 'Coordinate care services and support as needed' },
+    { id: 'task_11', name: 'Family Meeting', category: 'Communication', description: 'Meet with family members to discuss care' },
+    { id: 'task_12', name: 'Seasonal Preparation', category: 'Seasonal', description: 'Prepare for seasonal changes and needs' },
+    { id: 'task_13', name: 'Care Plan Build-up', category: 'Seasonal', description: 'Enhance care plans for changing needs' },
+    { id: 'task_14', name: 'Medical Treatment', category: 'Health', description: 'Apply prescribed medical treatments' },
+    { id: 'task_15', name: 'Client Relocation', category: 'Management', description: 'Assist with moving clients to new locations' },
+    { id: 'task_16', name: 'Equipment Sanitization', category: 'Health', description: 'Clean and sanitize care equipment' },
+    { id: 'task_17', name: 'Emergency Response', category: 'Emergency', description: 'Respond to client emergencies' },
+    { id: 'site_visit_inventory', name: 'Home Visit & Inventory', category: 'Management', description: 'Home visit with client status and inventory updates' },
+    { id: 'client_status_update', name: 'Client Status Update', category: 'Management', description: 'Update client care status and independence level' },
+    { id: 'care_equipment_update', name: 'Care Equipment Update', category: 'Management', description: 'Update care equipment inventory and needs' },
+    { id: 'task_18', name: 'Care Provider Review', category: 'Management', description: 'Review and adjust care provider assignments' },
+    { id: 'task_19', name: 'Client Monitoring', category: 'Assessment', description: 'Regular monitoring of client wellbeing and activity' },
+    // Personal Care category tasks
+    { id: 'task_20', name: 'Meal Preparation', category: 'Personal Care', description: 'Prepare nutritious meals for client', common: true },
+    { id: 'task_21', name: 'Assistance with Eating', category: 'Personal Care', description: 'Provide assistance with eating and nutrition' },
+    { id: 'task_22', name: 'Personal Hygiene', category: 'Personal Care', description: 'Assist with bathing, grooming, and personal care', common: true },
+    { id: 'task_23', name: 'Emergency Nutrition', category: 'Personal Care', description: 'Provide emergency nutrition support when needed' },
     // Problems category tasks
-    { id: 'task_24', name: 'Queen Management Issues', category: 'Problems', description: 'Address queen-related problems such as missing queen or laying issues' },
-    { id: 'task_25', name: 'General Problems', category: 'Problems', description: 'Address general hive problems requiring attention' },
+    { id: 'task_24', name: 'Care Plan Issues', category: 'Problems', description: 'Address care plan problems requiring attention' },
+    { id: 'task_25', name: 'General Problems', category: 'Problems', description: 'Address general client care problems requiring attention' },
     { id: 'task_26', name: 'Records Issues', category: 'Problems', description: 'Address inconsistencies or missing records' },
-    { id: 'task_27', name: 'Seasonal Issues', category: 'Problems', description: 'Address season-specific problems' },
-    { id: 'task_28', name: 'Treatment Required', category: 'Problems', description: 'Identify and treat disease or pest issues' },
-    { id: 'task_29', name: 'Hive State Update', category: 'Management', description: 'Update hive strength counts (Strong, Medium, Weak, NUC, Dead)' },
-    { id: 'task_30', name: 'Hive Box Update', category: 'Management', description: 'Update hive box counts (Doubles, Top-Splits, Singles, NUCs, Empty)' },
-    { id: 'task_31', name: 'Archive Site', category: 'Management', description: 'Archive a site to remove it from active counts while preserving historical data' },
-    { id: 'task_32', name: 'Unarchive Site', category: 'Management', description: 'Restore an archived site to active status' },
-    { id: 'task_33', name: 'Site Visit & Inventory', category: 'Inspection', description: 'Conduct a site visit and update inventory records' }
+    { id: 'task_27', name: 'Seasonal Issues', category: 'Problems', description: 'Address season-specific care problems' },
+    { id: 'task_28', name: 'Medical Treatment Required', category: 'Problems', description: 'Identify and address medical treatment needs' },
+    { id: 'task_29', name: 'Client Status Update', category: 'Management', description: 'Update client status (Independent, Assisted, Dependent, Rehabilitation, Hospice)' },
+    { id: 'task_30', name: 'Care Equipment Update', category: 'Management', description: 'Update care equipment inventory (Mobility aids, Medical equipment, Safety devices, etc.)' },
+    { id: 'task_31', name: 'Archive Client', category: 'Management', description: 'Archive a client to remove from active counts while preserving historical data' },
+    { id: 'task_32', name: 'Unarchive Client', category: 'Management', description: 'Restore an archived client to active status' },
+    { id: 'task_33', name: 'Home Visit & Assessment', category: 'Assessment', description: 'Conduct a home visit and update client assessment records', common: true },
+    // Additional Home Care Tasks
+    { id: 'task_34', name: 'Transportation Assistance', category: 'Support Services', description: 'Provide or arrange transportation for appointments' },
+    { id: 'task_35', name: 'Shopping Assistance', category: 'Support Services', description: 'Assist with grocery shopping and errands' },
+    { id: 'task_36', name: 'Companionship', category: 'Support Services', description: 'Provide social interaction and companionship' },
+    { id: 'task_37', name: 'Light Housekeeping', category: 'Support Services', description: 'Assist with light housekeeping tasks' },
+    { id: 'task_38', name: 'Mobility Assistance', category: 'Personal Care', description: 'Assist with mobility and transfers' },
+    { id: 'task_39', name: 'Wound Care', category: 'Health', description: 'Provide wound care and dressing changes' },
+    { id: 'task_40', name: 'Physical Therapy Support', category: 'Health', description: 'Support physical therapy exercises and routines' },
+    // Additional Home Care Worker Tasks
+    { id: 'task_41', name: 'Medication Administration', category: 'Health', description: 'Administer prescribed medications according to schedule', common: true },
+    { id: 'task_42', name: 'Medication Refill Coordination', category: 'Health', description: 'Coordinate medication refills with pharmacy and physician' },
+    { id: 'task_43', name: 'Blood Glucose Monitoring', category: 'Health', description: 'Monitor and record blood glucose levels' },
+    { id: 'task_44', name: 'Blood Pressure Monitoring', category: 'Health', description: 'Monitor and record blood pressure readings', common: true },
+    { id: 'task_45', name: 'Temperature Check', category: 'Health', description: 'Monitor body temperature and record readings' },
+    { id: 'task_46', name: 'Pain Assessment', category: 'Assessment', description: 'Assess and document client pain levels and management' },
+    { id: 'task_47', name: 'Fall Risk Assessment', category: 'Safety', description: 'Assess and document fall risk factors and prevention measures' },
+    { id: 'task_48', name: 'Nutrition Assessment', category: 'Assessment', description: 'Assess nutritional status and dietary needs' },
+    { id: 'task_49', name: 'Hydration Monitoring', category: 'Health', description: 'Monitor fluid intake and hydration status' },
+    { id: 'task_50', name: 'Skin Integrity Check', category: 'Health', description: 'Check for pressure sores, wounds, or skin issues' },
+    { id: 'task_51', name: 'Bowel & Bladder Care', category: 'Personal Care', description: 'Assist with toileting and incontinence care' },
+    { id: 'task_52', name: 'Catheter Care', category: 'Health', description: 'Provide catheter maintenance and care' },
+    { id: 'task_53', name: 'Oxygen Therapy Support', category: 'Health', description: 'Monitor and assist with oxygen therapy equipment' },
+    { id: 'task_54', name: 'Dementia Care Support', category: 'Personal Care', description: 'Provide specialized care for clients with dementia' },
+    { id: 'task_55', name: 'Behavioral Observation', category: 'Assessment', description: 'Observe and document behavioral changes or concerns' },
+    { id: 'task_56', name: 'Sleep Pattern Monitoring', category: 'Assessment', description: 'Monitor and document sleep patterns and quality' },
+    { id: 'task_57', name: 'Appointment Reminder', category: 'Support Services', description: 'Remind client of upcoming medical appointments' },
+    { id: 'task_58', name: 'Appointment Escort', category: 'Support Services', description: 'Accompany client to medical appointments' },
+    { id: 'task_59', name: 'Medication Side Effect Monitoring', category: 'Health', description: 'Monitor and document medication side effects' },
+    { id: 'task_60', name: 'Caregiver Training', category: 'Communication', description: 'Train family caregivers on care techniques' },
+    { id: 'task_61', name: 'Respite Care', category: 'Support Services', description: 'Provide respite care to give family caregivers a break' },
+    { id: 'task_62', name: 'End-of-Life Care Support', category: 'Health', description: 'Provide comfort and support during end-of-life care' },
+    { id: 'task_63', name: 'Grief Support', category: 'Support Services', description: 'Provide emotional support and grief counseling' },
+    { id: 'task_64', name: 'Social Activities', category: 'Support Services', description: 'Engage client in social activities and outings' },
+    { id: 'task_65', name: 'Cognitive Exercises', category: 'Health', description: 'Lead cognitive stimulation exercises and activities' },
+    { id: 'task_66', name: 'Range of Motion Exercises', category: 'Health', description: 'Assist with prescribed range of motion exercises' },
+    { id: 'task_67', name: 'Dressing Assistance', category: 'Personal Care', description: 'Assist with dressing and clothing selection' },
+    { id: 'task_68', name: 'Laundry Assistance', category: 'Support Services', description: 'Assist with laundry and clothing care' },
+    { id: 'task_69', name: 'Pet Care Assistance', category: 'Support Services', description: 'Assist with pet care and feeding' },
+    { id: 'task_70', name: 'Mail & Bill Organization', category: 'Support Services', description: 'Help organize mail and assist with bill management' },
+    { id: 'task_71', name: 'Technology Assistance', category: 'Support Services', description: 'Assist with phones, tablets, and other technology' },
+    { id: 'task_72', name: 'Home Modification Assessment', category: 'Safety', description: 'Assess need for home modifications for safety' },
+    { id: 'task_73', name: 'Emergency Contact Update', category: 'Administration', description: 'Update emergency contact information' },
+    { id: 'task_74', name: 'Insurance Coordination', category: 'Administration', description: 'Coordinate with insurance providers for coverage' },
+    { id: 'task_75', name: 'Care Team Meeting', category: 'Communication', description: 'Participate in care team meetings and coordination' }
 ];
 
 // Make COMPREHENSIVE_TASKS globally accessible
 window.COMPREHENSIVE_TASKS = COMPREHENSIVE_TASKS;
 
-// Honey types list - editable by admins
-let HONEY_TYPES = [
-    'Manuka',
-    'Rewarewa',
-    'Clover',
-    'Wildflower',
-    'Bush',
-    'Thyme',
-    'Lemon',
-    'Kamahi',
-    'Rata',
-    'Pohutukawa'
+// Care service types list - editable by admins
+let CARE_SERVICE_TYPES = [
+    'Personal Care',
+    'Health Monitoring',
+    'Meal Preparation',
+    'Transportation',
+    'Companionship',
+    'Housekeeping',
+    'Medical Support',
+    'Rehabilitation Support',
+    'Hospice Care',
+    'Respite Care'
 ];
+
+// Backward compatibility alias
+let HONEY_TYPES = CARE_SERVICE_TYPES;
 
 let tasks = COMPREHENSIVE_TASKS;
 let deletedTasks = {}; // Archive of deleted tasks for historical record display
@@ -273,8 +325,8 @@ let seasonalRequirements = []; // Array of {taskId, taskName, dueDate, category,
 // Initialize
 document.addEventListener('DOMContentLoaded', function() {
     if (typeof Logger !== 'undefined') {
-        Logger.log('🚀 DOM Content Loaded - Initializing BeeMarshall...');
-        Logger.log(`📦 BeeMarshall v${APP_VERSION} - Professional Apiary Management System`);
+        Logger.log('🚀 DOM Content Loaded - Initializing HomeCare...');
+        Logger.log(`📦 HomeCare v${APP_VERSION} - Professional Care Management System`);
     }
     
     // Initialize secure configuration and admin accounts
@@ -678,7 +730,7 @@ window.testFirebaseSecurity = function() {
 
 // Security audit function
 window.securityAudit = function() {
-    console.log('🔒 BeeMarshall Security Audit:');
+    console.log('🔒 HomeCare Security Audit:');
     console.log('================================');
     
     // Test bcrypt
@@ -930,7 +982,7 @@ function showWelcomePopup() {
     }
     
     if (welcomeMessage) {
-        welcomeMessage.textContent = `Your apiary management system is ready. All data has been synchronized and the dashboard is fully operational.`;
+        welcomeMessage.textContent = `Your care management system is ready. All data has been synchronized and the dashboard is fully operational.`;
     }
     
     // Add version tag
@@ -1121,7 +1173,7 @@ function getVersionChanges(version = APP_VERSION) {
 // Debug function to show version information
 window.showVersionInfo = function() {
     const info = getVersionInfo();
-    console.log('📦 BeeMarshall Version Information:');
+    console.log('📦 HomeCare Version Information:');
     console.log('Current Version: v${info.current}');
     console.log('Version History:', info.history);
     console.log('Latest Changes:', info.latest.changes);
@@ -1248,13 +1300,11 @@ function handleLogin(e) {
         scheduledTasks = [];
         employees = [];
         
-        // Delay to show success message then redirect
+        // Show login confirmation popup instead of directly showing main app
         setTimeout(() => {
-            console.log('🚀 Redirecting to dashboard...');
-            console.log('🏢 Tenant ID:', currentTenantId);
-            showMainApp();
-            initializeDataLoading();
-        }, 1500);
+            console.log('🔐 Showing login confirmation...');
+            showLoginConfirmationPopup(currentUser.username, adminAccount.role);
+        }, 500);
         
         return;
     }
@@ -1436,7 +1486,7 @@ function authenticateEmployee(employee, username, password, passwordHash) {
     // Check if employee is active
     if (!employee.isActive) {
         console.log('❌ Employee account is not active');
-        beeMarshallAlert('Your account is not active yet. Please contact your administrator to activate your account.', 'warning');
+        careMarshallAlert('Your account is not active yet. Please contact your administrator to activate your account.', 'warning');
         return;
     }
     
@@ -1485,7 +1535,7 @@ function authenticateEmployee(employee, username, password, passwordHash) {
         const now = new Date();
         if (now > expiryDate) {
             console.log('❌ Temporary password expired');
-            beeMarshallAlert('Your temporary password has expired. Please contact your administrator for a new password.', 'warning');
+            careMarshallAlert('Your temporary password has expired. Please contact your administrator for a new password.', 'warning');
             return;
         }
     }
@@ -1515,12 +1565,149 @@ function authenticateEmployee(employee, username, password, passwordHash) {
     localStorage.setItem('isAdmin', 'false');
     localStorage.setItem('currentTenantId', currentTenantId);
     
-    // Delay to show success message
+    // Show login confirmation popup instead of directly showing main app
     setTimeout(() => {
-        showMainApp();
-        initializeDataLoading();
-    }, 1500);
+        showLoginConfirmationPopup(employee.username, 'employee');
+    }, 500);
 }
+
+// Global variable to store pending authentication
+let pendingAuthentication = null;
+
+// Show login confirmation popup - user must confirm before accessing the app
+function showLoginConfirmationPopup(username, role) {
+    // Store pending authentication
+    pendingAuthentication = {
+        username: username,
+        role: role,
+        timestamp: new Date().toISOString()
+    };
+    
+    // Create or show confirmation modal
+    let confirmationModal = document.getElementById('loginConfirmationModal');
+    
+    if (!confirmationModal) {
+        // Create the modal if it doesn't exist
+        confirmationModal = document.createElement('div');
+        confirmationModal.id = 'loginConfirmationModal';
+        confirmationModal.className = 'modal fade';
+        confirmationModal.setAttribute('data-bs-backdrop', 'static');
+        confirmationModal.setAttribute('data-bs-keyboard', 'false');
+        confirmationModal.innerHTML = `
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content" style="background: var(--glass); backdrop-filter: blur(12px) saturate(1.1); border: 2px solid var(--primary-blue);">
+                    <div class="modal-header border-0">
+                        <h5 class="modal-title d-flex align-items-center">
+                            <i class="bi bi-shield-check me-2" style="color: var(--primary-blue); font-size: 1.5rem;"></i>
+                            Login Confirmation Required
+                        </h5>
+                    </div>
+                    <div class="modal-body text-center">
+                        <div class="mb-3">
+                            <i class="bi bi-person-check-fill" style="font-size: 3rem; color: var(--primary-blue);"></i>
+                        </div>
+                        <h6 class="mb-3">Welcome, <strong id="confirmUsername"></strong>!</h6>
+                        <p class="mb-3">You have successfully authenticated. Please confirm to proceed to the application.</p>
+                        <div class="alert alert-info mb-0">
+                            <small>
+                                <i class="bi bi-info-circle me-1"></i>
+                                Role: <strong id="confirmRole"></strong>
+                            </small>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0 justify-content-center">
+                        <button type="button" class="btn btn-secondary" onclick="cancelLogin()">
+                            <i class="bi bi-x-circle me-2"></i>Cancel
+                        </button>
+                        <button type="button" class="btn btn-primary" id="confirmLoginBtn" onclick="confirmLogin()">
+                            <i class="bi bi-check-circle me-2"></i>Confirm & Enter
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(confirmationModal);
+    }
+    
+    // Update modal content
+    document.getElementById('confirmUsername').textContent = username;
+    document.getElementById('confirmRole').textContent = role === 'admin' ? 'Administrator' : 'Employee';
+    
+    // Show the modal (non-dismissible)
+    const modal = new bootstrap.Modal(confirmationModal, {
+        backdrop: 'static',
+        keyboard: false
+    });
+    modal.show();
+}
+
+// Confirm login and proceed to main app
+function confirmLogin() {
+    if (!pendingAuthentication) {
+        console.error('❌ No pending authentication found');
+        return;
+    }
+    
+    console.log('✅ Login confirmed, proceeding to main app...');
+    
+    // Hide the confirmation modal
+    const modalElement = document.getElementById('loginConfirmationModal');
+    if (modalElement) {
+        const modal = bootstrap.Modal.getInstance(modalElement);
+        if (modal) {
+            modal.hide();
+        }
+    }
+    
+    // Clear pending authentication
+    pendingAuthentication = null;
+    
+    // Now show the main app
+    showMainApp();
+    initializeDataLoading();
+}
+
+// Cancel login - return to login screen
+function cancelLogin() {
+    console.log('❌ Login cancelled by user');
+    
+    // Clear authentication
+    currentUser = null;
+    isAdmin = false;
+    currentTenantId = null;
+    pendingAuthentication = null;
+    
+    // Clear localStorage
+    localStorage.removeItem('currentUser');
+    localStorage.removeItem('isAdmin');
+    localStorage.removeItem('currentTenantId');
+    
+    // Clear login form
+    document.getElementById('loginUsername').value = '';
+    document.getElementById('loginPassword').value = '';
+    
+    // Hide confirmation modal
+    const modalElement = document.getElementById('loginConfirmationModal');
+    if (modalElement) {
+        const modal = bootstrap.Modal.getInstance(modalElement);
+        if (modal) {
+            modal.hide();
+        }
+    }
+    
+    // Show login status
+    showLoginStatus('info', 'Login cancelled. Please try again.', false);
+    
+    // Ensure login screen is visible
+    const loginScreen = document.getElementById('loginScreen');
+    const mainApp = document.getElementById('mainApp');
+    if (loginScreen) loginScreen.classList.remove('hidden');
+    if (mainApp) mainApp.classList.add('hidden');
+}
+
+// Make functions globally available
+window.confirmLogin = confirmLogin;
+window.cancelLogin = cancelLogin;
 
 function setupMasterUser(username, password) {
     const masterUser = {
@@ -1578,11 +1765,10 @@ function validateLogin(username, password) {
             // Clean up any incorrect employee listings (Lars should not be an employee)
             cleanupIncorrectEmployeeListings();
             
-            // Delay to show success message
+            // Show login confirmation popup instead of directly showing main app
             setTimeout(() => {
-                showMainApp();
-                loadDataFromFirebase();
-            }, 1500);
+                showLoginConfirmationPopup(admin.username, 'admin');
+            }, 500);
             return;
         }
         
@@ -1607,7 +1793,7 @@ function validateLogin(username, password) {
             // Check if employee is active
             if (!employee.isActive) {
                 console.log('❌ Employee account is not active');
-                beeMarshallAlert('Your account is not active yet. Please contact your administrator to activate your account.', 'warning');
+                careMarshallAlert('Your account is not active yet. Please contact your administrator to activate your account.', 'warning');
                 return;
             }
             
@@ -1636,7 +1822,7 @@ function validateLogin(username, password) {
                 const now = new Date();
                 if (now > expiryDate) {
                     console.log('❌ Temporary password expired');
-                    beeMarshallAlert('Your temporary password has expired. Please contact your administrator for a new password.', 'warning');
+                    careMarshallAlert('Your temporary password has expired. Please contact your administrator for a new password.', 'warning');
                     return;
                 }
             }
@@ -1665,11 +1851,10 @@ function validateLogin(username, password) {
                 localStorage.setItem('currentUser', JSON.stringify(currentUser));
                 localStorage.setItem('isAdmin', 'false');
                 
-                // Delay to show success message
+                // Show login confirmation popup instead of directly showing main app
                 setTimeout(() => {
-                    showMainApp();
-                    loadDataFromFirebase();
-                }, 1500);
+                    showLoginConfirmationPopup(employee.username, 'employee');
+                }, 500);
             } else {
                 console.log('Login failed - no match');
                 showLoginStatus('danger', 'Invalid username or password. Please check your credentials and try again.', false);
@@ -1893,7 +2078,7 @@ function logout() {
 
 // Show Help Modal
 function showHelpModal() {
-    beeMarshallAlert('Welcome to BeeMarshall Help!\n\n📖 Getting Started:\n- Dashboard: Overview of your apiary\n- Sites: Manage your apiary locations\n- Actions: Track completed tasks\n- Schedule: Plan upcoming tasks\n- Reports: View detailed analytics\n\n💡 Tips:\n- Click on site markers on the map to view details\n- Schedule tasks from the dashboard or schedule view\n- Use the search feature to quickly find sites or actions\n\nNeed more help? Contact support.', 'info');
+    homeCareAlert('Welcome to HomeCare Help!\n\n📖 Getting Started:\n- Dashboard: Overview of your clients\n- Sites: Manage client locations\n- Actions: Track completed care tasks\n- Schedule: Plan upcoming care visits\n- Reports: View detailed analytics\n\n💡 Tips:\n- Click on site markers on the map to view client details\n- Schedule tasks from the dashboard or schedule view\n- Use the search feature to quickly find clients or care actions\n\nNeed more help? Contact support.', 'info');
 }
 
 // Show Settings Modal
@@ -1930,8 +2115,8 @@ function showSettingsModal() {
                     <div class="mb-3">
                         <label class="form-label fw-bold">About</label>
                         <p class="text-muted mb-0">
-                            <strong>BeeMarshall v${APP_VERSION}</strong><br>
-                            Professional Apiary Management System<br>
+                            <strong>HomeCare v${APP_VERSION}</strong><br>
+                            Professional Care Management System<br>
                             © 2024 GBTech
                         </p>
                     </div>
@@ -2111,7 +2296,7 @@ function savePasswordChange() {
             // Close modal after 2 seconds
             setTimeout(() => {
                 bootstrap.Modal.getInstance(document.getElementById('changePasswordModal')).hide();
-                beeMarshallAlert('Password changed successfully!', 'success');
+                careMarshallAlert('Password changed successfully!', 'success');
             }, 2000);
         })
         .catch((error) => {
@@ -2470,34 +2655,60 @@ function loadDataFromFirebase() {
         checkAllDataLoaded();
     });
     
-    // Load honey types
-    firebaseListeners.honeyTypes = database.ref(`tenants/${currentTenantId}/honeyTypes`);
-    firebaseListeners.honeyTypes.on('value', (snapshot) => {
+    // Load care service types (formerly honey types) - check both paths for backward compatibility
+    const careServiceTypesPath = `tenants/${currentTenantId}/careServiceTypes`;
+    const honeyTypesPath = `tenants/${currentTenantId}/honeyTypes`;
+    
+    // Try new path first, then fallback to old path
+    firebaseListeners.careServiceTypes = database.ref(careServiceTypesPath);
+    firebaseListeners.careServiceTypes.on('value', (snapshot) => {
         const data = snapshot.val();
-        if (data && Array.isArray(data)) {
-            HONEY_TYPES = data;
+        if (data && Array.isArray(data) && data.length > 0) {
+            CARE_SERVICE_TYPES = data;
+            HONEY_TYPES = data; // Sync for backward compatibility
         } else {
-            // Initialize with default honey types if none exist
-            HONEY_TYPES = [
-                'Manuka',
-                'Rewarewa',
-                'Clover',
-                'Wildflower',
-                'Bush',
-                'Thyme',
-                'Lemon',
-                'Kamahi',
-                'Rata',
-                'Pohutukawa'
-            ];
-            // Save default honey types to Firebase
-            database.ref(`tenants/${currentTenantId}/honeyTypes`).set(HONEY_TYPES);
+            // Check old path as fallback
+            database.ref(honeyTypesPath).once('value', (oldSnapshot) => {
+                const oldData = oldSnapshot.val();
+                if (oldData && Array.isArray(oldData) && oldData.length > 0) {
+                    HONEY_TYPES = oldData;
+                    CARE_SERVICE_TYPES = oldData; // Sync to new name
+                } else {
+                    // Initialize with default care service types if none exist
+                    CARE_SERVICE_TYPES = [
+                        'Personal Care',
+                        'Medical Care',
+                        'Companionship',
+                        'Transportation',
+                        'Housekeeping',
+                        'Meal Preparation',
+                        'Respite Care',
+                        'Specialized Care',
+                        'Rehabilitation Support',
+                        'End-of-Life Care'
+                    ];
+                    HONEY_TYPES = CARE_SERVICE_TYPES; // Sync for backward compatibility
+                    // Save default care service types to Firebase (both paths for compatibility)
+                    database.ref(careServiceTypesPath).set(CARE_SERVICE_TYPES);
+                    database.ref(honeyTypesPath).set(HONEY_TYPES);
+                }
+            });
         }
-        console.log('🍯 Honey types loaded for', currentTenantId + ':', HONEY_TYPES.length);
+        console.log('🏥 Care service types loaded for', currentTenantId + ':', CARE_SERVICE_TYPES.length);
         checkAllDataLoaded();
     }, (error) => {
-        console.log('❌ Tenant honey types access failed:', error.message);
-        checkAllDataLoaded();
+        console.log('❌ Tenant care service types access failed:', error.message);
+        // Fallback to old path
+        firebaseListeners.honeyTypes = database.ref(honeyTypesPath);
+        firebaseListeners.honeyTypes.on('value', (snapshot) => {
+            const data = snapshot.val();
+            if (data && Array.isArray(data)) {
+                HONEY_TYPES = data;
+                CARE_SERVICE_TYPES = data; // Sync to new name
+                console.log('🏥 Care service types loaded from fallback path:', CARE_SERVICE_TYPES.length);
+            }
+            checkAllDataLoaded();
+        });
     });
     
     if (isAdmin) {
@@ -2562,8 +2773,10 @@ function exportAllData() {
 }
 
 // Debug utility
-function debugBeeMarshall() {
-    console.log('=== BeeMarshall Debug Information ===');
+function debugHomeCare() {
+    console.log('=== HomeCare Debug Information ===');
+    // Backward compatibility
+    const debugBeeMarshall = debugHomeCare;
     console.log('Version:', APP_VERSION);
     console.log('Current User:', currentUser);
     console.log('Current Tenant ID:', currentTenantId);
@@ -2586,7 +2799,7 @@ let gbtechTestDataAdded = false;
 function createGBTechTestData() {
     // Only allow if logged in as GBTech
     if (currentTenantId !== 'gbtech' || currentUser.username !== 'GBTech') {
-        beeMarshallAlert('This feature is only available for GBTech login.', 'error');
+        careMarshallAlert('This feature is only available for GBTech login.', 'error');
         return;
     }
     
@@ -2609,7 +2822,7 @@ function createGBTechTestData() {
     const testSites = [
         {
             id: 1001,
-            name: 'Main Apiary - Strong Hives',
+            name: 'Main Care Facility - Independent Clients',
             location: 'Main Farm',
             lat: -36.8485,
             lng: 174.7633,
@@ -2651,7 +2864,7 @@ function createGBTechTestData() {
         },
         {
             id: 1004,
-            name: 'Remote Mountain Apiary',
+            name: 'Remote Care Facility',
             location: 'Mountain Top',
             lat: -36.8785,
             lng: 174.7933,
@@ -2665,7 +2878,7 @@ function createGBTechTestData() {
         },
         {
             id: 1005,
-            name: 'Urban Rooftop Apiary',
+            name: 'Urban Care Facility',
             location: 'City Center',
             lat: -36.8885,
             lng: 174.8033,
@@ -2707,7 +2920,7 @@ function createGBTechTestData() {
         },
         {
             id: 1008,
-            name: 'Research Apiary',
+            name: 'Research Care Facility',
             location: 'University Grounds',
             lat: -36.9185,
             lng: 174.8333,
@@ -2798,7 +3011,7 @@ function createGBTechTestData() {
         .then(() => {
             console.log('✅ GBTech test data created successfully');
             gbtechTestDataAdded = true;
-            beeMarshallAlert('Test data created successfully! You now have 8 diverse sites, 10 actions, and 7 scheduled tasks.', 'success');
+            careMarshallAlert('Test data created successfully! You now have 8 diverse sites, 10 actions, and 7 scheduled tasks.', 'success');
             
             // Refresh data
             setTimeout(() => {
@@ -2807,19 +3020,19 @@ function createGBTechTestData() {
         })
         .catch(error => {
             console.error('❌ Error creating test data:', error);
-            beeMarshallAlert('Error creating test data: ' + error.message, 'error');
+            careMarshallAlert('Error creating test data: ' + error.message, 'error');
         });
 }
 
 function undoGBTechTestData() {
     // Only allow if logged in as GBTech
     if (currentTenantId !== 'gbtech' || currentUser.username !== 'GBTech') {
-        beeMarshallAlert('This feature is only available for GBTech login.', 'error');
+        careMarshallAlert('This feature is only available for GBTech login.', 'error');
         return;
     }
     
     if (!gbtechTestDataBackup) {
-        beeMarshallAlert('No backup data found. Cannot undo test data.', 'warning');
+        careMarshallAlert('No backup data found. Cannot undo test data.', 'warning');
         return;
     }
     
@@ -2852,7 +3065,7 @@ function undoGBTechTestData() {
             console.log('✅ GBTech test data removed successfully');
             gbtechTestDataAdded = false;
             gbtechTestDataBackup = null;
-            beeMarshallAlert('Test data removed successfully! Your original data has been restored.', 'success');
+            careMarshallAlert('Test data removed successfully! Your original data has been restored.', 'success');
             
             // Refresh data
             setTimeout(() => {
@@ -2861,7 +3074,7 @@ function undoGBTechTestData() {
         })
         .catch(error => {
             console.error('❌ Error removing test data:', error);
-            beeMarshallAlert('Error removing test data: ' + error.message, 'error');
+            careMarshallAlert('Error removing test data: ' + error.message, 'error');
         });
 }
 
@@ -3003,7 +3216,7 @@ function saveEmployeePasswordChange(employeeId) {
     const confirmPassword = document.getElementById('employeeConfirmPassword').value;
     
     if (!newPassword || !confirmPassword) {
-        beeMarshallAlert('Please enter both password fields', 'error');
+        careMarshallAlert('Please enter both password fields', 'error');
         return;
     }
     
@@ -3011,12 +3224,12 @@ function saveEmployeePasswordChange(employeeId) {
     const passwordValidation = validatePasswordStrength(newPassword);
     if (!passwordValidation.isValid) {
         const errorMessage = 'Password requirements not met:\n• ' + passwordValidation.errors.join('\n• ');
-        beeMarshallAlert(errorMessage, 'error');
+        careMarshallAlert(errorMessage, 'error');
         return;
     }
     
     if (newPassword !== confirmPassword) {
-        beeMarshallAlert('Passwords do not match', 'error');
+        careMarshallAlert('Passwords do not match', 'error');
         return;
     }
     
@@ -3031,7 +3244,7 @@ function saveEmployeePasswordChange(employeeId) {
         passwordChanged: true // Mark password as changed
     })
     .then(() => {
-        beeMarshallAlert('✅ Password updated successfully! Your device is now remembered for future logins.', 'success');
+        careMarshallAlert('✅ Password updated successfully! Your device is now remembered for future logins.', 'success');
         
         // Close the modal
         const modal = document.getElementById('passwordChangePromptModal');
@@ -3042,7 +3255,7 @@ function saveEmployeePasswordChange(employeeId) {
     })
     .catch(error => {
         console.error('Error updating password:', error);
-        beeMarshallAlert('Failed to update password: ' + error.message, 'error');
+        careMarshallAlert('Failed to update password: ' + error.message, 'error');
     });
 }
 */

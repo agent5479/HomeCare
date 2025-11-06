@@ -3,31 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BeeMarshall v1.78 - Complete Apiary Management System</title>
+    <title>CareMarshall v0.7 - Professional Care Management System</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
     <link href="css/brand.css" rel="stylesheet">
     <style>
         :root {
-            /* Hive Design System - Light Yellow, Dark Yellow, White, Black */
-            --light-yellow: #FFFACD;
-            --dark-yellow: #DAA520;
-            --gold: #FFD700;
+            /* HomeCare Design System - Light Blue, Primary Blue, White, Black */
+            --light-blue: #E3F2FD;
+            --primary-blue: #1976D2;
+            --secondary-blue: #42A5F5;
             --white: #FFFFFF;
             --black: #000000;
-            --accent: #FFD700;
-            --bg: var(--light-yellow);
-            --glass: rgba(255, 250, 205, 0.95);
-            --shadow: 0 8px 32px rgba(218, 165, 32, 0.15);
+            --accent: #42A5F5;
+            --bg: var(--light-blue);
+            --glass: rgba(227, 242, 253, 0.95);
+            --shadow: 0 8px 32px rgba(25, 118, 210, 0.15);
             --radius: 12px;
             --transition: all .22s cubic-bezier(.4,0,.2,1);
             
-            /* Hive Color Palette */
-            --primary-bg: var(--light-yellow);
-            --primary-accent: var(--dark-yellow);
+            /* HomeCare Color Palette */
+            --primary-bg: var(--light-blue);
+            --primary-accent: var(--primary-blue);
             --secondary-accent: var(--white);
             --text-primary: var(--black);
-            --text-secondary: #666666;
+            --text-secondary: #4a5568;
             --success: #28a745;
             --warning: #ffc107;
             --danger: #dc3545;
@@ -44,9 +44,9 @@
         .hero-section {
             padding: 100px 0;
             text-align: center;
-            background: linear-gradient(135deg, var(--light-yellow) 0%, var(--white) 100%);
+            background: linear-gradient(135deg, var(--light-blue) 0%, var(--white) 100%);
             color: var(--black);
-            border-bottom: 3px solid var(--dark-yellow);
+            border-bottom: 3px solid var(--primary-blue);
         }
 
         .hero-title {
@@ -54,19 +54,19 @@
             font-weight: 700;
             margin-bottom: 1rem;
             color: var(--black);
-            text-shadow: 2px 2px 4px rgba(218, 165, 32, 0.2);
+            text-shadow: 2px 2px 4px rgba(25, 118, 210, 0.2);
         }
 
         .hero-subtitle {
             font-size: 1.5rem;
             margin-bottom: 2rem;
-            color: var(--text-secondary);
+            color: #4a5568;
             font-weight: 500;
         }
 
         .feature-card {
             background: var(--white);
-            border: 2px solid var(--dark-yellow);
+            border: 2px solid var(--primary-blue);
             border-radius: var(--radius);
             padding: 2rem;
             margin-bottom: 2rem;
@@ -77,20 +77,20 @@
 
         .feature-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 20px 25px rgba(218, 165, 32, 0.15);
-            border-color: var(--gold);
+            box-shadow: 0 20px 25px rgba(25, 118, 210, 0.15);
+            border-color: var(--secondary-blue);
         }
 
         .feature-icon {
             font-size: 3rem;
             margin-bottom: 1rem;
-            color: var(--dark-yellow);
+            color: var(--primary-blue);
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, var(--dark-yellow), var(--gold));
-            border: 2px solid var(--dark-yellow);
-            color: var(--black);
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            border: 2px solid var(--primary-blue);
+            color: var(--white);
             padding: 12px 30px;
             border-radius: 25px;
             font-weight: 600;
@@ -98,15 +98,15 @@
         }
 
         .btn-primary:hover {
-            background: linear-gradient(135deg, var(--gold), var(--dark-yellow));
+            background: linear-gradient(135deg, var(--secondary-blue), var(--primary-blue));
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(218, 165, 32, 0.3);
-            color: var(--black);
+            box-shadow: 0 5px 15px rgba(25, 118, 210, 0.3);
+            color: var(--white);
         }
 
         .btn-outline-primary {
-            border: 2px solid var(--dark-yellow);
-            color: var(--black);
+            border: 2px solid var(--primary-blue);
+            color: var(--primary-blue);
             background: transparent;
             padding: 12px 30px;
             border-radius: 25px;
@@ -115,15 +115,15 @@
         }
 
         .btn-outline-primary:hover {
-            background: var(--dark-yellow);
-            color: var(--black);
+            background: var(--primary-blue);
+            color: var(--white);
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(218, 165, 32, 0.3);
+            box-shadow: 0 5px 15px rgba(25, 118, 210, 0.3);
         }
 
         .stats-section {
-            background: var(--light-yellow);
-            border: 2px solid var(--dark-yellow);
+            background: var(--light-blue);
+            border: 2px solid var(--primary-blue);
             border-radius: 20px;
             padding: 3rem;
             margin: 3rem 0;
@@ -138,12 +138,12 @@
         .stat-number {
             font-size: 2.5rem;
             font-weight: 700;
-            color: var(--dark-yellow);
+            color: var(--primary-blue);
         }
 
         .comparison-table {
             background: var(--white);
-            border: 2px solid var(--dark-yellow);
+            border: 2px solid var(--primary-blue);
             border-radius: 15px;
             overflow: hidden;
             box-shadow: var(--shadow);
@@ -158,14 +158,14 @@
 
         .expandable-card:hover {
             transform: translateY(-8px);
-            box-shadow: 0 20px 40px rgba(218, 165, 32, 0.2);
+            box-shadow: 0 20px 40px rgba(25, 118, 210, 0.2);
         }
 
         .expand-indicator {
             position: absolute;
             top: 15px;
             right: 15px;
-            color: var(--dark-yellow);
+            color: var(--primary-blue);
             font-size: 1.2rem;
             transition: transform var(--transition);
         }
@@ -177,11 +177,11 @@
         .card-details {
             margin-top: 1rem;
             padding-top: 1rem;
-            border-top: 1px solid rgba(218, 165, 32, 0.2);
+            border-top: 1px solid rgba(25, 118, 210, 0.2);
         }
 
         .card-details h6 {
-            color: var(--dark-yellow);
+            color: var(--primary-blue);
             font-weight: 600;
             margin-bottom: 0.75rem;
         }
@@ -193,7 +193,7 @@
 
         .card-details li {
             margin-bottom: 0.5rem;
-            color: var(--text-secondary);
+            color: #4a5568;
             line-height: 1.5;
         }
 
@@ -208,7 +208,7 @@
 
         .legal-card {
             background: var(--white);
-            border: 2px solid var(--dark-yellow);
+            border: 2px solid var(--primary-blue);
             border-radius: 15px;
             padding: 2rem;
             text-align: center;
@@ -219,12 +219,12 @@
 
         .legal-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 15px 30px rgba(218, 165, 32, 0.2);
+            box-shadow: 0 15px 30px rgba(25, 118, 210, 0.2);
         }
 
         .legal-icon {
             font-size: 2.5rem;
-            color: var(--dark-yellow);
+            color: var(--primary-blue);
             margin-bottom: 1rem;
         }
 
@@ -235,13 +235,13 @@
         }
 
         .legal-card p {
-            color: var(--text-secondary);
+            color: #4a5568;
             line-height: 1.6;
             margin-bottom: 0;
         }
 
         .comparison-table th {
-            background: var(--light-yellow);
+            background: var(--light-blue);
             color: var(--black);
             border: none;
             font-weight: 600;
@@ -249,15 +249,15 @@
 
         .comparison-table td {
             color: var(--black);
-            border-color: var(--dark-yellow);
+            border-color: var(--primary-blue);
         }
 
         .footer {
-            background: var(--light-yellow);
+            background: var(--light-blue);
             color: var(--black);
             padding: 2rem 0;
             margin-top: 4rem;
-            border-top: 3px solid var(--dark-yellow);
+            border-top: 3px solid var(--primary-blue);
         }
     </style>
 </head>
@@ -268,17 +268,17 @@
             <div class="row justify-content-center">
                 <div class="col-lg-8">
                     <h1 class="hero-title">
-                        <i class="bi bi-hexagon-fill"></i> BeeMarshall v1.78
+                        <i class="bi bi-house-heart-fill"></i> CareMarshall v0.7
                     </h1>
                     <p class="hero-subtitle">
-                        Complete Apiary Management System
+                        Professional Care Management System
                     </p>
                     <p class="lead mb-4">
-                        Production-ready digital solution for professional beekeeping operations. Multi-tenant architecture, 
-                        team management, real-time sync, and comprehensive analytics for modern apiary management.
+                        Production-ready digital solution for professional care management. Multi-tenant architecture, 
+                        team management, real-time sync, and comprehensive analytics for professional care providers.
                     </p>
                     <div class="d-flex gap-3 justify-content-center flex-wrap">
-                        <a href="beemarshall-full.html" class="btn btn-primary btn-lg">
+                        <a href="caremarshall-full.html" class="btn btn-primary btn-lg">
                             <i class="bi bi-rocket-takeoff"></i> Launch Application
                         </a>
                         <a href="reports.html" class="btn btn-outline-primary btn-lg">
@@ -299,14 +299,14 @@
                         <i class="bi bi-geo-alt-fill"></i>
                     </div>
                     <h4>Site Management</h4>
-                    <p>Track multiple apiary sites with GPS coordinates, site classifications, and detailed site information. Interactive maps and site grouping for efficient management.</p>
+                    <p>Track multiple client locations with GPS coordinates, client status classifications, and detailed client information. Interactive maps and location grouping for efficient care coordination.</p>
                     <div class="expand-indicator">
                         <i class="bi bi-chevron-down"></i>
                     </div>
                     <div class="collapse" id="siteManagementDetails">
                         <div class="card-details">
                             <h6>Comprehensive Site Management System</h6>
-                            <p>BeeMarshall's site management provides complete control over your apiary operations with professional-grade tools designed for modern beekeepers.</p>
+                            <p>HomeCare's client management provides complete control over your care operations with professional-grade tools designed for care providers.</p>
                             
                             <h6>🌍 Location & Mapping</h6>
                             <ul>
@@ -318,19 +318,19 @@
                             
                             <h6>📊 Site Classifications & Organization</h6>
                             <ul>
-                                <li><strong>Functional Classification:</strong> Production, Nucleus, Queen Rearing, Research, and Custom categories</li>
-                                <li><strong>Seasonal Classification:</strong> Summer Sites, Winter Sites, and All-Year-Round operations</li>
+                                <li><strong>Client Status Classification:</strong> Independent, Assisted, Dependent, Rehabilitation, Hospice, and Custom categories</li>
+                                <li><strong>Location Types:</strong> Home-based, Facility-based, and various care settings</li>
                                 <li><strong>Smart Filtering:</strong> Filter sites by classification, status, or custom criteria</li>
                                 <li><strong>Alphabetical Sorting:</strong> Automatic alphabetical organization for easy navigation</li>
                             </ul>
                             
-                            <h6>🏠 Hive Inventory & Management</h6>
+                            <h6>🏠 Client Status & Management</h6>
                             <ul>
-                                <li><strong>Visual Hive Grid:</strong> Interactive grid system showing hive layout and configuration</li>
-                                <li><strong>Strength Monitoring:</strong> Track Strong, Medium, Weak, NUC, and Dead hives with real-time updates</li>
-                                <li><strong>Stack Configuration:</strong> Monitor Doubles, Top Splits, Singles, NUC Stacks, and Empty Platforms</li>
-                                <li><strong>Quick Updates:</strong> One-click hive count updates from summary cards</li>
-                                <li><strong>Hive History:</strong> Complete audit trail of all hive changes and modifications</li>
+                                <li><strong>Visual Client Dashboard:</strong> Interactive dashboard showing client status and care information</li>
+                                <li><strong>Status Monitoring:</strong> Track Independent, Assisted, Dependent, Rehabilitation, and Hospice clients with real-time updates</li>
+                                <li><strong>Care Equipment Management:</strong> Monitor care equipment and resources</li>
+                                <li><strong>Quick Updates:</strong> One-click client status updates from summary cards</li>
+                                <li><strong>Client History:</strong> Complete audit trail of all client care changes and modifications</li>
                             </ul>
                             
                             <h6>👥 Landowner & Access Management</h6>
@@ -357,27 +357,27 @@
                         <i class="bi bi-graph-up-arrow"></i>
                     </div>
                     <h4>Performance Analytics</h4>
-                    <p>Advanced reporting and analytics with real-time data visualization. Track hive strength, productivity, health metrics, and operational efficiency.</p>
+                    <p>Advanced reporting and analytics with real-time data visualization. Track client status, care quality, health metrics, and operational efficiency.</p>
                     <div class="expand-indicator">
                         <i class="bi bi-chevron-down"></i>
                     </div>
                     <div class="collapse" id="analyticsDetails">
                         <div class="card-details">
                             <h6>Advanced Performance Analytics Dashboard</h6>
-                            <p>Transform your apiary data into actionable insights with comprehensive analytics and real-time reporting capabilities designed for professional beekeepers.</p>
+                            <p>Transform your care data into actionable insights with comprehensive analytics and real-time reporting capabilities designed for professional care providers.</p>
                             
-                            <h6>📊 Interactive Hive Analysis</h6>
+                            <h6>📊 Interactive Client Status Analysis</h6>
                             <ul>
-                                <li><strong>Real-time Hive Strength Tracking:</strong> Live monitoring of Strong, Medium, Weak, NUC, and Dead hives across all sites</li>
-                                <li><strong>Stack Configuration Analysis:</strong> Visual breakdown of Doubles, Top Splits, Singles, NUC Stacks, and Empty Platforms</li>
-                                <li><strong>Performance Rate Calculations:</strong> Automatic calculation of hive success rates and mortality percentages</li>
-                                <li><strong>Clickable Analytics Cards:</strong> Interactive cards that filter sites by specific hive categories</li>
-                                <li><strong>Historical Trends:</strong> Track hive performance changes over time with visual indicators</li>
+                                <li><strong>Real-time Client Status Tracking:</strong> Live monitoring of Independent, Assisted, Dependent, Rehabilitation, and Hospice clients across all locations</li>
+                                <li><strong>Care Equipment Analysis:</strong> Visual breakdown of care equipment and resources</li>
+                                <li><strong>Performance Rate Calculations:</strong> Automatic calculation of care quality metrics and outcomes</li>
+                                <li><strong>Clickable Analytics Cards:</strong> Interactive cards that filter locations by specific client status categories</li>
+                                <li><strong>Historical Trends:</strong> Track client care progress and outcomes over time with visual indicators</li>
                             </ul>
                             
                             <h6>📈 Comprehensive Reporting Suite</h6>
                             <ul>
-                                <li><strong>Hive Performance Report:</strong> Detailed analysis of hive strength distribution and productivity metrics</li>
+                                <li><strong>Client Care Performance Report:</strong> Detailed analysis of client status distribution and care quality metrics</li>
                                 <li><strong>Health & Mortality Monitor:</strong> Disease outbreak tracking, mortality rate analysis, and treatment effectiveness</li>
                                 <li><strong>Operations Analysis:</strong> Task completion rates, efficiency metrics, and resource utilization</li>
                                 <li><strong>Harvest History Tracking:</strong> Year-over-year harvest analysis with honey type breakdowns</li>
@@ -555,7 +555,7 @@
         <div class="row">
             <div class="col-12">
                 <div class="legal-section">
-                    <h2 class="text-center text-hive-primary mb-4">Legal & Privacy Information</h2>
+                    <h2 class="text-center mb-4" style="color: var(--primary-blue);">Legal & Privacy Information</h2>
                     <div class="row">
                         <div class="col-md-4">
                             <div class="legal-card">
@@ -563,7 +563,7 @@
                                     <i class="bi bi-shield-check"></i>
                                 </div>
                                 <h5>Terms of Use</h5>
-                                <p>By using BeeMarshall, you agree to our terms of service. This system is designed for professional apiary management and data security.</p>
+                                <p>By using HomeCare, you agree to our terms of service. This system is designed for professional care management and data security.</p>
                             </div>
                         </div>
                         <div class="col-md-4">
@@ -581,7 +581,7 @@
                                     <i class="bi bi-code-slash"></i>
                                 </div>
                                 <h5>Open Source</h5>
-                                <p>BeeMarshall is built on open-source technologies. Source code and data structures are transparent and auditable.</p>
+                                <p>HomeCare is built on open-source technologies. Source code and data structures are transparent and auditable.</p>
                             </div>
                         </div>
                     </div>
@@ -594,22 +594,22 @@
     <div class="container">
         <div class="row">
             <div class="col-12">
-                <h2 class="text-center text-hive-primary mb-4">Access BeeMarshall</h2>
-                <p class="text-center text-muted mb-5">One comprehensive application with all features integrated</p>
+                <h2 class="text-center mb-4" style="color: var(--primary-blue);">Access CareMarshall</h2>
+                <p class="text-center mb-5" style="color: #4a5568;">One comprehensive application with all features integrated</p>
             </div>
         </div>
         <div class="row justify-content-center">
             <div class="col-lg-8">
                 <div class="feature-card text-center">
                     <div class="feature-icon mb-4">
-                        <i class="bi bi-hexagon-fill"></i>
+                        <i class="bi bi-house-heart-fill"></i>
                     </div>
                     <h3 class="mb-3">Complete Apiary Management System</h3>
                     <p class="mb-4">Everything you need for professional beekeeping management in one integrated application.</p>
                     
                     <div class="row mb-4">
                         <div class="col-md-6">
-                            <h6 class="text-hive-primary mb-3">Core Features</h6>
+                            <h6 class="mb-3" style="color: var(--primary-blue); font-weight: 600;">Core Features</h6>
                             <ul class="list-unstyled text-start">
                                 <li><i class="bi bi-check-circle text-success me-2"></i> Site management with GPS</li>
                                 <li><i class="bi bi-check-circle text-success me-2"></i> Task scheduling and tracking</li>
@@ -619,7 +619,7 @@
                             </ul>
                         </div>
                         <div class="col-md-6">
-                            <h6 class="text-hive-primary mb-3">Analytics & Reporting</h6>
+                            <h6 class="mb-3" style="color: var(--primary-blue); font-weight: 600;">Analytics & Reporting</h6>
                             <ul class="list-unstyled text-start">
                                 <li><i class="bi bi-check-circle text-success me-2"></i> Performance analytics</li>
                                 <li><i class="bi bi-check-circle text-success me-2"></i> Health monitoring</li>
@@ -631,7 +631,7 @@
                     </div>
                     
                     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-                        <a href="beemarshall-full.html" class="btn btn-primary btn-lg me-md-2">
+                        <a href="caremarshall-full.html" class="btn btn-primary btn-lg me-md-2">
                             <i class="bi bi-play-circle"></i> Launch Application
                         </a>
                         <a href="reports.html" class="btn btn-outline-primary btn-lg" target="_blank">
@@ -640,7 +640,7 @@
                     </div>
                     
                     <div class="mt-4">
-                        <small class="text-muted">
+                        <small style="color: #4a5568;">
                             <i class="bi bi-info-circle me-1"></i>
                             Reports open in a new tab for easy reference while using the main application
                         </small>
@@ -695,24 +695,24 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-6">
-                    <h5><i class="bi bi-hexagon-fill"></i> BeeMarshall</h5>
-                    <p>Professional Apiary Management System</p>
-                    <p>Made with <i class="bi bi-heart-fill text-danger"></i> for beekeepers</p>
+                    <h5><i class="bi bi-house-heart-fill"></i> CareMarshall</h5>
+                    <p>Professional Care Management System</p>
+                    <p>Made with <i class="bi bi-heart-fill text-danger"></i> for care providers</p>
                 </div>
                 <div class="col-md-6 text-md-end">
                     <h6>Quick Links</h6>
                     <div class="d-flex flex-column flex-md-row justify-content-md-end gap-2">
-                        <a href="beemarshall-full.html" class="text-hive-primary text-decoration-none">Full Application</a>
-                        <a href="reports.html" class="text-hive-primary text-decoration-none">Reports</a>
-                        <a href="USER_GUIDE.md" class="text-hive-primary text-decoration-none">User Guide</a>
-                        <a href="LOGIN_TROUBLESHOOTING.md" class="text-hive-primary text-decoration-none">Support</a>
+                        <a href="caremarshall-full.html" class="text-decoration-none" style="color: var(--primary-blue); font-weight: 500;">Full Application</a>
+                        <a href="reports.html" class="text-decoration-none" style="color: var(--primary-blue); font-weight: 500;">Reports</a>
+                        <a href="USER_GUIDE.md" class="text-decoration-none" style="color: var(--primary-blue); font-weight: 500;">User Guide</a>
+                        <a href="LOGIN_TROUBLESHOOTING.md" class="text-decoration-none" style="color: var(--primary-blue); font-weight: 500;">Support</a>
                     </div>
                 </div>
             </div>
-            <hr class="my-3" style="border-color: var(--dark-yellow);">
+            <hr class="my-3" style="border-color: var(--primary-blue);">
             <div class="row">
                 <div class="col-12 text-center">
-                    <p class="mb-0">&copy; 2024 BeeMarshall. Professional Apiary Management System.</p>
+                    <p class="mb-0">&copy; 2024 CareMarshall. Professional Care Management System.</p>
                 </div>
             </div>
         </div>

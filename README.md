@@ -1,8 +1,8 @@
-# 🐝 BeeMarshall - Complete Apiary Management System
+# 🏠 HomeCare - Professional Care Management System
 
-A comprehensive, production-ready web-based apiary (beekeeping) management system built with modern web technologies. Features real-time data synchronization, multi-tenant architecture, role-based access control, and comprehensive reporting capabilities.
+A comprehensive, production-ready web-based care management system for disabled and elderly care services. Features real-time data synchronization, multi-tenant architecture, role-based access control, and comprehensive reporting capabilities.
 
-![Version](https://img.shields.io/badge/version-1.78-blue.svg)
+![Version](https://img.shields.io/badge/version-0.7-blue.svg)
 ![Status](https://img.shields.io/badge/status-production--ready-green.svg)
 ![Security](https://img.shields.io/badge/security-enhanced-orange.svg)
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
@@ -25,29 +25,31 @@ A comprehensive, production-ready web-based apiary (beekeeping) management syste
 - **Mobile-Responsive**: Optimized for all device sizes
 - **Security-First**: No hardcoded credentials, secure password management
 
-## 🚀 Current Version: v1.78
+## 🚀 Current Version: v0.7
 
 ### System Capabilities
 - **🔐 Enterprise Authentication** - Multi-tenant Firebase authentication with secure password management
 - **👥 Team Management** - Admin-controlled employee accounts with temporary password system
-- **📍 Advanced Site Management** - GPS coordinates, functional/seasonal classifications, harvest tracking
-- **🗺️ Interactive Mapping** - Real-time site visualization with weather integration
-- **🐝 Individual Hive Tracking** - Detailed hive management with health status monitoring
-- **📝 Comprehensive Action Logging** - Task-based activity logging with automatic categorization
-- **📅 Intelligent Scheduling** - Task scheduling with overdue detection and rescheduling
-- **📊 Advanced Analytics** - Performance metrics, health monitoring, operations analysis
+- **📍 Advanced Client Location Management** - GPS coordinates, client status tracking, care coordination
+- **🗺️ Interactive Mapping** - Real-time client location visualization with weather integration
+- **👤 Individual Client Tracking** - Detailed client management with care status monitoring
+- **📝 Comprehensive Care Action Logging** - Task-based activity logging with automatic categorization
+- **📅 Intelligent Scheduling** - Care visit scheduling with overdue detection and rescheduling
+- **📊 Advanced Analytics** - Performance metrics, care monitoring, operations analysis
 - **🔍 Data Integrity Checking** - Built-in validation and consistency checking
 - **📱 Mobile-Optimized** - Responsive design with touch-friendly interfaces
 - **🌐 Real-Time Sync** - Live data synchronization with offline change queuing
 - **📦 Data Export** - CSV export for all data types with tenant isolation
 - **🛡️ Security Hardened** - No hardcoded credentials, secure tenant isolation
 
-## 🏷️ Site Classification System
+## 🏷️ Client Status Classification System
 
-### Functional Classifications
-- **Production** - Primary honey production sites
-- **Nucleus** - Small colonies for breeding
-- **Queen Rearing** - Specialized queen production
+### Client Status Levels
+- **Independent** - Clients who can manage daily activities independently
+- **Assisted** - Clients requiring some assistance with daily activities
+- **Dependent** - Clients requiring significant assistance and support
+- **Rehabilitation** - Clients in active rehabilitation programs
+- **Hospice** - Clients receiving end-of-life care
 - **Research** - Experimental and study sites
 - **Education** - Training and demonstration sites
 - **Quarantine** - Isolated health management

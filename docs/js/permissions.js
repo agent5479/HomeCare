@@ -1,4 +1,4 @@
-// BeeMarshall - Permissions and Team Collaboration Module
+// HomeCare - Permissions and Team Collaboration Module
 // Defines role-based access control for team members
 
 /**
@@ -30,7 +30,12 @@ const PERMISSIONS = {
     TASK_DELETE: ['master_admin', 'admin'],
     TASK_TRANSFER_TO_SCHEDULE: ['master_admin', 'admin', 'demo_admin', 'employee'],
     
-    // Individual Hives
+    // Individual Clients (formerly Hives)
+    CLIENT_VIEW: ['master_admin', 'admin', 'demo_admin', 'employee'],
+    CLIENT_CREATE: ['master_admin', 'admin', 'demo_admin', 'employee'],
+    CLIENT_UPDATE: ['master_admin', 'admin', 'demo_admin', 'employee'],
+    CLIENT_DELETE: ['master_admin', 'admin'],
+    // Backward compatibility
     HIVE_VIEW: ['master_admin', 'admin', 'demo_admin', 'employee'],
     HIVE_CREATE: ['master_admin', 'admin', 'demo_admin', 'employee'],
     HIVE_UPDATE: ['master_admin', 'admin', 'demo_admin', 'employee'],
@@ -102,10 +107,13 @@ function canDeleteTask() {
 }
 
 /**
- * Check if user can delete individual hives
+ * Check if user can delete individual clients (formerly hives)
  */
+function canDeleteClient() {
+    return hasPermission('CLIENT_DELETE');
+}
 function canDeleteHive() {
-    return hasPermission('HIVE_DELETE');
+    return hasPermission('HIVE_DELETE') || hasPermission('CLIENT_DELETE'); // Backward compatibility
 }
 
 /**
@@ -123,7 +131,7 @@ function canTransferToSchedule() {
 }
 
 /**
- * Check if user can update hive schematics
+ * Check if user can update client care equipment (formerly hive schematics)
  */
 function canUpdateSchematics() {
     return hasPermission('SCHEMATIC_UPDATE');
@@ -133,7 +141,7 @@ function canUpdateSchematics() {
  * Show permission denied alert
  */
 function showPermissionDeniedAlert(action = 'perform this action') {
-    beeMarshallAlert(
+    homeCareAlert(
         `🔒 Access Denied\n\nYou do not have permission to ${action}.\n\nContact your administrator for access.`,
         'warning'
     );
@@ -194,7 +202,8 @@ window.hasPermission = hasPermission;
 window.canDeleteSite = canDeleteSite;
 window.canDeleteAction = canDeleteAction;
 window.canDeleteTask = canDeleteTask;
-window.canDeleteHive = canDeleteHive;
+window.canDeleteClient = canDeleteClient;
+window.canDeleteHive = canDeleteHive; // Backward compatibility
 window.canManageEmployees = canManageEmployees;
 window.canTransferToSchedule = canTransferToSchedule;
 window.canUpdateSchematics = canUpdateSchematics;
