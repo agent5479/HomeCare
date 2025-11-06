@@ -3,36 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<<<<<<< HEAD
     <title>CareMarshall v0.7 - Professional Care Management System</title>
+    <meta name="description" content="Professional care coordination platform for New Zealand home care providers - client management, compliance tracking, and team coordination">
+    
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
     <link href="css/brand.css" rel="stylesheet">
+    
     <style>
         :root {
-            /* HomeCare Design System - Light Blue, Primary Blue, White, Black */
-            --light-blue: #E3F2FD;
             --primary-blue: #1976D2;
             --secondary-blue: #42A5F5;
+            --light-blue: #E3F2FD;
             --white: #FFFFFF;
             --black: #000000;
-            --accent: #42A5F5;
-            --bg: var(--light-blue);
-            --glass: rgba(227, 242, 253, 0.95);
+            --text-secondary: #4a5568;
             --shadow: 0 8px 32px rgba(25, 118, 210, 0.15);
             --radius: 12px;
             --transition: all .22s cubic-bezier(.4,0,.2,1);
-            
-            /* HomeCare Color Palette */
-            --primary-bg: var(--light-blue);
-            --primary-accent: var(--primary-blue);
-            --secondary-accent: var(--white);
-            --text-primary: var(--black);
-            --text-secondary: #4a5568;
-            --success: #28a745;
-            --warning: #ffc107;
-            --danger: #dc3545;
-            --info: #17a2b8;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
         body {
@@ -42,11 +36,37 @@
             color: var(--black);
         }
 
+        /* Navigation */
+        .navbar {
+            background: var(--white) !important;
+            box-shadow: 0 2px 8px rgba(25, 118, 210, 0.1);
+            padding: 1rem 0;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            color: var(--primary-blue) !important;
+            font-size: 1.4rem;
+        }
+
+        .navbar-brand i {
+            color: var(--primary-blue);
+        }
+
+        .nav-link {
+            color: var(--text-secondary) !important;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-blue) !important;
+        }
+
+        /* Hero Section */
         .hero-section {
-            padding: 100px 0;
-            text-align: center;
+            padding: 80px 0 60px;
             background: linear-gradient(135deg, var(--light-blue) 0%, var(--white) 100%);
-            color: var(--black);
             border-bottom: 3px solid var(--primary-blue);
         }
 
@@ -55,74 +75,39 @@
             font-weight: 700;
             margin-bottom: 1rem;
             color: var(--black);
-            text-shadow: 2px 2px 4px rgba(25, 118, 210, 0.2);
+            text-shadow: 2px 2px 4px rgba(25, 118, 210, 0.1);
         }
 
         .hero-subtitle {
             font-size: 1.5rem;
-            margin-bottom: 2rem;
-            color: #4a5568;
+            margin-bottom: 1.5rem;
+            color: var(--text-secondary);
             font-weight: 500;
         }
 
-        .feature-card {
-            background: var(--white);
-            border: 2px solid var(--primary-blue);
-            border-radius: var(--radius);
-            padding: 2rem;
+        .hero-description {
+            font-size: 1.1rem;
+            line-height: 1.7;
+            color: var(--text-secondary);
             margin-bottom: 2rem;
-            transition: all var(--transition);
-            color: var(--black);
-            box-shadow: var(--shadow);
-=======
-    <title>HomeCare Management System</title>
-    <meta name="description" content="Professional Care Coordination Platform for elderly, disabled, and special needs care">
-    
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
-    <!-- Custom CSS -->
-    <link href="css/homecare-brand.css" rel="stylesheet">
-    
-    <style>
-        .hero-section {
-            background: linear-gradient(135deg, #4A90E2, #2E5BBA);
-            color: white;
-            padding: 4rem 0;
-        }
-        .feature-card {
-            transition: transform 0.3s ease;
-            height: 100%;
->>>>>>> b5053293d01ba10c025b4a2821ec94760e3b0555
-        }
-        .feature-card:hover {
-            transform: translateY(-5px);
-<<<<<<< HEAD
-            box-shadow: 0 20px 25px rgba(25, 118, 210, 0.15);
-            border-color: var(--secondary-blue);
-        }
-
-        .feature-icon {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            color: var(--primary-blue);
         }
 
         .btn-primary {
             background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
-            border: 2px solid var(--primary-blue);
+            border: none;
             color: var(--white);
-            padding: 12px 30px;
+            padding: 14px 32px;
             border-radius: 25px;
             font-weight: 600;
-            transition: all var(--transition);
+            font-size: 1.1rem;
+            transition: var(--transition);
+            text-decoration: none;
+            display: inline-block;
         }
 
         .btn-primary:hover {
-            background: linear-gradient(135deg, var(--secondary-blue), var(--primary-blue));
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(25, 118, 210, 0.3);
+            box-shadow: 0 8px 20px rgba(25, 118, 210, 0.3);
             color: var(--white);
         }
 
@@ -133,173 +118,205 @@
             padding: 12px 30px;
             border-radius: 25px;
             font-weight: 600;
-            transition: all var(--transition);
+            font-size: 1.1rem;
+            transition: var(--transition);
+            text-decoration: none;
+            display: inline-block;
         }
 
         .btn-outline-primary:hover {
             background: var(--primary-blue);
             color: var(--white);
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(25, 118, 210, 0.3);
+            box-shadow: 0 8px 20px rgba(25, 118, 210, 0.3);
         }
 
+        /* Feature Cards */
+        .features-section {
+            padding: 60px 0;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .section-title h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--black);
+            margin-bottom: 1rem;
+        }
+
+        .section-title p {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+        }
+
+        .feature-card {
+            background: var(--white);
+            border: 2px solid var(--primary-blue);
+            border-radius: var(--radius);
+            padding: 2rem;
+            height: 100%;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(25, 118, 210, 0.2);
+            border-color: var(--secondary-blue);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            color: var(--primary-blue);
+            margin-bottom: 1rem;
+        }
+
+        .feature-card h4 {
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--black);
+        }
+
+        .feature-card p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 0;
+        }
+
+        /* Stats Section */
         .stats-section {
             background: var(--light-blue);
             border: 2px solid var(--primary-blue);
             border-radius: 20px;
             padding: 3rem;
-            margin: 3rem 0;
+            margin: 4rem 0;
             box-shadow: var(--shadow);
         }
 
         .stat-item {
             text-align: center;
-            color: var(--black);
         }
 
         .stat-number {
-            font-size: 2.5rem;
+            font-size: 3rem;
             font-weight: 700;
             color: var(--primary-blue);
-        }
-
-        .comparison-table {
-            background: var(--white);
-            border: 2px solid var(--primary-blue);
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: var(--shadow);
-        }
-
-        /* Expandable Card Styles */
-        .expandable-card {
-            cursor: pointer;
-            position: relative;
-            transition: all var(--transition);
-        }
-
-        .expandable-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 20px 40px rgba(25, 118, 210, 0.2);
-        }
-
-        .expand-indicator {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            color: var(--primary-blue);
-            font-size: 1.2rem;
-            transition: transform var(--transition);
-        }
-
-        .expandable-card[aria-expanded="true"] .expand-indicator {
-            transform: rotate(180deg);
-        }
-
-        .card-details {
-            margin-top: 1rem;
-            padding-top: 1rem;
-            border-top: 1px solid rgba(25, 118, 210, 0.2);
-        }
-
-        .card-details h6 {
-            color: var(--primary-blue);
-            font-weight: 600;
-            margin-bottom: 0.75rem;
-        }
-
-        .card-details ul {
-            margin-bottom: 0;
-            padding-left: 1.2rem;
-        }
-
-        .card-details li {
             margin-bottom: 0.5rem;
-            color: #4a5568;
-            line-height: 1.5;
         }
 
-        .card-details strong {
-            color: var(--black);
+        .stat-label {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            font-weight: 500;
         }
 
-        /* Legal Section Styles */
-        .legal-section {
-            margin: 4rem 0;
-        }
-
-        .legal-card {
-            background: var(--white);
-            border: 2px solid var(--primary-blue);
-            border-radius: 15px;
-            padding: 2rem;
+        /* CTA Section */
+        .cta-section {
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            color: var(--white);
+            padding: 60px 0;
+            margin-top: 60px;
             text-align: center;
-            height: 100%;
-            transition: all var(--transition);
-            box-shadow: var(--shadow);
         }
 
-        .legal-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 30px rgba(25, 118, 210, 0.2);
-        }
-
-        .legal-icon {
+        .cta-section h2 {
             font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .cta-section p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            opacity: 0.95;
+        }
+
+        .btn-light {
+            background: var(--white);
             color: var(--primary-blue);
-            margin-bottom: 1rem;
-        }
-
-        .legal-card h5 {
-            color: var(--black);
+            padding: 14px 32px;
+            border-radius: 25px;
             font-weight: 600;
-            margin-bottom: 1rem;
-        }
-
-        .legal-card p {
-            color: #4a5568;
-            line-height: 1.6;
-            margin-bottom: 0;
-        }
-
-        .comparison-table th {
-            background: var(--light-blue);
-            color: var(--black);
+            font-size: 1.1rem;
             border: none;
-            font-weight: 600;
+            transition: var(--transition);
+            text-decoration: none;
+            display: inline-block;
         }
 
-        .comparison-table td {
-            color: var(--black);
-            border-color: var(--primary-blue);
+        .btn-light:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            color: var(--primary-blue);
         }
 
+        /* Footer */
         .footer {
             background: var(--light-blue);
             color: var(--black);
-            padding: 2rem 0;
-            margin-top: 4rem;
+            padding: 3rem 0 2rem;
             border-top: 3px solid var(--primary-blue);
-=======
         }
-        .login-demo {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            padding: 2rem;
-            backdrop-filter: blur(10px);
->>>>>>> b5053293d01ba10c025b4a2821ec94760e3b0555
+
+        .footer h5 {
+            color: var(--primary-blue);
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .footer p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .footer a {
+            color: var(--primary-blue);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .footer a:hover {
+            color: var(--secondary-blue);
+        }
+
+        .footer-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1.2rem;
+            }
+
+            .stat-number {
+                font-size: 2rem;
+            }
+
+            .section-title h2 {
+                font-size: 2rem;
+            }
         }
     </style>
 </head>
 <body>
-<<<<<<< HEAD
-=======
     <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+    <nav class="navbar navbar-expand-lg navbar-light">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center" href="#">
-                <i class="bi bi-heart-pulse-fill text-primary me-2" style="font-size: 1.5rem;"></i>
-                <span class="fw-bold">HomeCare Management</span>
+                <i class="bi bi-house-heart-fill me-2"></i>
+                CareMarshall
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -310,144 +327,39 @@
                         <a class="nav-link" href="#features">Features</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#demo">Demo</a>
+                        <a class="nav-link" href="#stats">Statistics</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="homecare-management.html">Launch App</a>
+                        <a class="nav-link" href="beemarshall-full.html" style="color: var(--primary-blue) !important; font-weight: 600;">Launch App</a>
                     </li>
                 </ul>
             </div>
         </div>
     </nav>
 
->>>>>>> b5053293d01ba10c025b4a2821ec94760e3b0555
     <!-- Hero Section -->
-    <div class="hero-section">
+    <section class="hero-section">
         <div class="container">
-<<<<<<< HEAD
             <div class="row justify-content-center">
-                <div class="col-lg-8">
+                <div class="col-lg-10 text-center">
                     <h1 class="hero-title">
                         <i class="bi bi-house-heart-fill"></i> CareMarshall v0.7
                     </h1>
                     <p class="hero-subtitle">
-                        Professional Care Management System
+                        Professional Care Management System for New Zealand
                     </p>
-                    <p class="lead mb-4">
-                        Production-ready digital solution for professional care management. Multi-tenant architecture, 
-                        team management, real-time sync, and comprehensive analytics for professional care providers.
+                    <p class="hero-description">
+                        Production-ready digital solution for professional home care providers. Multi-tenant architecture, 
+                        team coordination, real-time synchronization, NZ compliance tracking, and comprehensive analytics 
+                        designed specifically for New Zealand care services.
                     </p>
                     <div class="d-flex gap-3 justify-content-center flex-wrap">
-                        <a href="caremarshall-full.html" class="btn btn-primary btn-lg">
-                            <i class="bi bi-rocket-takeoff"></i> Launch Application
+                        <a href="beemarshall-full.html" class="btn btn-primary">
+                            <i class="bi bi-rocket-takeoff me-2"></i>Launch Application
                         </a>
-                        <a href="reports.html" class="btn btn-outline-primary btn-lg">
-                            <i class="bi bi-graph-up"></i> View Reports
+                        <a href="reports.html" class="btn btn-outline-primary">
+                            <i class="bi bi-graph-up me-2"></i>View Reports
                         </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Features Section -->
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-4">
-                <div class="feature-card expandable-card" data-bs-toggle="collapse" data-bs-target="#siteManagementDetails" aria-expanded="false">
-                    <div class="feature-icon">
-                        <i class="bi bi-geo-alt-fill"></i>
-                    </div>
-                    <h4>Site Management</h4>
-                    <p>Track multiple client locations with GPS coordinates, client status classifications, and detailed client information. Interactive maps and location grouping for efficient care coordination.</p>
-                    <div class="expand-indicator">
-                        <i class="bi bi-chevron-down"></i>
-                    </div>
-                    <div class="collapse" id="siteManagementDetails">
-                        <div class="card-details">
-                            <h6>Comprehensive Site Management System</h6>
-                            <p>HomeCare's client management provides complete control over your care operations with professional-grade tools designed for care providers.</p>
-                            
-                            <h6>🌍 Location & Mapping</h6>
-                            <ul>
-                                <li><strong>GPS Precision:</strong> Accurate location tracking with Google Maps integration for precise site positioning</li>
-                                <li><strong>Interactive Maps:</strong> Visual site overview with clickable markers and site details</li>
-                                <li><strong>Distance Calculations:</strong> Automatic distance calculations between sites for efficient route planning</li>
-                                <li><strong>Site Grouping:</strong> Organize sites by region, landowner, or management type</li>
-                            </ul>
-                            
-                            <h6>📊 Site Classifications & Organization</h6>
-                            <ul>
-                                <li><strong>Client Status Classification:</strong> Independent, Assisted, Dependent, Rehabilitation, Hospice, and Custom categories</li>
-                                <li><strong>Location Types:</strong> Home-based, Facility-based, and various care settings</li>
-                                <li><strong>Smart Filtering:</strong> Filter sites by classification, status, or custom criteria</li>
-                                <li><strong>Alphabetical Sorting:</strong> Automatic alphabetical organization for easy navigation</li>
-                            </ul>
-                            
-                            <h6>🏠 Client Status & Management</h6>
-                            <ul>
-                                <li><strong>Visual Client Dashboard:</strong> Interactive dashboard showing client status and care information</li>
-                                <li><strong>Status Monitoring:</strong> Track Independent, Assisted, Dependent, Rehabilitation, and Hospice clients with real-time updates</li>
-                                <li><strong>Care Equipment Management:</strong> Monitor care equipment and resources</li>
-                                <li><strong>Quick Updates:</strong> One-click client status updates from summary cards</li>
-                                <li><strong>Client History:</strong> Complete audit trail of all client care changes and modifications</li>
-                            </ul>
-                            
-                            <h6>👥 Landowner & Access Management</h6>
-                            <ul>
-                                <li><strong>Contact Database:</strong> Store landowner contact information and access permissions</li>
-                                <li><strong>Access Tracking:</strong> Monitor site access permissions and restrictions</li>
-                                <li><strong>Relationship Management:</strong> Track multiple sites per landowner with consolidated views</li>
-                            </ul>
-                            
-                            <h6>📈 Data Management & Archiving</h6>
-                            <ul>
-                                <li><strong>Archive System:</strong> Hide inactive sites while preserving all historical data</li>
-                                <li><strong>Data Export:</strong> Export site data to CSV for external analysis</li>
-                                <li><strong>Backup & Recovery:</strong> Automatic data backup with easy recovery options</li>
-                                <li><strong>Version Control:</strong> Track all changes with timestamps and user attribution</li>
-                            </ul>
-=======
-            <div class="row align-items-center">
-                <div class="col-lg-6">
-                    <h1 class="display-4 fw-bold mb-4">HomeCare Management System</h1>
-                    <p class="lead mb-4">Professional Care Coordination Platform for elderly, disabled, and special needs care. Built with modern web technologies and Firebase for real-time data synchronization.</p>
-                    <div class="d-flex gap-3">
-                        <a href="homecare-management.html" class="btn btn-light btn-lg">
-                            <i class="bi bi-play-circle me-2"></i>Launch Application
-                        </a>
-                        <a href="#features" class="btn btn-outline-light btn-lg">
-                            <i class="bi bi-info-circle me-2"></i>Learn More
-                        </a>
-                    </div>
-                </div>
-                <div class="col-lg-6">
-                    <div class="login-demo">
-                        <h4 class="mb-3">System Access</h4>
-                        <div class="row">
-                            <div class="col-6">
-                                <div class="card bg-primary text-white mb-3">
-                                    <div class="card-body text-center">
-                                        <h6>Admin Access</h6>
-                                        <small>Full system control<br>& management</small>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="card bg-success text-white mb-3">
-                                    <div class="card-body text-center">
-                                        <h6>Developer Access</h6>
-                                        <small>Technical features<br>& configuration</small>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <a href="homecare-management.html" class="btn btn-warning w-100">
-                            <i class="bi bi-box-arrow-in-right me-2"></i>Access System
-                        </a>
-                        <small class="text-muted d-block mt-2 text-center">
-                            <i class="bi bi-shield-lock me-1"></i>Secure login required
-                        </small>
                     </div>
                 </div>
             </div>
@@ -455,498 +367,200 @@
     </section>
 
     <!-- Features Section -->
-    <section id="features" class="py-5">
+    <section class="features-section" id="features">
         <div class="container">
-            <div class="row">
-                <div class="col-12 text-center mb-5">
-                    <h2 class="display-5 fw-bold">Comprehensive Care Management</h2>
-                    <p class="lead text-muted">Everything you need to coordinate professional home care services</p>
+            <div class="section-title">
+                <h2>Comprehensive Care Management</h2>
+                <p>Everything you need to coordinate professional home care services</p>
+            </div>
+            
+            <div class="row g-4 mb-4">
+                <div class="col-lg-4 col-md-6">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="bi bi-geo-alt-fill"></i>
+                        </div>
+                        <h4>Client Location Management</h4>
+                        <p>Track multiple client sites with GPS coordinates, interactive OpenStreetMap integration centered on Takaka, NZ. Visual site overview with detailed client information and special needs flags.</p>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4 col-md-6">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="bi bi-clipboard-check"></i>
+                        </div>
+                        <h4>Care Action Tracking</h4>
+                        <p>Comprehensive care action logging with automated deletion hiding, task completion tracking, site visit recording, and complete audit trails for all care activities.</p>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4 col-md-6">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="bi bi-shield-check"></i>
+                        </div>
+                        <h4>NZ Compliance Tracking</h4>
+                        <p>Built-in compliance management for New Zealand care providers including HDS registration, insurance tracking, privacy audits, and statutory record retention requirements.</p>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4 col-md-6">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="bi bi-people-fill"></i>
+                        </div>
+                        <h4>Team Coordination</h4>
+                        <p>Multi-user support with role-based permissions. Admin and employee access levels, secure authentication, and collaborative workflow management with activity tracking.</p>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4 col-md-6">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="bi bi-calendar-check"></i>
+                        </div>
+                        <h4>Task Scheduling</h4>
+                        <p>Advanced task scheduling with calendar views, priority management, automated reminders, and team assignment. Track task completion and monitor care delivery in real-time.</p>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4 col-md-6">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="bi bi-cloud-check"></i>
+                        </div>
+                        <h4>Real-time Sync</h4>
+                        <p>Firebase-powered real-time data synchronization across all devices. Offline support with automatic sync when connection is restored. Multi-device collaboration with instant updates.</p>
+                    </div>
                 </div>
             </div>
+            
             <div class="row g-4">
-                <div class="col-md-4">
-                    <div class="card feature-card h-100">
-                        <div class="card-body text-center">
-                            <i class="bi bi-people-fill text-primary mb-3" style="font-size: 3rem;"></i>
-                            <h5 class="card-title">Client Management</h5>
-                            <p class="card-text">Comprehensive client profiles with medical information, care preferences, and emergency contacts.</p>
+                <div class="col-lg-4 col-md-6">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="bi bi-hospital"></i>
                         </div>
+                        <h4>Special Needs Flags</h4>
+                        <p>Track client-specific requirements including wheelchair accessibility, medical equipment on-site, dietary restrictions, mobility assistance, and 12 other special care flags for comprehensive client profiling.</p>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="card feature-card h-100">
-                        <div class="card-body text-center">
-                            <i class="bi bi-clipboard-check-fill text-success mb-3" style="font-size: 3rem;"></i>
-                            <h5 class="card-title">Care Action Logging</h5>
-                            <p class="card-text">50+ predefined care tasks across 6 categories with real-time logging and documentation.</p>
+                
+                <div class="col-lg-4 col-md-6">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="bi bi-graph-up-arrow"></i>
                         </div>
+                        <h4>Analytics & Reports</h4>
+                        <p>Comprehensive reporting with data visualization, care metrics analysis, compliance status tracking, and exportable reports for regulatory requirements and operational insights.</p>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="card feature-card h-100">
-                        <div class="card-body text-center">
-                            <i class="bi bi-calendar-check-fill text-warning mb-3" style="font-size: 3rem;"></i>
-                            <h5 class="card-title">Task Scheduling</h5>
-                            <p class="card-text">Advanced scheduling with automated reminders, priority management, and team coordination.</p>
+                
+                <div class="col-lg-4 col-md-6">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="bi bi-phone"></i>
                         </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card feature-card h-100">
-                        <div class="card-body text-center">
-                            <i class="bi bi-graph-up text-info mb-3" style="font-size: 3rem;"></i>
-                            <h5 class="card-title">Analytics & Reporting</h5>
-                            <p class="card-text">Comprehensive reporting with charts, analytics, and data visualization for care insights.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card feature-card h-100">
-                        <div class="card-body text-center">
-                            <i class="bi bi-shield-check text-danger mb-3" style="font-size: 3rem;"></i>
-                            <h5 class="card-title">Security & Compliance</h5>
-                            <p class="card-text">Enterprise-level security with multi-tenant architecture and role-based access control.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card feature-card h-100">
-                        <div class="card-body text-center">
-                            <i class="bi bi-phone text-primary mb-3" style="font-size: 3rem;"></i>
-                            <h5 class="card-title">Mobile Responsive</h5>
-                            <p class="card-text">Fully responsive design that works perfectly on desktop, tablet, and mobile devices.</p>
->>>>>>> b5053293d01ba10c025b4a2821ec94760e3b0555
-                        </div>
+                        <h4>Mobile Responsive</h4>
+                        <p>Fully responsive design optimized for desktop, tablet, and mobile devices. Access client information, update care notes, and complete tasks from any device, anywhere.</p>
                     </div>
                 </div>
             </div>
-<<<<<<< HEAD
-            <div class="col-lg-4">
-                <div class="feature-card expandable-card" data-bs-toggle="collapse" data-bs-target="#analyticsDetails" aria-expanded="false">
-                    <div class="feature-icon">
-                        <i class="bi bi-graph-up-arrow"></i>
-                    </div>
-                    <h4>Performance Analytics</h4>
-                    <p>Advanced reporting and analytics with real-time data visualization. Track client status, care quality, health metrics, and operational efficiency.</p>
-                    <div class="expand-indicator">
-                        <i class="bi bi-chevron-down"></i>
-                    </div>
-                    <div class="collapse" id="analyticsDetails">
-                        <div class="card-details">
-                            <h6>Advanced Performance Analytics Dashboard</h6>
-                            <p>Transform your care data into actionable insights with comprehensive analytics and real-time reporting capabilities designed for professional care providers.</p>
-                            
-                            <h6>📊 Interactive Client Status Analysis</h6>
-                            <ul>
-                                <li><strong>Real-time Client Status Tracking:</strong> Live monitoring of Independent, Assisted, Dependent, Rehabilitation, and Hospice clients across all locations</li>
-                                <li><strong>Care Equipment Analysis:</strong> Visual breakdown of care equipment and resources</li>
-                                <li><strong>Performance Rate Calculations:</strong> Automatic calculation of care quality metrics and outcomes</li>
-                                <li><strong>Clickable Analytics Cards:</strong> Interactive cards that filter locations by specific client status categories</li>
-                                <li><strong>Historical Trends:</strong> Track client care progress and outcomes over time with visual indicators</li>
-                            </ul>
-                            
-                            <h6>📈 Comprehensive Reporting Suite</h6>
-                            <ul>
-                                <li><strong>Client Care Performance Report:</strong> Detailed analysis of client status distribution and care quality metrics</li>
-                                <li><strong>Health & Mortality Monitor:</strong> Disease outbreak tracking, mortality rate analysis, and treatment effectiveness</li>
-                                <li><strong>Operations Analysis:</strong> Task completion rates, efficiency metrics, and resource utilization</li>
-                                <li><strong>Harvest History Tracking:</strong> Year-over-year harvest analysis with honey type breakdowns</li>
-                                <li><strong>Honey Potentials Report:</strong> Site-specific honey production potential based on hive strength and location</li>
-                            </ul>
-                            
-                            <h6>🎯 Data Visualization & Charts</h6>
-                            <ul>
-                                <li><strong>Interactive Pie Charts:</strong> Hive strength distribution with clickable segments</li>
-                                <li><strong>Dynamic Bar Charts:</strong> Stack configuration analysis with responsive design</li>
-                                <li><strong>Performance Metrics:</strong> Real-time calculation of success rates and efficiency indicators</li>
-                                <li><strong>Mobile-Optimized Charts:</strong> Responsive design that works perfectly on all devices</li>
-                                <li><strong>Chart.js Integration:</strong> Professional-grade charting with smooth animations and interactions</li>
-                            </ul>
-                            
-                            <h6>📋 Data Integrity & Quality</h6>
-                            <ul>
-                                <li><strong>Automated Integrity Checks:</strong> Detect data inconsistencies and missing information</li>
-                                <li><strong>Data Validation:</strong> Ensure hive counts match strength totals and stack configurations</li>
-                                <li><strong>Quality Indicators:</strong> Visual alerts for data quality issues with suggested fixes</li>
-                                <li><strong>Cross-Reference Validation:</strong> Verify data consistency across related fields and sites</li>
-                            </ul>
-                            
-                            <h6>💾 Export & Integration</h6>
-                            <ul>
-                                <li><strong>CSV Export:</strong> Export all data for external analysis in Excel or other tools</li>
-                                <li><strong>Real-time Sync:</strong> Live data updates across all devices and team members</li>
-                                <li><strong>Historical Data:</strong> Complete audit trail of all changes and modifications</li>
-                                <li><strong>Multi-tenant Support:</strong> Secure data isolation for different organizations</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-4">
-                <div class="feature-card expandable-card" data-bs-toggle="collapse" data-bs-target="#schedulingDetails" aria-expanded="false">
-                    <div class="feature-icon">
-                        <i class="bi bi-calendar-check"></i>
-                    </div>
-                    <h4>Task Scheduling</h4>
-                    <p>Comprehensive task management with scheduling, reminders, and progress tracking. Seasonal requirements and automated task suggestions.</p>
-                    <div class="expand-indicator">
-                        <i class="bi bi-chevron-down"></i>
-                    </div>
-                    <div class="collapse" id="schedulingDetails">
-                        <div class="card-details">
-                            <h6>Scheduling Capabilities:</h6>
-                            <ul>
-                                <li><strong>Task Categories:</strong> Inspection, Feeding, Treatment, Harvest, Maintenance, and more</li>
-                                <li><strong>Priority Levels:</strong> Normal, High, and Urgent task prioritization</li>
-                                <li><strong>Due Date Tracking:</strong> Visual calendar with overdue indicators</li>
-                                <li><strong>Bulk Operations:</strong> Schedule multiple tasks across sites efficiently</li>
-                                <li><strong>Task Templates:</strong> Pre-configured task sets for common operations</li>
-                                <li><strong>Progress Tracking:</strong> Mark tasks complete with timestamps and notes</li>
-                            </ul>
-=======
         </div>
     </section>
-
-    <!-- Demo Section -->
-    <section id="demo" class="py-5 bg-light">
-        <div class="container">
-            <div class="row">
-                <div class="col-12 text-center mb-5">
-                    <h2 class="display-5 fw-bold">Ready to Get Started?</h2>
-                    <p class="lead text-muted">Experience the full HomeCare Management System with our live demo</p>
-                </div>
-            </div>
-            <div class="row justify-content-center">
-                <div class="col-lg-8">
-                    <div class="card shadow-lg">
-                        <div class="card-body text-center p-5">
-                            <i class="bi bi-heart-pulse-fill text-primary mb-4" style="font-size: 4rem;"></i>
-                            <h3 class="mb-4">Launch HomeCare Management System</h3>
-                            <p class="lead mb-4">Access the full application with pre-configured demo accounts</p>
-                            <div class="row mb-4">
-                                <div class="col-md-6">
-                                    <div class="alert alert-primary">
-                                        <strong>Administrator Access</strong><br>
-                                        Full system management<br>
-                                        <small class="text-muted">Contact admin for credentials</small>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="alert alert-success">
-                                        <strong>Developer Access</strong><br>
-                                        Technical configuration<br>
-                                        <small class="text-muted">Contact IT for credentials</small>
-                                    </div>
-                                </div>
-                            </div>
-                            <a href="homecare-management.html" class="btn btn-primary btn-lg">
-                                <i class="bi bi-rocket-takeoff me-2"></i>Launch Application
-                            </a>
->>>>>>> b5053293d01ba10c025b4a2821ec94760e3b0555
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-lg-4">
-                <div class="feature-card expandable-card" data-bs-toggle="collapse" data-bs-target="#teamDetails" aria-expanded="false">
-                    <div class="feature-icon">
-                        <i class="bi bi-people-fill"></i>
-                    </div>
-                    <h4>Team Management</h4>
-                    <p>Multi-user support with role-based permissions. Employee management, task assignment, and collaborative workflow management.</p>
-                    <div class="expand-indicator">
-                        <i class="bi bi-chevron-down"></i>
-                    </div>
-                    <div class="collapse" id="teamDetails">
-                        <div class="card-details">
-                            <h6>Team Features:</h6>
-                            <ul>
-                                <li><strong>Role-Based Access:</strong> Admin and Employee roles with appropriate permissions</li>
-                                <li><strong>Employee Activation:</strong> Secure activation system with temporary passwords</li>
-                                <li><strong>Tenant Isolation:</strong> Multi-tenant architecture for data security</li>
-                                <li><strong>Permission Control:</strong> Employees can view/update but not delete critical data</li>
-                                <li><strong>Activity Tracking:</strong> Monitor who made changes and when</li>
-                                <li><strong>Secure Login:</strong> No hardcoded passwords - all credentials stored securely</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-4">
-                <div class="feature-card expandable-card" data-bs-toggle="collapse" data-bs-target="#syncDetails" aria-expanded="false">
-                    <div class="feature-icon">
-                        <i class="bi bi-cloud-arrow-up"></i>
-                    </div>
-                    <h4>Real-time Sync</h4>
-                    <p>Firebase-powered real-time data synchronization across all devices. Offline support with automatic sync when connection is restored.</p>
-                    <div class="expand-indicator">
-                        <i class="bi bi-chevron-down"></i>
-                    </div>
-                    <div class="collapse" id="syncDetails">
-                        <div class="card-details">
-                            <h6>Sync Features:</h6>
-                            <ul>
-                                <li><strong>Persistent Sync Status:</strong> Real-time overlay showing sync status and pending changes</li>
-                                <li><strong>Offline Support:</strong> Continue working without internet - changes queue locally</li>
-                                <li><strong>Automatic Reconnection:</strong> Queued changes sync when connection restored</li>
-                                <li><strong>Data Integrity:</strong> Conflict resolution and data validation</li>
-                                <li><strong>Multi-Device Sync:</strong> Changes appear instantly across all devices</li>
-                                <li><strong>Change Tracking:</strong> Detailed logging of all data modifications</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-4">
-                <div class="feature-card expandable-card" data-bs-toggle="collapse" data-bs-target="#securityDetails" aria-expanded="false">
-                    <div class="feature-icon">
-                        <i class="bi bi-shield-check"></i>
-                    </div>
-                    <h4>Data Security</h4>
-                    <p>Enterprise-grade security with encrypted data transmission and storage. Multi-tenant architecture for data isolation and privacy protection.</p>
-                    <div class="expand-indicator">
-                        <i class="bi bi-chevron-down"></i>
-                    </div>
-                    <div class="collapse" id="securityDetails">
-                        <div class="card-details">
-                            <h6>Security Features:</h6>
-                            <ul>
-                                <li><strong>No Hardcoded Passwords:</strong> All credentials stored securely in GitHub Secrets</li>
-                                <li><strong>Firebase Security:</strong> Encrypted data transmission and storage</li>
-                                <li><strong>Multi-Tenant Architecture:</strong> Complete data isolation between organizations</li>
-                                <li><strong>Role-Based Permissions:</strong> Granular access control for different user types</li>
-                                <li><strong>Secure Authentication:</strong> Temporary passwords with device remembering</li>
-                                <li><strong>Open Source:</strong> Transparent, auditable codebase for security review</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <!-- Stats Section -->
-    <div class="container">
-        <div class="stats-section">
-            <div class="row text-center">
-                <div class="col-md-3">
-                    <div class="stat-item">
-                        <div class="stat-number">50+</div>
-                        <div>Active Sites</div>
+    <section id="stats">
+        <div class="container">
+            <div class="stats-section">
+                <div class="row">
+                    <div class="col-md-3 col-6 mb-4 mb-md-0">
+                        <div class="stat-item">
+                            <div class="stat-number"><i class="bi bi-geo-alt-fill"></i></div>
+                            <div class="stat-label">Client Site Management</div>
+                        </div>
                     </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="stat-item">
-                        <div class="stat-number">1000+</div>
-                        <div>Hives Tracked</div>
+                    <div class="col-md-3 col-6 mb-4 mb-md-0">
+                        <div class="stat-item">
+                            <div class="stat-number"><i class="bi bi-people-fill"></i></div>
+                            <div class="stat-label">Team Coordination</div>
+                        </div>
                     </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="stat-item">
-                        <div class="stat-number">24/7</div>
-                        <div>Data Sync</div>
+                    <div class="col-md-3 col-6">
+                        <div class="stat-item">
+                            <div class="stat-number"><i class="bi bi-clock-fill"></i></div>
+                            <div class="stat-label">24/7 Data Sync</div>
+                        </div>
                     </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="stat-item">
-                        <div class="stat-number">100%</div>
-                        <div>Secure</div>
+                    <div class="col-md-3 col-6">
+                        <div class="stat-item">
+                            <div class="stat-number"><i class="bi bi-shield-check"></i></div>
+                            <div class="stat-label">NZ Compliance</div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+    </section>
 
-    <!-- Legal & Privacy Information -->
-    <div class="container">
-        <div class="row">
-            <div class="col-12">
-                <div class="legal-section">
-                    <h2 class="text-center mb-4" style="color: var(--primary-blue);">Legal & Privacy Information</h2>
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="legal-card">
-                                <div class="legal-icon">
-                                    <i class="bi bi-shield-check"></i>
-                                </div>
-                                <h5>Terms of Use</h5>
-                                <p>By using HomeCare, you agree to our terms of service. This system is designed for professional care management and data security.</p>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="legal-card">
-                                <div class="legal-icon">
-                                    <i class="bi bi-lock"></i>
-                                </div>
-                                <h5>Data Privacy</h5>
-                                <p>Your data is stored securely in Firebase cloud infrastructure. While encrypted in transit and at rest, data is not entirely hidden from advanced analysis.</p>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="legal-card">
-                                <div class="legal-icon">
-                                    <i class="bi bi-code-slash"></i>
-                                </div>
-                                <h5>Open Source</h5>
-                                <p>HomeCare is built on open-source technologies. Source code and data structures are transparent and auditable.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Application Access -->
-    <div class="container">
-        <div class="row">
-            <div class="col-12">
-                <h2 class="text-center mb-4" style="color: var(--primary-blue);">Access CareMarshall</h2>
-                <p class="text-center mb-5" style="color: #4a5568;">One comprehensive application with all features integrated</p>
-            </div>
-        </div>
-        <div class="row justify-content-center">
-            <div class="col-lg-8">
-                <div class="feature-card text-center">
-                    <div class="feature-icon mb-4">
-                        <i class="bi bi-house-heart-fill"></i>
-                    </div>
-                    <h3 class="mb-3">Complete Apiary Management System</h3>
-                    <p class="mb-4">Everything you need for professional beekeeping management in one integrated application.</p>
-                    
-                    <div class="row mb-4">
-                        <div class="col-md-6">
-                            <h6 class="mb-3" style="color: var(--primary-blue); font-weight: 600;">Core Features</h6>
-                            <ul class="list-unstyled text-start">
-                                <li><i class="bi bi-check-circle text-success me-2"></i> Site management with GPS</li>
-                                <li><i class="bi bi-check-circle text-success me-2"></i> Task scheduling and tracking</li>
-                                <li><i class="bi bi-check-circle text-success me-2"></i> Team management</li>
-                                <li><i class="bi bi-check-circle text-success me-2"></i> Real-time data sync</li>
-                                <li><i class="bi bi-check-circle text-success me-2"></i> Weather integration</li>
-                            </ul>
-                        </div>
-                        <div class="col-md-6">
-                            <h6 class="mb-3" style="color: var(--primary-blue); font-weight: 600;">Analytics & Reporting</h6>
-                            <ul class="list-unstyled text-start">
-                                <li><i class="bi bi-check-circle text-success me-2"></i> Performance analytics</li>
-                                <li><i class="bi bi-check-circle text-success me-2"></i> Health monitoring</li>
-                                <li><i class="bi bi-check-circle text-success me-2"></i> Operations analysis</li>
-                                <li><i class="bi bi-check-circle text-success me-2"></i> Data visualization</li>
-                                <li><i class="bi bi-check-circle text-success me-2"></i> Export capabilities</li>
-                            </ul>
-                        </div>
-                    </div>
-                    
-                    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-                        <a href="caremarshall-full.html" class="btn btn-primary btn-lg me-md-2">
-                            <i class="bi bi-play-circle"></i> Launch Application
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8 text-center">
+                    <h2>Ready to Transform Your Care Operations?</h2>
+                    <p>Access the complete CareMarshall system with all integrated features designed for New Zealand care providers</p>
+                    <div class="d-flex gap-3 justify-content-center flex-wrap">
+                        <a href="beemarshall-full.html" class="btn btn-light">
+                            <i class="bi bi-box-arrow-in-right me-2"></i>Access System
                         </a>
-                        <a href="reports.html" class="btn btn-outline-primary btn-lg" target="_blank">
-                            <i class="bi bi-graph-up"></i> Open Reports
+                        <a href="reports.html" class="btn btn-outline-light" style="border: 2px solid white;">
+                            <i class="bi bi-file-earmark-bar-graph me-2"></i>View Reports
                         </a>
                     </div>
-                    
-                    <div class="mt-4">
-                        <small style="color: #4a5568;">
-                            <i class="bi bi-info-circle me-1"></i>
-                            Reports open in a new tab for easy reference while using the main application
-                        </small>
-                    </div>
+                    <p class="mt-4 mb-0" style="opacity: 0.9;">
+                        <i class="bi bi-shield-lock me-2"></i>Secure login required • Multi-tenant architecture • Enterprise-grade security
+                    </p>
                 </div>
             </div>
         </div>
-    </div>
-
-    <!-- Quick Start Guide -->
-    <div class="container">
-        <div class="row">
-            <div class="col-12">
-                <div class="feature-card">
-                    <h3 class="text-center mb-4"><i class="bi bi-lightning"></i> Quick Start Guide</h3>
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="text-center">
-                                <div class="feature-icon">
-                                    <i class="bi bi-person-plus"></i>
-                                </div>
-                                <h5>1. Login</h5>
-                                <p>Use your assigned credentials to access the system. Contact administrator for login details.</p>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="text-center">
-                                <div class="feature-icon">
-                                    <i class="bi bi-geo-alt"></i>
-                                </div>
-                                <h5>2. Add Sites</h5>
-                                <p>Create your first apiary site with GPS coordinates and site classifications.</p>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="text-center">
-                                <div class="feature-icon">
-                                    <i class="bi bi-graph-up"></i>
-                                </div>
-                                <h5>3. Track Progress</h5>
-                                <p>Monitor performance, schedule tasks, and analyze data with comprehensive reporting.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    </section>
 
     <!-- Footer -->
-<<<<<<< HEAD
-    <div class="footer">
+    <footer class="footer">
         <div class="container">
             <div class="row">
-                <div class="col-md-6">
-                    <h5><i class="bi bi-house-heart-fill"></i> CareMarshall</h5>
-                    <p>Professional Care Management System</p>
-                    <p>Made with <i class="bi bi-heart-fill text-danger"></i> for care providers</p>
+                <div class="col-lg-6 mb-4 mb-lg-0">
+                    <h5><i class="bi bi-house-heart-fill me-2"></i>CareMarshall v0.7</h5>
+                    <p>Professional Care Management System designed specifically for New Zealand home care providers. Comprehensive client management, compliance tracking, and team coordination in one integrated platform.</p>
+                    <p class="mb-0">
+                        <i class="bi bi-heart-fill text-danger"></i> Built with care for care providers
+                    </p>
                 </div>
-                <div class="col-md-6 text-md-end">
-                    <h6>Quick Links</h6>
-                    <div class="d-flex flex-column flex-md-row justify-content-md-end gap-2">
-                        <a href="caremarshall-full.html" class="text-decoration-none" style="color: var(--primary-blue); font-weight: 500;">Full Application</a>
-                        <a href="reports.html" class="text-decoration-none" style="color: var(--primary-blue); font-weight: 500;">Reports</a>
-                        <a href="USER_GUIDE.md" class="text-decoration-none" style="color: var(--primary-blue); font-weight: 500;">User Guide</a>
-                        <a href="LOGIN_TROUBLESHOOTING.md" class="text-decoration-none" style="color: var(--primary-blue); font-weight: 500;">Support</a>
+                <div class="col-lg-6">
+                    <h5>Quick Links</h5>
+                    <div class="footer-links">
+                        <a href="beemarshall-full.html"><i class="bi bi-rocket-takeoff me-1"></i>Launch Application</a>
+                        <a href="reports.html"><i class="bi bi-graph-up me-1"></i>Reports</a>
+                        <a href="USER_GUIDE.md"><i class="bi bi-book me-1"></i>User Guide</a>
+                        <a href="LOGIN_TROUBLESHOOTING.md"><i class="bi bi-question-circle me-1"></i>Support</a>
+                    </div>
+                    <div class="mt-3">
+                        <p class="mb-0"><small><i class="bi bi-info-circle me-1"></i>Open source • Transparent • Auditable</small></p>
+                        <p class="mb-0"><small><i class="bi bi-lock me-1"></i>Data encrypted in transit and at rest</small></p>
                     </div>
                 </div>
             </div>
-            <hr class="my-3" style="border-color: var(--primary-blue);">
+            <hr style="border-color: var(--primary-blue); margin: 2rem 0 1rem;">
             <div class="row">
                 <div class="col-12 text-center">
-                    <p class="mb-0">&copy; 2024 CareMarshall. Professional Care Management System.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-=======
-    <footer class="bg-dark text-white py-4">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-6">
-                    <h5>HomeCare Management System</h5>
-                    <p class="text-muted">Professional Care Coordination Platform</p>
-                </div>
-                <div class="col-md-6 text-md-end">
-                    <p class="text-muted mb-0">&copy; 2024 HomeCare Management System. All rights reserved.</p>
+                    <p class="mb-0">&copy; 2024 CareMarshall v0.7 • Professional Care Management System for New Zealand</p>
                 </div>
             </div>
         </div>
     </footer>
 
-    <!-- Bootstrap JS -->
->>>>>>> b5053293d01ba10c025b4a2821ec94760e3b0555
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
-
