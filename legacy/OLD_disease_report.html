@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+
+{% block title %}Disease Report - BeeMarshall{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow">
+            <div class="card-header bg-warning text-dark">
+                <h4 class="mb-0"><i class="bi bi-exclamation-triangle"></i> Disease Report</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST" novalidate>
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="mb-3">
+                        {{ form.site_id.label(class="form-label") }}
+                        {{ form.site_id(class="form-select" + (" is-invalid" if form.site_id.errors else "")) }}
+                        {% if form.site_id.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.site_id.errors %}{{ error }}{% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="card mb-3">
+                        <div class="card-header bg-light">
+                            <h6 class="mb-0"><i class="bi bi-bug"></i> Disease Counts</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="disease-count-grid">
+                                <div class="disease-count-item">
+                                    {{ form.afb_count.label(class="form-label") }}
+                                    {{ form.afb_count(class="form-control" + (" is-invalid" if form.afb_count.errors else "")) }}
+                                    {% if form.afb_count.errors %}
+                                        <div class="invalid-feedback">
+                                            {% for error in form.afb_count.errors %}{{ error }}{% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="disease-count-item">
+                                    {{ form.varroa_count.label(class="form-label") }}
+                                    {{ form.varroa_count(class="form-control" + (" is-invalid" if form.varroa_count.errors else "")) }}
+                                    {% if form.varroa_count.errors %}
+                                        <div class="invalid-feedback">
+                                            {% for error in form.varroa_count.errors %}{{ error }}{% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="disease-count-item">
+                                    {{ form.chalkbrood_count.label(class="form-label") }}
+                                    {{ form.chalkbrood_count(class="form-control" + (" is-invalid" if form.chalkbrood_count.errors else "")) }}
+                                    {% if form.chalkbrood_count.errors %}
+                                        <div class="invalid-feedback">
+                                            {% for error in form.chalkbrood_count.errors %}{{ error }}{% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="disease-count-item">
+                                    {{ form.sacbrood_count.label(class="form-label") }}
+                                    {{ form.sacbrood_count(class="form-control" + (" is-invalid" if form.sacbrood_count.errors else "")) }}
+                                    {% if form.sacbrood_count.errors %}
+                                        <div class="invalid-feedback">
+                                            {% for error in form.sacbrood_count.errors %}{{ error }}{% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="disease-count-item">
+                                    {{ form.dwv_count.label(class="form-label") }}
+                                    {{ form.dwv_count(class="form-control" + (" is-invalid" if form.dwv_count.errors else "")) }}
+                                    {% if form.dwv_count.errors %}
+                                        <div class="invalid-feedback">
+                                            {% for error in form.dwv_count.errors %}{{ error }}{% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form.notes.label(class="form-label") }}
+                        {{ form.notes(class="form-control" + (" is-invalid" if form.notes.errors else ""), 
+                           rows="4") }}
+                        {% if form.notes.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.notes.errors %}{{ error }}{% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form.report_date.label(class="form-label") }}
+                        {{ form.report_date(class="form-control" + (" is-invalid" if form.report_date.errors else "")) }}
+                        {% if form.report_date.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.report_date.errors %}{{ error }}{% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Cancel
+                        </a>
+                        <button type="submit" class="btn btn-warning btn-lg">
+                            <i class="bi bi-check-circle"></i> Submit Report
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

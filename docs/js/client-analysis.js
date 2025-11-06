@@ -159,3 +159,4 @@ window.updateEquipmentBreakdown = updateEquipmentBreakdown;
 // Backward compatibility aliases
 window.updateHiveStrengthBreakdown = updateClientStatusBreakdown;
 
+

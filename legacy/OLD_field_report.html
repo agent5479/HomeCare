@@ -1,0 +1,193 @@
+{% extends "base.html" %}
+
+{% block title %}Field Report - BeeMarshall{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <div class="card shadow">
+            <div class="card-header bg-success text-white">
+                <h4 class="mb-0"><i class="bi bi-check-square"></i> Quick Field Report</h4>
+                <small>Seamless reporting for beekeepers in the field</small>
+            </div>
+            <div class="card-body">
+                <form method="POST" novalidate>
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="mb-4">
+                        {{ form.site_id.label(class="form-label") }}
+                        {{ form.site_id(class="form-select" + (" is-invalid" if form.site_id.errors else "")) }}
+                        {% if form.site_id.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.site_id.errors %}{{ error }}{% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Quick Action Checkboxes -->
+                    <div class="card mb-4">
+                        <div class="card-header bg-light">
+                            <h6 class="mb-0"><i class="bi bi-lightning"></i> Quick Actions (Tick what you did)</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="quick-action-grid">
+                                <div class="quick-action-item">
+                                    <div class="form-check">
+                                        {{ form.inspection(class="form-check-input") }}
+                                        {{ form.inspection.label(class="form-check-label") }}
+                                    </div>
+                                </div>
+                                <div class="quick-action-item">
+                                    <div class="form-check">
+                                        {{ form.feeding(class="form-check-input") }}
+                                        {{ form.feeding.label(class="form-check-label") }}
+                                    </div>
+                                </div>
+                                <div class="quick-action-item">
+                                    <div class="form-check">
+                                        {{ form.treatment(class="form-check-input") }}
+                                        {{ form.treatment.label(class="form-check-label") }}
+                                    </div>
+                                </div>
+                                <div class="quick-action-item">
+                                    <div class="form-check">
+                                        {{ form.harvest(class="form-check-input") }}
+                                        {{ form.harvest.label(class="form-check-label") }}
+                                    </div>
+                                </div>
+                                <div class="quick-action-item">
+                                    <div class="form-check">
+                                        {{ form.maintenance(class="form-check-input") }}
+                                        {{ form.maintenance.label(class="form-check-label") }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Hive Counts -->
+                    <div class="card mb-4">
+                        <div class="card-header bg-light">
+                            <h6 class="mb-0"><i class="bi bi-speedometer2"></i> Hive Strength Counts</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    {{ form.strong_hives.label(class="form-label") }}
+                                    {{ form.strong_hives(class="form-control" + (" is-invalid" if form.strong_hives.errors else "")) }}
+                                    {% if form.strong_hives.errors %}
+                                        <div class="invalid-feedback">
+                                            {% for error in form.strong_hives.errors %}{{ error }}{% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="col-md-4 mb-3">
+                                    {{ form.medium_hives.label(class="form-label") }}
+                                    {{ form.medium_hives(class="form-control" + (" is-invalid" if form.medium_hives.errors else "")) }}
+                                    {% if form.medium_hives.errors %}
+                                        <div class="invalid-feedback">
+                                            {% for error in form.medium_hives.errors %}{{ error }}{% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="col-md-4 mb-3">
+                                    {{ form.weak_hives.label(class="form-label") }}
+                                    {{ form.weak_hives(class="form-control" + (" is-invalid" if form.weak_hives.errors else "")) }}
+                                    {% if form.weak_hives.errors %}
+                                        <div class="invalid-feedback">
+                                            {% for error in form.weak_hives.errors %}{{ error }}{% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Disease Counts -->
+                    <div class="card mb-4">
+                        <div class="card-header bg-light">
+                            <h6 class="mb-0"><i class="bi bi-bug"></i> Disease Counts (if any)</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-2 mb-3">
+                                    {{ form.afb_count.label(class="form-label") }}
+                                    {{ form.afb_count(class="form-control" + (" is-invalid" if form.afb_count.errors else "")) }}
+                                    {% if form.afb_count.errors %}
+                                        <div class="invalid-feedback">
+                                            {% for error in form.afb_count.errors %}{{ error }}{% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="col-md-2 mb-3">
+                                    {{ form.varroa_count.label(class="form-label") }}
+                                    {{ form.varroa_count(class="form-control" + (" is-invalid" if form.varroa_count.errors else "")) }}
+                                    {% if form.varroa_count.errors %}
+                                        <div class="invalid-feedback">
+                                            {% for error in form.varroa_count.errors %}{{ error }}{% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="col-md-2 mb-3">
+                                    {{ form.chalkbrood_count.label(class="form-label") }}
+                                    {{ form.chalkbrood_count(class="form-control" + (" is-invalid" if form.chalkbrood_count.errors else "")) }}
+                                    {% if form.chalkbrood_count.errors %}
+                                        <div class="invalid-feedback">
+                                            {% for error in form.chalkbrood_count.errors %}{{ error }}{% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="col-md-2 mb-3">
+                                    {{ form.sacbrood_count.label(class="form-label") }}
+                                    {{ form.sacbrood_count(class="form-control" + (" is-invalid" if form.sacbrood_count.errors else "")) }}
+                                    {% if form.sacbrood_count.errors %}
+                                        <div class="invalid-feedback">
+                                            {% for error in form.sacbrood_count.errors %}{{ error }}{% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="col-md-2 mb-3">
+                                    {{ form.dwv_count.label(class="form-label") }}
+                                    {{ form.dwv_count(class="form-control" + (" is-invalid" if form.dwv_count.errors else "")) }}
+                                    {% if form.dwv_count.errors %}
+                                        <div class="invalid-feedback">
+                                            {% for error in form.dwv_count.errors %}{{ error }}{% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Notes -->
+                    <div class="mb-4">
+                        {{ form.notes.label(class="form-label") }}
+                        {{ form.notes(class="form-control" + (" is-invalid" if form.notes.errors else ""), 
+                           rows="3", placeholder="Optional notes...") }}
+                        {% if form.notes.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.notes.errors %}{{ error }}{% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Cancel
+                        </a>
+                        <button type="submit" class="btn btn-success btn-lg">
+                            <i class="bi bi-check-circle"></i> Submit Field Report
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

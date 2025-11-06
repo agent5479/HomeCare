@@ -1,0 +1,73 @@
+# GitHub Pages Configuration for HomeCare Management System
+title: HomeCare Management System
+description: Professional Care Coordination Platform for elderly, disabled, and special needs care
+author: HomeCare Team
+email: support@homecare.com
+
+# GitHub Pages settings
+baseurl: "/HomeCare"
+url: "https://agent5479.github.io"
+
+# Build settings
+markdown: kramdown
+highlighter: rouge
+theme: minima
+
+# Navigation
+navigation:
+  - title: Home
+    url: /
+  - title: Launch App
+    url: /homecare-management.html
+  - title: Documentation
+    url: /HOMECARE_MANAGEMENT_GUIDE.md
+  - title: Quick Start
+    url: /HOMECARE_QUICK_START.md
+
+# Collections
+collections:
+  - docs
+
+# Defaults
+defaults:
+  - scope:
+      path: ""
+      type: "pages"
+    values:
+      layout: "default"
+  - scope:
+      path: ""
+      type: "posts"
+    values:
+      layout: "post"
+
+# Exclude files from processing
+exclude:
+  - README.md
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor
+  - .sass-cache
+  - .jekyll-cache
+  - .jekyll-metadata
+  - .git
+  - .gitignore
+
+# Include files
+include:
+  - _redirects
+
+# Plugins
+plugins:
+  - jekyll-feed
+  - jekyll-sitemap
+  - jekyll-seo-tag
+
+# SEO
+seo:
+  type: "WebApplication"
+  name: "HomeCare Management System"
+  description: "Professional Care Coordination Platform for elderly, disabled, and special needs care"
+  url: "https://agent5479.github.io/HomeCare"
+  image: "https://agent5479.github.io/HomeCare/images/homecare-logo.png"

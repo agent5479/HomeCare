@@ -1,0 +1,219 @@
+{% extends "base.html" %}
+
+{% block title %}Action History - BeeMarshall{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h1 class="display-5"><i class="bi bi-list-check"></i> Action History</h1>
+        <p class="lead text-muted">Track all your hive management activities</p>
+    </div>
+    <div class="col-auto">
+        <a href="{{ url_for('log_action') }}" class="btn btn-warning btn-lg">
+            <i class="bi bi-plus-circle"></i> Log New Action
+        </a>
+    </div>
+</div>
+
+<!-- Filter Options -->
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="row align-items-center">
+            <div class="col">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="showArchived" 
+                           {% if show_archived %}checked{% endif %}
+                           onchange="toggleArchived()">
+                    <label class="form-check-label" for="showArchived">
+                        Show Archived Actions
+                    </label>
+                </div>
+            </div>
+            <div class="col-auto">
+                <span class="text-muted">
+                    Total: {{ actions.total }} action(s)
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Actions Table -->
+<div class="card">
+    <div class="card-header bg-info text-white">
+        <h5 class="mb-0"><i class="bi bi-table"></i> Action History</h5>
+    </div>
+    <div class="card-body">
+        {% if actions.items %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Site</th>
+                        <th>Individual Hive</th>
+                        <th>Task</th>
+                        <th>Description</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for action in actions.items %}
+                    <tr {% if action.is_archived %}class="table-secondary"{% endif %}>
+                        <td>{{ action.action_date.strftime('%Y-%m-%d %H:%M') }}</td>
+                        <td>
+                            <a href="{{ url_for('site_detail', site_id=action.site_id) }}" 
+                               class="text-decoration-none fw-bold">
+                                <i class="bi bi-geo-alt-fill text-warning"></i> {{ action.site.name }}
+                            </a>
+                        </td>
+                        <td>
+                            {% if action.individual_hive %}
+                                <a href="{{ url_for('site_detail', site_id=action.site_id) }}#hive-{{ action.individual_hive.id }}" 
+                                   class="text-decoration-none">
+                                    <i class="bi bi-hexagon-fill text-warning"></i> {{ action.individual_hive.hive_number }}
+                                </a>
+                            {% else %}
+                                <a href="{{ url_for('site_detail', site_id=action.site_id) }}" 
+                                   class="text-decoration-none">
+                                    <small class="text-muted"><i class="bi bi-hexagon"></i> All hives</small>
+                                </a>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="badge bg-secondary">{{ action.task_name }}</span>
+                        </td>
+                        <td>{{ action.description[:100] if action.description else '-' }}</td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <a href="{{ url_for('log_action') }}?site_id={{ action.site_id }}{% if action.individual_hive_id %}&hive_id={{ action.individual_hive_id }}{% endif %}" 
+                                   class="btn btn-sm btn-warning" title="Log new action for this site">
+                                    <i class="bi bi-plus-circle"></i>
+                                </a>
+                                {% if action.is_archived %}
+                                <button class="btn btn-sm btn-outline-success" onclick="unarchiveAction({{ action.id }})" title="Unarchive action">
+                                    <i class="bi bi-arrow-counterclockwise"></i>
+                                </button>
+                                {% else %}
+                                <button class="btn btn-sm btn-outline-secondary" onclick="archiveAction({{ action.id }})" title="Archive action">
+                                    <i class="bi bi-archive"></i>
+                                </button>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Pagination -->
+        {% if actions.pages > 1 %}
+        <nav aria-label="Action pagination">
+            <ul class="pagination justify-content-center mt-4">
+                {% if actions.has_prev %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ actions.prev_num }}{% if show_archived %}&archived=true{% endif %}">
+                        Previous
+                    </a>
+                </li>
+                {% endif %}
+                
+                {% for page_num in actions.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+                    {% if page_num %}
+                        {% if page_num == actions.page %}
+                        <li class="page-item active">
+                            <span class="page-link">{{ page_num }}</span>
+                        </li>
+                        {% else %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_num }}{% if show_archived %}&archived=true{% endif %}">
+                                {{ page_num }}
+                            </a>
+                        </li>
+                        {% endif %}
+                    {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+                
+                {% if actions.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ actions.next_num }}{% if show_archived %}&archived=true{% endif %}">
+                        Next
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+        
+        {% else %}
+        <div class="text-center my-5">
+            <i class="bi bi-list-check text-muted" style="font-size: 5rem;"></i>
+            <h4 class="mt-3 text-muted">No Actions Found</h4>
+            <p class="text-muted">Start logging your hive management activities.</p>
+            <a href="{{ url_for('log_action') }}" class="btn btn-warning btn-lg mt-3">
+                <i class="bi bi-plus-circle"></i> Log First Action
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function toggleArchived() {
+    const showArchived = document.getElementById('showArchived').checked;
+    window.location.href = '{{ url_for("actions") }}' + (showArchived ? '?archived=true' : '');
+}
+
+function archiveAction(actionId) {
+    if (confirm('Archive this action? It will be hidden from the main view.')) {
+        fetch(`/action/${actionId}/archive`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Failed to archive action');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred');
+        });
+    }
+}
+
+function unarchiveAction(actionId) {
+    fetch(`/action/${actionId}/unarchive`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert('Failed to unarchive action');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred');
+    });
+}
+</script>
+{% endblock %}
+

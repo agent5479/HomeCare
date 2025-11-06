@@ -1,0 +1,400 @@
+{% extends "base.html" %}
+
+{% block title %}Report Dashboard - BeeMarshall{% endblock %}
+
+{% block extra_css %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h1 class="display-5"><i class="bi bi-graph-up"></i> Report Dashboard</h1>
+        <p class="lead text-muted">Advanced analytics for hive performance, health, and operations</p>
+    </div>
+</div>
+
+<!-- Date Range and Filters -->
+<div class="row mb-4">
+    <div class="col">
+        <div class="WIDGET-CONTAINER">
+            <div class="WIDGET-HEADER">
+                <i class="bi bi-calendar-range"></i> Date Range & Filters
+            </div>
+            <div class="WIDGET-BODY">
+                <form method="GET" class="row g-3">
+                    <div class="col-md-3">
+                        <label class="form-label">Start Date</label>
+                        <input type="date" name="start_date" class="WIDGET-INPUT" value="{{ start_date }}">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">End Date</label>
+                        <input type="date" name="end_date" class="WIDGET-INPUT" value="{{ end_date }}">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Group By</label>
+                        <select name="group_by" class="WIDGET-SELECT">
+                            <option value="months" {% if group_by == 'months' %}selected{% endif %}>Months</option>
+                            <option value="days" {% if group_by == 'days' %}selected{% endif %}>Days</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">&nbsp;</label>
+                        <button type="submit" class="WIDGET-BUTTON w-100">
+                            <i class="bi bi-funnel"></i> Apply Filters
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Key Metrics Overview -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body text-center">
+                <h3 class="card-title">{{ key_metrics.total_hives }}</h3>
+                <p class="card-text">Total Hives</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-success text-white">
+            <div class="card-body text-center">
+                <h3 class="card-title">{{ key_metrics.total_strong }}</h3>
+                <p class="card-text">Strong Hives</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-warning text-dark">
+            <div class="card-body text-center">
+                <h3 class="card-title">{{ key_metrics.total_weak + key_metrics.total_dead }}</h3>
+                <p class="card-text">Weak/Dead Hives</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-info text-white">
+            <div class="card-body text-center">
+                <h3 class="card-title">{{ "%.1f"|format(key_metrics.health_score) }}%</h3>
+                <p class="card-text">Health Score</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Time Series Charts -->
+<div class="row mb-4">
+    <div class="col-lg-6 mb-4">
+        <div class="WIDGET-CONTAINER">
+            <div class="WIDGET-HEADER">
+                <i class="bi bi-graph-up-arrow"></i> Hive Strength
+            </div>
+            <div class="WIDGET-BODY">
+                <canvas id="hiveStrengthChart" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6 mb-4">
+        <div class="WIDGET-CONTAINER">
+            <div class="WIDGET-HEADER">
+                <i class="bi bi-box"></i> Supers Added
+            </div>
+            <div class="WIDGET-BODY">
+                <canvas id="supersChart" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-lg-6 mb-4">
+        <div class="WIDGET-CONTAINER">
+            <div class="WIDGET-HEADER">
+                <i class="bi bi-x-circle"></i> Hive Deaths
+            </div>
+            <div class="WIDGET-BODY">
+                <canvas id="deathsChart" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6 mb-4">
+        <div class="WIDGET-CONTAINER">
+            <div class="WIDGET-HEADER">
+                <i class="bi bi-bug"></i> Disease Observations
+            </div>
+            <div class="WIDGET-BODY">
+                <canvas id="diseaseChart" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Categorical Breakdowns -->
+<div class="row mb-4">
+    <div class="col-lg-6 mb-4">
+        <div class="WIDGET-CONTAINER">
+            <div class="WIDGET-HEADER">
+                <i class="bi bi-pie-chart"></i> Death Reasons
+            </div>
+            <div class="WIDGET-BODY">
+                <canvas id="deathReasonsChart" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6 mb-4">
+        <div class="WIDGET-CONTAINER">
+            <div class="WIDGET-HEADER">
+                <i class="bi bi-exclamation-triangle"></i> Diseases Observed
+            </div>
+            <div class="WIDGET-BODY">
+                <canvas id="diseasesChart" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-lg-6 mb-4">
+        <div class="WIDGET-CONTAINER">
+            <div class="WIDGET-HEADER">
+                <i class="bi bi-arrow-repeat"></i> Requeening Reasons
+            </div>
+            <div class="WIDGET-BODY">
+                <canvas id="requeeningChart" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6 mb-4">
+        <div class="WIDGET-CONTAINER">
+            <div class="WIDGET-HEADER">
+                <i class="bi bi-box-seam"></i> Consumables Used
+            </div>
+            <div class="WIDGET-BODY">
+                <canvas id="consumablesChart" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Site Performance Summary -->
+<div class="row">
+    <div class="col">
+        <div class="WIDGET-CONTAINER">
+            <div class="WIDGET-HEADER">
+                <i class="bi bi-geo-alt"></i> Site Performance Summary
+            </div>
+            <div class="WIDGET-BODY">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Site Classifications:</h6>
+                        <ul class="list-unstyled">
+                            <li><strong>Summer Sites:</strong> {{ sites|selectattr('site_type', 'equalto', 'summer')|list|length }}</li>
+                            <li><strong>Winter Sites:</strong> {{ sites|selectattr('site_type', 'equalto', 'winter')|list|length }}</li>
+                            <li><strong>All Weather Access:</strong> {{ sites|selectattr('access_type', 'equalto', 'all_weather')|list|length }}</li>
+                            <li><strong>Dry Only Access:</strong> {{ sites|selectattr('access_type', 'equalto', 'dry_only')|list|length }}</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Operational Status:</h6>
+                        <ul class="list-unstyled">
+                            <li><strong>Quarantine Sites:</strong> {{ key_metrics.quarantine_sites }}</li>
+                            <li><strong>Total Actions:</strong> {{ key_metrics.total_actions }}</li>
+                            <li><strong>Disease Reports:</strong> {{ key_metrics.total_disease_reports }}</li>
+                            <li><strong>Contact Required Sites:</strong> {{ sites|selectattr('contact_before_visit', 'equalto', true)|list|length }}</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Chart.js configuration
+Chart.defaults.font.family = 'Inter, sans-serif';
+Chart.defaults.font.size = 12;
+
+// Time series data
+const timeSeriesData = {{ time_series_data | tojson }};
+const categoricalData = {{ categorical_data | tojson }};
+
+// Hive Strength Chart
+const hiveStrengthCtx = document.getElementById('hiveStrengthChart').getContext('2d');
+new Chart(hiveStrengthCtx, {
+    type: 'line',
+    data: {
+        labels: timeSeriesData.hive_strength.map(d => d.period),
+        datasets: [{
+            label: 'Hive Strength',
+            data: timeSeriesData.hive_strength.map(d => d.value),
+            borderColor: '#28a745',
+            backgroundColor: 'rgba(40, 167, 69, 0.1)',
+            tension: 0.4
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            y: {
+                beginAtZero: true,
+                max: 60
+            }
+        }
+    }
+});
+
+// Supers Chart
+const supersCtx = document.getElementById('supersChart').getContext('2d');
+new Chart(supersCtx, {
+    type: 'line',
+    data: {
+        labels: timeSeriesData.supers_added.map(d => d.period),
+        datasets: [{
+            label: 'Supers Added',
+            data: timeSeriesData.supers_added.map(d => d.value),
+            borderColor: '#ffc107',
+            backgroundColor: 'rgba(255, 193, 7, 0.1)',
+            tension: 0.4
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            y: {
+                beginAtZero: true,
+                max: 40
+            }
+        }
+    }
+});
+
+// Deaths Chart
+const deathsCtx = document.getElementById('deathsChart').getContext('2d');
+new Chart(deathsCtx, {
+    type: 'bar',
+    data: {
+        labels: timeSeriesData.hive_deaths.map(d => d.period),
+        datasets: [{
+            label: 'Hive Deaths',
+            data: timeSeriesData.hive_deaths.map(d => d.value),
+            backgroundColor: '#fd7e14'
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            y: {
+                beginAtZero: true,
+                max: 5
+            }
+        }
+    }
+});
+
+// Disease Chart
+const diseaseCtx = document.getElementById('diseaseChart').getContext('2d');
+new Chart(diseaseCtx, {
+    type: 'bar',
+    data: {
+        labels: timeSeriesData.disease_observations.map(d => d.period),
+        datasets: [{
+            label: 'Disease Observations',
+            data: timeSeriesData.disease_observations.map(d => d.value),
+            backgroundColor: '#20c997'
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            y: {
+                beginAtZero: true,
+                max: 3
+            }
+        }
+    }
+});
+
+// Death Reasons Chart
+const deathReasonsCtx = document.getElementById('deathReasonsChart').getContext('2d');
+new Chart(deathReasonsCtx, {
+    type: 'doughnut',
+    data: {
+        labels: Object.keys(categoricalData.death_reasons),
+        datasets: [{
+            data: Object.values(categoricalData.death_reasons),
+            backgroundColor: ['#dc3545', '#fd7e14', '#6c757d', '#17a2b8']
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false
+    }
+});
+
+// Diseases Chart
+const diseasesCtx = document.getElementById('diseasesChart').getContext('2d');
+new Chart(diseasesCtx, {
+    type: 'bar',
+    data: {
+        labels: Object.keys(categoricalData.diseases),
+        datasets: [{
+            label: 'Disease Count',
+            data: Object.values(categoricalData.diseases),
+            backgroundColor: '#ffc107'
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        indexAxis: 'y'
+    }
+});
+
+// Requeening Chart
+const requeeningCtx = document.getElementById('requeeningChart').getContext('2d');
+new Chart(requeeningCtx, {
+    type: 'doughnut',
+    data: {
+        labels: Object.keys(categoricalData.requeening_reasons),
+        datasets: [{
+            data: Object.values(categoricalData.requeening_reasons),
+            backgroundColor: ['#6f42c1', '#e83e8c', '#20c997', '#fd7e14']
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false
+    }
+});
+
+// Consumables Chart
+const consumablesCtx = document.getElementById('consumablesChart').getContext('2d');
+new Chart(consumablesCtx, {
+    type: 'bar',
+    data: {
+        labels: Object.keys(categoricalData.consumables),
+        datasets: [{
+            label: 'Usage Count',
+            data: Object.values(categoricalData.consumables),
+            backgroundColor: ['#007bff', '#28a745', '#ffc107']
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        indexAxis: 'y'
+    }
+});
+</script>
+{% endblock %}
+

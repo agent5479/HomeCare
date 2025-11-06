@@ -1,0 +1,225 @@
+{% extends "base.html" %}
+
+{% block title %}Task Templates - BeeMarshall{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h1 class="display-5"><i class="bi bi-list-check"></i> Task Templates</h1>
+        <p class="lead text-muted">Manage predefined task templates for your beekeeping operations</p>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row mb-4">
+    <div class="col">
+        <div class="WIDGET-CONTAINER">
+            <div class="WIDGET-HEADER">
+                <i class="bi bi-tools"></i> Template Management
+            </div>
+            <div class="WIDGET-BODY">
+                <div class="d-flex gap-2 flex-wrap">
+                    <a href="{{ url_for('new_task_template') }}" class="WIDGET-BUTTON">
+                        <i class="bi bi-plus-circle"></i> New Template
+                    </a>
+                    <a href="{{ url_for('scheduler') }}" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Back to Scheduler
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Task Templates by Category -->
+{% if templates %}
+{% for category, category_templates in templates|groupby('category') %}
+<div class="row mb-4">
+    <div class="col">
+        <div class="WIDGET-CONTAINER">
+            <div class="WIDGET-HEADER">
+                <i class="bi bi-folder"></i> {{ category }}
+            </div>
+            <div class="WIDGET-BODY">
+                <div class="row">
+                    {% for template in category_templates %}
+                    <div class="col-md-6 col-lg-4 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h6 class="card-title mb-0">{{ template.name }}</h6>
+                                    {% if template.is_system_template %}
+                                    <span class="badge bg-primary">System</span>
+                                    {% else %}
+                                    <span class="badge bg-success">Custom</span>
+                                    {% endif %}
+                                </div>
+                                
+                                {% if template.description %}
+                                <p class="card-text small text-muted">{{ template.description[:100] }}{% if template.description|length > 100 %}...{% endif %}</p>
+                                {% endif %}
+                                
+                                <div class="row small text-muted mb-3">
+                                    <div class="col-6">
+                                        <i class="bi bi-clock"></i> {{ template.estimated_duration }} min
+                                    </div>
+                                    <div class="col-6">
+                                        <span class="badge bg-{{ 'success' if template.priority == 'low' else 'warning' if template.priority == 'medium' else 'danger' if template.priority == 'high' else 'dark' }}">
+                                            {{ template.priority.title() }}
+                                        </span>
+                                    </div>
+                                </div>
+                                
+                                {% if template.is_seasonal %}
+                                <div class="small text-info mb-2">
+                                    <i class="bi bi-calendar3"></i> Seasonal Task
+                                </div>
+                                {% endif %}
+                                
+                                {% if template.weather_dependent %}
+                                <div class="small text-warning mb-2">
+                                    <i class="bi bi-cloud-rain"></i> Weather Dependent
+                                </div>
+                                {% endif %}
+                                
+                                <div class="d-flex gap-1">
+                                    <button class="btn btn-sm btn-outline-primary" onclick="quickScheduleTemplate({{ template.id }})">
+                                        <i class="bi bi-plus"></i> Schedule
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-secondary" onclick="viewTemplateDetails({{ template.id }})">
+                                        <i class="bi bi-eye"></i> Details
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% else %}
+<div class="row">
+    <div class="col">
+        <div class="WIDGET-CONTAINER">
+            <div class="WIDGET-BODY text-center">
+                <i class="bi bi-inbox display-1 text-muted"></i>
+                <h5 class="text-muted mt-3">No Task Templates Found</h5>
+                <p class="text-muted">Create your first task template to get started with scheduling.</p>
+                <a href="{{ url_for('new_task_template') }}" class="WIDGET-BUTTON">
+                    <i class="bi bi-plus-circle"></i> Create Template
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function quickScheduleTemplate(templateId) {
+    window.location.href = '/scheduler/quick-schedule?template=' + templateId;
+}
+
+function viewTemplateDetails(templateId) {
+    // Open modal with template details
+    fetch(`/api/template/${templateId}`)
+        .then(response => response.json())
+        .then(data => {
+            const modalHtml = `
+                <div class="modal fade" id="templateModal" tabindex="-1">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">${data.name}</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <strong>Category:</strong> ${data.category}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <strong>Priority:</strong> ${data.priority}
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <strong>Duration:</strong> ${data.estimated_duration} minutes
+                                    </div>
+                                    <div class="col-md-6">
+                                        <strong>Type:</strong> ${data.is_system_template ? 'System Template' : 'Custom Template'}
+                                    </div>
+                                </div>
+                                
+                                ${data.description ? `<p><strong>Description:</strong><br>${data.description}</p>` : ''}
+                                
+                                ${data.checklist_items.length > 0 ? `
+                                    <h6>Checklist Items:</h6>
+                                    <ul>
+                                        ${data.checklist_items.map(item => `<li>${item}</li>`).join('')}
+                                    </ul>
+                                ` : ''}
+                                
+                                ${data.equipment_needed.length > 0 ? `
+                                    <h6>Equipment Needed:</h6>
+                                    <ul>
+                                        ${data.equipment_needed.map(item => `<li>${item}</li>`).join('')}
+                                    </ul>
+                                ` : ''}
+                                
+                                ${data.supplies_needed.length > 0 ? `
+                                    <h6>Supplies Needed:</h6>
+                                    <ul>
+                                        ${data.supplies_needed.map(item => `<li>${item}</li>`).join('')}
+                                    </ul>
+                                ` : ''}
+                                
+                                ${data.is_seasonal ? `
+                                    <div class="alert alert-info">
+                                        <i class="bi bi-calendar3"></i> This is a seasonal task (${data.season_months || 'various months'})
+                                    </div>
+                                ` : ''}
+                                
+                                ${data.weather_dependent ? `
+                                    <div class="alert alert-warning">
+                                        <i class="bi bi-cloud-rain"></i> This task is weather dependent
+                                        ${data.min_temperature ? `<br>Min Temperature: ${data.min_temperature}°C` : ''}
+                                        ${data.max_temperature ? `<br>Max Temperature: ${data.max_temperature}°C` : ''}
+                                        ${data.avoid_rain ? '<br>Avoid rainy weather' : ''}
+                                    </div>
+                                ` : ''}
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-primary" onclick="quickScheduleTemplate(${templateId})">
+                                    <i class="bi bi-plus"></i> Schedule This Task
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Remove existing modal if any
+            const existingModal = document.getElementById('templateModal');
+            if (existingModal) {
+                existingModal.remove();
+            }
+            
+            // Add modal to body
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+            
+            // Show modal
+            const modal = new bootstrap.Modal(document.getElementById('templateModal'));
+            modal.show();
+        })
+        .catch(error => {
+            alert('Error loading template details');
+        });
+}
+</script>
+{% endblock %}

@@ -1,0 +1,6 @@
+﻿MAP WIDGET VIEW ON MAPS - COMPLETE
+âœ… View on Maps button added to cluster map popups
+âœ… Same functionality as cluster details modal
+âœ… Opens Google Maps on Android
+âœ… Opens Apple Maps on iOS
+âœ… Opens Google Maps web on Desktop

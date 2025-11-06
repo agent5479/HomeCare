@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BeeMarshall - Professional Apiary Logistics</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/landing.css') }}">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white fixed-top shadow-sm">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="bi bi-hexagon-fill text-warning"></i>
+                <span class="brand-text">BeeMarshall</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#features">Features</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#about">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#contact">Contact</a>
+                    </li>
+                    <li class="nav-item ms-3">
+                        <a class="btn btn-outline-warning" href="{{ url_for('login') }}">
+                            <i class="bi bi-box-arrow-in-right"></i> Login
+                        </a>
+                    </li>
+                    <li class="nav-item ms-2">
+                        <a class="btn btn-warning" href="{{ url_for('register') }}">
+                            <i class="bi bi-person-plus"></i> Sign Up
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container">
+            <div class="row align-items-center min-vh-100">
+                <div class="col-lg-6 hero-content">
+                    <div class="animate-fade-in">
+                        <h1 class="display-3 fw-bold mb-4">
+                            Manage Your Apiary<br>
+                            <span class="text-warning">Like a Pro</span>
+                        </h1>
+                        <p class="lead mb-4">
+                            BeeMarshall is a comprehensive hive management system that helps beekeepers track 
+                            locations, log activities, and manage their colonies with ease.
+                        </p>
+                        <div class="d-flex gap-3 mb-4">
+                            <a href="{{ url_for('register') }}" class="btn btn-warning btn-lg">
+                                <i class="bi bi-rocket-takeoff"></i> Get Started Free
+                            </a>
+                            <a href="#features" class="btn btn-outline-dark btn-lg">
+                                <i class="bi bi-play-circle"></i> Learn More
+                            </a>
+                        </div>
+                        <div class="hero-stats">
+                            <div class="stat-item">
+                                <i class="bi bi-geo-alt-fill text-warning"></i>
+                                <span>Track Multiple Locations</span>
+                            </div>
+                            <div class="stat-item">
+                                <i class="bi bi-check-circle-fill text-success"></i>
+                                <span>Log Activities Easily</span>
+                            </div>
+                            <div class="stat-item">
+                                <i class="bi bi-graph-up text-info"></i>
+                                <span>Monitor Your Hives</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="hero-image animate-float">
+                        <div class="image-placeholder">
+                            <i class="bi bi-hexagon-fill text-warning"></i>
+                            <i class="bi bi-hexagon-fill text-warning"></i>
+                            <i class="bi bi-hexagon-fill text-warning"></i>
+                            <i class="bi bi-hexagon-fill text-warning"></i>
+                            <i class="bi bi-hexagon-fill text-warning"></i>
+                            <i class="bi bi-hexagon-fill text-warning"></i>
+                            <div class="overlay-text">
+                                <i class="bi bi-map display-1 text-white mb-3"></i>
+                                <h3>Visual Hive Management</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features-section py-5">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="display-4 fw-bold mb-3">Powerful Features for Beekeepers</h2>
+                <p class="lead text-muted">Everything you need to manage your apiary effectively</p>
+            </div>
+
+            <div class="row g-4">
+                <!-- Feature 1 -->
+                <div class="col-md-6 col-lg-4">
+                    <div class="feature-card">
+                        <div class="feature-icon bg-warning">
+                            <i class="bi bi-geo-alt-fill"></i>
+                        </div>
+                        <h4>Location Tracking</h4>
+                        <p>Track all your hive sites with GPS coordinates. View them on interactive maps and manage multiple locations effortlessly.</p>
+                    </div>
+                </div>
+
+                <!-- Feature 2 -->
+                <div class="col-md-6 col-lg-4">
+                    <div class="feature-card">
+                        <div class="feature-icon bg-success">
+                            <i class="bi bi-list-check"></i>
+                        </div>
+                        <h4>Quick Action Logging</h4>
+                        <p>Log multiple tasks at once with simple checkboxes. Record inspections, feeding, treatments, and more in seconds.</p>
+                    </div>
+                </div>
+
+                <!-- Feature 3 -->
+                <div class="col-md-6 col-lg-4">
+                    <div class="feature-card">
+                        <div class="feature-icon bg-info">
+                            <i class="bi bi-hexagon"></i>
+                        </div>
+                        <h4>Individual Hive Tracking</h4>
+                        <p>Monitor specific hives for infection management. Track status, add notes, and maintain detailed records.</p>
+                    </div>
+                </div>
+
+                <!-- Feature 4 -->
+                <div class="col-md-6 col-lg-4">
+                    <div class="feature-card">
+                        <div class="feature-icon bg-primary">
+                            <i class="bi bi-calendar-check"></i>
+                        </div>
+                        <h4>Activity History</h4>
+                        <p>Keep comprehensive records of all hive activities. Archive old entries and maintain a clean, organized log.</p>
+                    </div>
+                </div>
+
+                <!-- Feature 5 -->
+                <div class="col-md-6 col-lg-4">
+                    <div class="feature-card">
+                        <div class="feature-icon bg-danger">
+                            <i class="bi bi-speedometer2"></i>
+                        </div>
+                        <h4>Dashboard Analytics</h4>
+                        <p>Get an overview of your entire apiary at a glance. Track statistics, recent activities, and key metrics.</p>
+                    </div>
+                </div>
+
+                <!-- Feature 6 -->
+                <div class="col-md-6 col-lg-4">
+                    <div class="feature-card">
+                        <div class="feature-icon bg-secondary">
+                            <i class="bi bi-gear-fill"></i>
+                        </div>
+                        <h4>Custom Settings</h4>
+                        <p>Configure harvest timelines, sugar requirements, and custom notes for each hive site to fit your workflow.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Task Categories Section -->
+    <section class="tasks-section py-5 bg-light">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="display-4 fw-bold mb-3">Comprehensive Task Management</h2>
+                <p class="lead text-muted">Track all your beekeeping activities with 25+ predefined tasks</p>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-md-6 col-lg-4">
+                    <div class="task-category">
+                        <i class="bi bi-eye-fill"></i>
+                        <h5>Inspection</h5>
+                        <ul>
+                            <li>General Inspection</li>
+                            <li>Queen Check</li>
+                            <li>Brood Pattern</li>
+                            <li>Pest Inspection</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-4">
+                    <div class="task-category">
+                        <i class="bi bi-droplet-fill"></i>
+                        <h5>Feeding</h5>
+                        <ul>
+                            <li>Sugar Syrup</li>
+                            <li>Pollen Patty</li>
+                            <li>Fondant Feeding</li>
+                            <li>Emergency Feeding</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-4">
+                    <div class="task-category">
+                        <i class="bi bi-shield-fill-check"></i>
+                        <h5>Treatment</h5>
+                        <ul>
+                            <li>Varroa Treatment</li>
+                            <li>Nosema Treatment</li>
+                            <li>Small Hive Beetle</li>
+                            <li>General Treatment</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-4">
+                    <div class="task-category">
+                        <i class="bi bi-basket-fill"></i>
+                        <h5>Harvest</h5>
+                        <ul>
+                            <li>Honey Harvest</li>
+                            <li>Wax Collection</li>
+                            <li>Propolis Harvest</li>
+                            <li>Frame Extraction</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-4">
+                    <div class="task-category">
+                        <i class="bi bi-tools"></i>
+                        <h5>Maintenance</h5>
+                        <ul>
+                            <li>Add/Remove Super</li>
+                            <li>Replace Frames</li>
+                            <li>Hive Repair</li>
+                            <li>Entrance Reducer</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-4">
+                    <div class="task-category">
+                        <i class="bi bi-lightning-fill"></i>
+                        <h5>Events</h5>
+                        <ul>
+                            <li>Swarm Collection</li>
+                            <li>Colony Split</li>
+                            <li>Combine Colonies</li>
+                            <li>Requeening</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about-section py-5">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6 mb-4 mb-lg-0">
+                    <h2 class="display-4 fw-bold mb-4">Built by Beekeepers,<br>for Beekeepers</h2>
+                    <p class="lead mb-4">
+                        BeeMarshall was created to solve real problems that beekeepers face every day. 
+                        Whether you're managing a few backyard hives or running a commercial operation, 
+                        our platform adapts to your needs.
+                    </p>
+                    <div class="about-features">
+                        <div class="about-item">
+                            <i class="bi bi-check-circle-fill text-success"></i>
+                            <span>Free and Open Source</span>
+                        </div>
+                        <div class="about-item">
+                            <i class="bi bi-check-circle-fill text-success"></i>
+                            <span>No Data Limits</span>
+                        </div>
+                        <div class="about-item">
+                            <i class="bi bi-check-circle-fill text-success"></i>
+                            <span>Self-Hosted Option</span>
+                        </div>
+                        <div class="about-item">
+                            <i class="bi bi-check-circle-fill text-success"></i>
+                            <span>Mobile Responsive</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="about-image">
+                        <div class="honeycomb-grid">
+                            <i class="bi bi-hexagon-fill"></i>
+                            <i class="bi bi-hexagon-fill"></i>
+                            <i class="bi bi-hexagon-fill"></i>
+                            <i class="bi bi-hexagon-fill"></i>
+                            <i class="bi bi-hexagon-fill"></i>
+                            <i class="bi bi-hexagon-fill"></i>
+                            <i class="bi bi-hexagon-fill"></i>
+                            <i class="bi bi-hexagon-fill"></i>
+                            <i class="bi bi-hexagon-fill"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section py-5 bg-warning">
+        <div class="container">
+            <div class="row justify-content-center text-center">
+                <div class="col-lg-8">
+                    <h2 class="display-4 fw-bold mb-4">Ready to Get Started?</h2>
+                    <p class="lead mb-4">
+                        Join beekeepers who are already using BeeMarshall to manage their apiaries more effectively.
+                    </p>
+                    <div class="d-flex gap-3 justify-content-center">
+                        <a href="{{ url_for('register') }}" class="btn btn-dark btn-lg">
+                            <i class="bi bi-rocket-takeoff"></i> Create Free Account
+                        </a>
+                        <a href="{{ url_for('login') }}" class="btn btn-outline-dark btn-lg">
+                            <i class="bi bi-box-arrow-in-right"></i> Sign In
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact-section py-5">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="display-4 fw-bold mb-3">Get in Touch</h2>
+                <p class="lead text-muted">Have questions? We're here to help!</p>
+            </div>
+
+            <div class="row justify-content-center">
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="contact-card">
+                        <i class="bi bi-github"></i>
+                        <h5>GitHub</h5>
+                        <p>Contribute or report issues</p>
+                        <a href="https://github.com/yourusername/BeeMarshall" class="btn btn-outline-dark">
+                            Visit Repository
+                        </a>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="contact-card">
+                        <i class="bi bi-file-text"></i>
+                        <h5>Documentation</h5>
+                        <p>Learn how to use BeeMarshall</p>
+                        <a href="https://github.com/yourusername/BeeMarshall/blob/main/README.md" class="btn btn-outline-dark">
+                            Read Docs
+                        </a>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="contact-card">
+                        <i class="bi bi-chat-dots"></i>
+                        <h5>Community</h5>
+                        <p>Join our beekeeping community</p>
+                        <a href="https://github.com/yourusername/BeeMarshall/discussions" class="btn btn-outline-dark">
+                            Join Discussion
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer py-4 bg-dark text-white">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 mb-3 mb-lg-0">
+                    <h5>
+                        <i class="bi bi-hexagon-fill text-warning"></i> BeeMarshall
+                    </h5>
+                    <p class="text-muted">Professional apiary management for everyone.</p>
+                </div>
+                <div class="col-lg-4 mb-3 mb-lg-0">
+                    <h5>Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#features" class="text-muted">Features</a></li>
+                        <li><a href="#about" class="text-muted">About</a></li>
+                        <li><a href="{{ url_for('login') }}" class="text-muted">Login</a></li>
+                        <li><a href="{{ url_for('register') }}" class="text-muted">Sign Up</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-4">
+                    <h5>Resources</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="https://github.com/yourusername/BeeMarshall" class="text-muted">GitHub</a></li>
+                        <li><a href="https://github.com/yourusername/BeeMarshall/blob/main/README.md" class="text-muted">Documentation</a></li>
+                        <li><a href="https://github.com/yourusername/BeeMarshall/blob/main/LICENSE" class="text-muted">License</a></li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="my-4 bg-secondary">
+            <div class="text-center text-muted">
+                <p class="mb-0">&copy; 2025 BeeMarshall - Professional Apiary Logistics. Made with 🐝 and 🍯</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Smooth Scroll -->
+    <script>
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+

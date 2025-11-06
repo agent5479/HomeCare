@@ -1,0 +1,16 @@
+# Redirects for HomeCare Management System
+# This file is used by Netlify and other static site hosts
+
+# Redirect root to main app
+/ /homecare-management.html 200
+
+# Redirect common paths
+/app /homecare-management.html 200
+/dashboard /homecare-management.html 200
+/login /homecare-management.html 200
+
+# API redirects (if needed)
+/api/* /homecare-management.html 200
+
+# Fallback for SPA routing
+/* /homecare-management.html 200

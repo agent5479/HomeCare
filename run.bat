@@ -1,6 +1,6 @@
 @echo off
 echo ========================================
-echo  LarsBees - Apiary Management System
+echo  HomeCare Management System
 echo ========================================
 echo.
 
@@ -36,10 +36,14 @@ if not exist ".env" (
 )
 
 REM Run the application
-echo Starting LarsBees...
+echo Starting HomeCare Management System...
 echo.
 echo Open your browser and go to: http://localhost:5000
+<<<<<<< HEAD
 echo Test login - Username: admin, Password: [Contact administrator]
+=======
+echo Login with: Jess / JessCard2025! or GBTech / 1q2w3e!Q@W#E
+>>>>>>> b5053293d01ba10c025b4a2821ec94760e3b0555
 echo.
 echo Press Ctrl+C to stop the server
 echo.

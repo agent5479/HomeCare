@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+
+{% block title %}Export Data - BeeMarshall{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h1 class="display-5"><i class="bi bi-download"></i> Export Data</h1>
+        <p class="lead text-muted">Export your beekeeping data in CSV format for analysis and backup</p>
+    </div>
+</div>
+
+<!-- Export Statistics -->
+<div class="export-widget">
+    <div class="WIDGET-HEADER">
+        <i class="bi bi-bar-chart"></i> Export Statistics
+    </div>
+    <div class="export-stats-grid">
+        <div class="export-stat-item">
+            <h3 class="text-primary">{{ stats.sites }}</h3>
+            <p class="mb-0">Sites</p>
+        </div>
+        <div class="export-stat-item">
+            <h3 class="text-success">{{ stats.actions }}</h3>
+            <p class="mb-0">Actions</p>
+        </div>
+        <div class="export-stat-item">
+            <h3 class="text-warning">{{ stats.disease_reports }}</h3>
+            <p class="mb-0">Disease Reports</p>
+        </div>
+        <div class="export-stat-item">
+            <h3 class="text-info">{{ stats.individual_hives }}</h3>
+            <p class="mb-0">Individual Hives</p>
+        </div>
+    </div>
+</div>
+
+<!-- Export Options -->
+<div class="row">
+    <!-- Comprehensive Export -->
+    <div class="col-lg-6 mb-4">
+        <div class="export-option-card">
+            <div class="WIDGET-HEADER">
+                <i class="bi bi-file-earmark-spreadsheet"></i> Comprehensive Export
+            </div>
+            <div class="WIDGET-BODY">
+                <p>Complete dataset including all new fields and calculated summaries.</p>
+                <ul class="list-unstyled">
+                    <li><i class="bi bi-check-circle text-success"></i> All site information</li>
+                    <li><i class="bi bi-check-circle text-success"></i> Landowner details</li>
+                    <li><i class="bi bi-check-circle text-success"></i> Site classifications</li>
+                    <li><i class="bi bi-check-circle text-success"></i> Hive setup details</li>
+                    <li><i class="bi bi-check-circle text-success"></i> Strength ratings</li>
+                    <li><i class="bi bi-check-circle text-success"></i> Individual hive summaries</li>
+                    <li><i class="bi bi-check-circle text-success"></i> Action summaries</li>
+                    <li><i class="bi bi-check-circle text-success"></i> Disease report totals</li>
+                </ul>
+            </div>
+            <div class="mt-auto">
+                <a href="{{ url_for('export_comprehensive') }}" class="export-button w-100">
+                    <i class="bi bi-download"></i> Download Comprehensive CSV
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Individual Exports -->
+    <div class="col-lg-6 mb-4">
+        <div class="export-option-card">
+            <div class="WIDGET-HEADER">
+                <i class="bi bi-files"></i> Individual Exports
+            </div>
+            <div class="WIDGET-BODY">
+                <p>Export specific data types separately.</p>
+                
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('export_sites') }}" class="WIDGET-BUTTON">
+                        <i class="bi bi-geo-alt"></i> Sites Only
+                        <span class="WIDGET-BADGE ms-2">{{ stats.sites }}</span>
+                    </a>
+                    
+                    <a href="{{ url_for('export_actions') }}" class="WIDGET-BUTTON" style="background-color: #28a745;">
+                        <i class="bi bi-list-check"></i> Actions Only
+                        <span class="WIDGET-BADGE ms-2" style="background-color: #28a745;">{{ stats.actions }}</span>
+                    </a>
+                    
+                    <a href="{{ url_for('export_disease_reports') }}" class="WIDGET-BUTTON" style="background-color: #ffc107; color: #000;">
+                        <i class="bi bi-exclamation-triangle"></i> Disease Reports
+                        <span class="WIDGET-BADGE ms-2" style="background-color: #ffc107; color: #000;">{{ stats.disease_reports }}</span>
+                    </a>
+                    
+                    <a href="{{ url_for('export_individual_hives') }}" class="WIDGET-BUTTON" style="background-color: #17a2b8;">
+                        <i class="bi bi-hexagon"></i> Individual Hives
+                        <span class="WIDGET-BADGE ms-2" style="background-color: #17a2b8;">{{ stats.individual_hives }}</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Export Information -->
+<div class="WIDGET-CONTAINER">
+    <div class="WIDGET-HEADER">
+        <i class="bi bi-info-circle"></i> Export Information
+    </div>
+    <div class="WIDGET-BODY">
+        <div class="row">
+            <div class="col-md-6">
+                <h6>Comprehensive Export Includes:</h6>
+                <ul class="list-unstyled">
+                    <li><strong>Site Data:</strong> All basic site information</li>
+                    <li><strong>Landowner Info:</strong> Contact details and requirements</li>
+                    <li><strong>Site Classification:</strong> Summer/Winter, Access types</li>
+                    <li><strong>Hive Setup:</strong> Single/Double/Nuc/Dead/Top Splits</li>
+                    <li><strong>Strength Ratings:</strong> Strong/Medium/Weak counts</li>
+                    <li><strong>Quarantine Status:</strong> Site quarantine information</li>
+                </ul>
+            </div>
+            <div class="col-md-6">
+                <h6>Calculated Summaries:</h6>
+                <ul class="list-unstyled">
+                    <li><strong>Individual Hives:</strong> Status counts by site</li>
+                    <li><strong>Action History:</strong> Total and recent action counts</li>
+                    <li><strong>Disease Totals:</strong> Cumulative disease counts</li>
+                    <li><strong>Timestamps:</strong> Creation and update dates</li>
+                    <li><strong>Last Activity:</strong> Most recent action details</li>
+                    <li><strong>Health Status:</strong> Overall site health indicators</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="alert alert-info mt-3">
+            <h6><i class="bi bi-lightbulb"></i> Tips for Data Analysis:</h6>
+            <ul class="mb-0">
+                <li>Use the comprehensive export for complete data analysis</li>
+                <li>Individual exports are useful for specific data types</li>
+                <li>All timestamps are in UTC format</li>
+                <li>Boolean values are exported as True/False</li>
+                <li>Empty fields are exported as empty strings</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

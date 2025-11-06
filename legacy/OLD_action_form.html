@@ -1,0 +1,269 @@
+{% extends "base.html" %}
+
+{% block title %}Log Action - BeeMarshall{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow">
+            <div class="card-header bg-warning">
+                <h4 class="mb-0"><i class="bi bi-plus-circle"></i> Log Hive Action</h4>
+            </div>
+            <div class="card-body">
+                <!-- Quick Log Section -->
+                <div class="card mb-4 bg-light">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-lightning-fill"></i> Quick Log (Multiple Tasks)</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="quickLogForm">
+                            <div class="mb-3">
+                                <label for="quickSite" class="form-label">Select Site</label>
+                                <select class="form-select" id="quickSite" required>
+                                    <option value="">Choose site...</option>
+                                    {% for choice in form.site_id.choices %}
+                                    <option value="{{ choice[0] }}">{{ choice[1] }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="quickDate" class="form-label">Action Date</label>
+                                <input type="date" class="form-control" id="quickDate">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Select Tasks Completed</label>
+                                <div class="row">
+                                    {% set categories = {} %}
+                                    {% for task in task_types %}
+                                        {% if task.category not in categories %}
+                                            {% set _ = categories.update({task.category: []}) %}
+                                        {% endif %}
+                                        {% set _ = categories[task.category].append(task) %}
+                                    {% endfor %}
+                                    
+                                    {% for category, tasks in categories.items() %}
+                                    <div class="col-md-6 mb-3">
+                                        <h6 class="text-muted text-uppercase">{{ category }}</h6>
+                                        {% for task in tasks %}
+                                        <div class="form-check">
+                                            <input class="form-check-input quick-task-checkbox" type="checkbox" 
+                                                   value="{{ task.id }}" id="task{{ task.id }}">
+                                            <label class="form-check-label" for="task{{ task.id }}">
+                                                {{ task.name }}
+                                            </label>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-warning btn-lg w-100">
+                                <i class="bi bi-check-circle"></i> Log Selected Tasks
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- Divider -->
+                <div class="text-center my-4">
+                    <span class="badge bg-secondary">OR</span>
+                </div>
+                
+                <!-- Detailed Form -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-pencil"></i> Detailed Log (Single Task with Notes)</h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST" novalidate>
+                            {{ form.hidden_tag() }}
+                            
+                            <div class="mb-3">
+                                {{ form.site_id.label(class="form-label") }}
+                                {{ form.site_id(class="form-select" + (" is-invalid" if form.site_id.errors else ""), 
+                                   onchange="loadIndividualHives()") }}
+                                {% if form.site_id.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.site_id.errors %}{{ error }}{% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="mb-3" id="individualHiveContainer" style="display: none;">
+                                {{ form.individual_hive_id.label(class="form-label") }}
+                                {{ form.individual_hive_id(class="form-select") }}
+                                <small class="form-text text-muted">Leave empty to apply to all hives in site</small>
+                            </div>
+                            
+                            <div class="mb-3">
+                                {{ form.task_type_id.label(class="form-label") }}
+                                {{ form.task_type_id(class="form-select" + (" is-invalid" if form.task_type_id.errors else ""), 
+                                   onchange="toggleCustomTask()") }}
+                                {% if form.task_type_id.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.task_type_id.errors %}{{ error }}{% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="mb-3" id="customTaskContainer" style="display: none;">
+                                {{ form.custom_task_name.label(class="form-label") }}
+                                {{ form.custom_task_name(class="form-control" + (" is-invalid" if form.custom_task_name.errors else "")) }}
+                                {% if form.custom_task_name.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.custom_task_name.errors %}{{ error }}{% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="mb-3">
+                                {{ form.description.label(class="form-label") }}
+                                {{ form.description(class="form-control" + (" is-invalid" if form.description.errors else ""), 
+                                   rows="4") }}
+                                {% if form.description.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.description.errors %}{{ error }}{% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="mb-3">
+                                {{ form.action_date.label(class="form-label") }}
+                                {{ form.action_date(class="form-control" + (" is-invalid" if form.action_date.errors else "")) }}
+                                {% if form.action_date.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.action_date.errors %}{{ error }}{% endfor %}
+                                    </div>
+                                {% endif %}
+                                <small class="form-text text-muted">Leave empty to use current date/time</small>
+                            </div>
+                            
+                            <div class="d-flex justify-content-between">
+                                <a href="{{ url_for('actions') }}" class="btn btn-secondary">
+                                    <i class="bi bi-arrow-left"></i> Cancel
+                                </a>
+                                <button type="submit" class="btn btn-warning btn-lg">
+                                    <i class="bi bi-check-circle"></i> Log Action
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Quick log form submission
+document.getElementById('quickLogForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const siteId = document.getElementById('quickSite').value;
+    const actionDate = document.getElementById('quickDate').value;
+    const checkboxes = document.querySelectorAll('.quick-task-checkbox:checked');
+    const taskIds = Array.from(checkboxes).map(cb => parseInt(cb.value));
+    
+    if (!siteId) {
+        alert('Please select a site');
+        return;
+    }
+    
+    if (taskIds.length === 0) {
+        alert('Please select at least one task');
+        return;
+    }
+    
+    const data = {
+        site_id: parseInt(siteId),
+        task_ids: taskIds,
+        action_date: actionDate || new Date().toISOString()
+    };
+    
+    fetch('{{ url_for("log_quick_action") }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.message);
+            window.location.href = '{{ url_for("actions") }}';
+        } else {
+            alert('Error: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while logging actions');
+    });
+});
+
+// Toggle custom task field
+function toggleCustomTask() {
+    const taskTypeSelect = document.getElementById('task_type_id');
+    const customContainer = document.getElementById('customTaskContainer');
+    
+    if (taskTypeSelect.value === '0') {
+        customContainer.style.display = 'block';
+    } else {
+        customContainer.style.display = 'none';
+    }
+}
+
+// Load individual hives for selected site
+function loadIndividualHives() {
+    const siteSelect = document.getElementById('site_id');
+    const siteId = siteSelect.value;
+    const hiveContainer = document.getElementById('individualHiveContainer');
+    const hiveSelect = document.getElementById('individual_hive_id');
+    
+    if (siteId) {
+        fetch(`/api/site/${siteId}/hives`)
+            .then(response => response.json())
+            .then(hives => {
+                hiveSelect.innerHTML = '<option value="">All hives in site</option>';
+                hives.forEach(hive => {
+                    const option = document.createElement('option');
+                    option.value = hive.id;
+                    option.textContent = hive.hive_number;
+                    hiveSelect.appendChild(option);
+                });
+                
+                if (hives.length > 0) {
+                    hiveContainer.style.display = 'block';
+                } else {
+                    hiveContainer.style.display = 'none';
+                }
+            })
+            .catch(error => console.error('Error loading hives:', error));
+    } else {
+        hiveContainer.style.display = 'none';
+    }
+}
+
+// Set today's date as default
+document.addEventListener('DOMContentLoaded', function() {
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('quickDate').value = today;
+    
+    // Check if site is pre-selected from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const preSelectedSite = urlParams.get('site');
+    if (preSelectedSite) {
+        document.getElementById('site_id').value = preSelectedSite;
+        document.getElementById('quickSite').value = preSelectedSite;
+        loadIndividualHives();
+    }
+});
+</script>
+{% endblock %}
+

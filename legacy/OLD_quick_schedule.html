@@ -1,0 +1,224 @@
+{% extends "base.html" %}
+
+{% block title %}Quick Schedule - BeeMarshall{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h1 class="display-5"><i class="bi bi-lightning"></i> Quick Schedule Task</h1>
+        <p class="lead text-muted">Rapidly schedule tasks across your apiary sites</p>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="WIDGET-CONTAINER">
+            <div class="WIDGET-HEADER">
+                <i class="bi bi-calendar-plus"></i> Schedule New Task
+            </div>
+            <div class="WIDGET-BODY">
+                <form method="POST">
+                    {{ form.hidden_tag() }}
+                    
+                    <!-- Task Template Selection -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Task Type</label>
+                        {{ form.task_template_id(class="WIDGET-SELECT") }}
+                        <div class="form-text">Select the type of task to schedule</div>
+                    </div>
+                    
+                    <!-- Assignment Options -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Assignment</label>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    {{ form.assign_to_all_sites(class="form-check-input") }}
+                                    {{ form.assign_to_all_sites.label(class="form-check-label") }}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div id="site-selection" class="mt-3" style="display: none;">
+                            <label class="form-label">Select Sites</label>
+                            {{ form.selected_sites(class="WIDGET-SELECT", multiple=True, size="5") }}
+                        </div>
+                        
+                        <div id="hive-selection" class="mt-3" style="display: none;">
+                            <label class="form-label">Select Individual Hives</label>
+                            {{ form.selected_hives(class="WIDGET-SELECT", multiple=True, size="5") }}
+                        </div>
+                    </div>
+                    
+                    <!-- Scheduling Options -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Schedule Type</label>
+                        <div class="row">
+                            <div class="col-md-6">
+                                {{ form.schedule_type(class="WIDGET-SELECT") }}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Single Task Scheduling -->
+                    <div id="single-scheduling" class="mb-4">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label class="form-label">Scheduled Date</label>
+                                {{ form.scheduled_date(class="WIDGET-INPUT") }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Scheduled Time</label>
+                                {{ form.scheduled_time(class="WIDGET-INPUT") }}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Recurring Task Scheduling -->
+                    <div id="recurring-scheduling" class="mb-4" style="display: none;">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <label class="form-label">Recurrence Pattern</label>
+                                {{ form.recurrence_pattern(class="WIDGET-SELECT") }}
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Every X periods</label>
+                                {{ form.recurrence_interval(class="WIDGET-INPUT") }}
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">End Date</label>
+                                {{ form.recurrence_end_date(class="WIDGET-INPUT") }}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Task Settings -->
+                    <div class="mb-4">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label class="form-label">Priority</label>
+                                {{ form.priority(class="WIDGET-SELECT") }}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Submit Buttons -->
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="WIDGET-BUTTON">
+                            <i class="bi bi-calendar-check"></i> Schedule Task
+                        </button>
+                        <a href="{{ url_for('scheduler') }}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Back to Scheduler
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Task Template Preview -->
+<div class="row justify-content-center mt-4">
+    <div class="col-lg-8">
+        <div class="WIDGET-CONTAINER">
+            <div class="WIDGET-HEADER">
+                <i class="bi bi-info-circle"></i> Task Template Information
+            </div>
+            <div class="WIDGET-BODY">
+                <div id="template-preview">
+                    <p class="text-muted">Select a task template to view details</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const assignToAllCheckbox = document.getElementById('assign_to_all_sites');
+    const siteSelection = document.getElementById('site-selection');
+    const hiveSelection = document.getElementById('hive-selection');
+    const scheduleTypeSelect = document.getElementById('schedule_type');
+    const singleScheduling = document.getElementById('single-scheduling');
+    const recurringScheduling = document.getElementById('recurring-scheduling');
+    const templateSelect = document.getElementById('task_template_id');
+    const templatePreview = document.getElementById('template-preview');
+    
+    // Handle assignment options
+    assignToAllCheckbox.addEventListener('change', function() {
+        if (this.checked) {
+            siteSelection.style.display = 'none';
+            hiveSelection.style.display = 'none';
+        } else {
+            siteSelection.style.display = 'block';
+            hiveSelection.style.display = 'block';
+        }
+    });
+    
+    // Handle schedule type
+    scheduleTypeSelect.addEventListener('change', function() {
+        if (this.value === 'recurring') {
+            singleScheduling.style.display = 'none';
+            recurringScheduling.style.display = 'block';
+        } else {
+            singleScheduling.style.display = 'block';
+            recurringScheduling.style.display = 'none';
+        }
+    });
+    
+    // Handle template selection
+    templateSelect.addEventListener('change', function() {
+        const templateId = this.value;
+        if (templateId) {
+            // Load template details via AJAX
+            fetch(`/api/template/${templateId}`)
+                .then(response => response.json())
+                .then(data => {
+                    templatePreview.innerHTML = `
+                        <h6>${data.name}</h6>
+                        <p class="text-muted">${data.description}</p>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <small><strong>Duration:</strong> ${data.estimated_duration} minutes</small>
+                            </div>
+                            <div class="col-md-4">
+                                <small><strong>Priority:</strong> ${data.priority}</small>
+                            </div>
+                            <div class="col-md-4">
+                                <small><strong>Category:</strong> ${data.category}</small>
+                            </div>
+                        </div>
+                        ${data.checklist_items.length > 0 ? `
+                            <div class="mt-3">
+                                <small><strong>Checklist Items:</strong></small>
+                                <ul class="small">
+                                    ${data.checklist_items.map(item => `<li>${item}</li>`).join('')}
+                                </ul>
+                            </div>
+                        ` : ''}
+                        ${data.equipment_needed.length > 0 ? `
+                            <div class="mt-3">
+                                <small><strong>Equipment Needed:</strong></small>
+                                <ul class="small">
+                                    ${data.equipment_needed.map(item => `<li>${item}</li>`).join('')}
+                                </ul>
+                            </div>
+                        ` : ''}
+                    `;
+                })
+                .catch(error => {
+                    templatePreview.innerHTML = '<p class="text-danger">Error loading template details</p>';
+                });
+        } else {
+            templatePreview.innerHTML = '<p class="text-muted">Select a task template to view details</p>';
+        }
+    });
+    
+    // Set default date to today
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('scheduled_date').value = today;
+});
+</script>
+{% endblock %}

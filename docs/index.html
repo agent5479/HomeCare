@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<<<<<<< HEAD
     <title>CareMarshall v0.7 - Professional Care Management System</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
@@ -73,10 +74,31 @@
             transition: all var(--transition);
             color: var(--black);
             box-shadow: var(--shadow);
+=======
+    <title>HomeCare Management System</title>
+    <meta name="description" content="Professional Care Coordination Platform for elderly, disabled, and special needs care">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="css/homecare-brand.css" rel="stylesheet">
+    
+    <style>
+        .hero-section {
+            background: linear-gradient(135deg, #4A90E2, #2E5BBA);
+            color: white;
+            padding: 4rem 0;
         }
-
+        .feature-card {
+            transition: transform 0.3s ease;
+            height: 100%;
+>>>>>>> b5053293d01ba10c025b4a2821ec94760e3b0555
+        }
         .feature-card:hover {
             transform: translateY(-5px);
+<<<<<<< HEAD
             box-shadow: 0 20px 25px rgba(25, 118, 210, 0.15);
             border-color: var(--secondary-blue);
         }
@@ -258,13 +280,51 @@
             padding: 2rem 0;
             margin-top: 4rem;
             border-top: 3px solid var(--primary-blue);
+=======
+        }
+        .login-demo {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+>>>>>>> b5053293d01ba10c025b4a2821ec94760e3b0555
         }
     </style>
 </head>
 <body>
+<<<<<<< HEAD
+=======
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="#">
+                <i class="bi bi-heart-pulse-fill text-primary me-2" style="font-size: 1.5rem;"></i>
+                <span class="fw-bold">HomeCare Management</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#features">Features</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#demo">Demo</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="homecare-management.html">Launch App</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+>>>>>>> b5053293d01ba10c025b4a2821ec94760e3b0555
     <!-- Hero Section -->
     <div class="hero-section">
         <div class="container">
+<<<<<<< HEAD
             <div class="row justify-content-center">
                 <div class="col-lg-8">
                     <h1 class="hero-title">
@@ -347,10 +407,120 @@
                                 <li><strong>Backup & Recovery:</strong> Automatic data backup with easy recovery options</li>
                                 <li><strong>Version Control:</strong> Track all changes with timestamps and user attribution</li>
                             </ul>
+=======
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <h1 class="display-4 fw-bold mb-4">HomeCare Management System</h1>
+                    <p class="lead mb-4">Professional Care Coordination Platform for elderly, disabled, and special needs care. Built with modern web technologies and Firebase for real-time data synchronization.</p>
+                    <div class="d-flex gap-3">
+                        <a href="homecare-management.html" class="btn btn-light btn-lg">
+                            <i class="bi bi-play-circle me-2"></i>Launch Application
+                        </a>
+                        <a href="#features" class="btn btn-outline-light btn-lg">
+                            <i class="bi bi-info-circle me-2"></i>Learn More
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="login-demo">
+                        <h4 class="mb-3">System Access</h4>
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="card bg-primary text-white mb-3">
+                                    <div class="card-body text-center">
+                                        <h6>Admin Access</h6>
+                                        <small>Full system control<br>& management</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="card bg-success text-white mb-3">
+                                    <div class="card-body text-center">
+                                        <h6>Developer Access</h6>
+                                        <small>Technical features<br>& configuration</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <a href="homecare-management.html" class="btn btn-warning w-100">
+                            <i class="bi bi-box-arrow-in-right me-2"></i>Access System
+                        </a>
+                        <small class="text-muted d-block mt-2 text-center">
+                            <i class="bi bi-shield-lock me-1"></i>Secure login required
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-12 text-center mb-5">
+                    <h2 class="display-5 fw-bold">Comprehensive Care Management</h2>
+                    <p class="lead text-muted">Everything you need to coordinate professional home care services</p>
+                </div>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="card feature-card h-100">
+                        <div class="card-body text-center">
+                            <i class="bi bi-people-fill text-primary mb-3" style="font-size: 3rem;"></i>
+                            <h5 class="card-title">Client Management</h5>
+                            <p class="card-text">Comprehensive client profiles with medical information, care preferences, and emergency contacts.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card feature-card h-100">
+                        <div class="card-body text-center">
+                            <i class="bi bi-clipboard-check-fill text-success mb-3" style="font-size: 3rem;"></i>
+                            <h5 class="card-title">Care Action Logging</h5>
+                            <p class="card-text">50+ predefined care tasks across 6 categories with real-time logging and documentation.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card feature-card h-100">
+                        <div class="card-body text-center">
+                            <i class="bi bi-calendar-check-fill text-warning mb-3" style="font-size: 3rem;"></i>
+                            <h5 class="card-title">Task Scheduling</h5>
+                            <p class="card-text">Advanced scheduling with automated reminders, priority management, and team coordination.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card feature-card h-100">
+                        <div class="card-body text-center">
+                            <i class="bi bi-graph-up text-info mb-3" style="font-size: 3rem;"></i>
+                            <h5 class="card-title">Analytics & Reporting</h5>
+                            <p class="card-text">Comprehensive reporting with charts, analytics, and data visualization for care insights.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card feature-card h-100">
+                        <div class="card-body text-center">
+                            <i class="bi bi-shield-check text-danger mb-3" style="font-size: 3rem;"></i>
+                            <h5 class="card-title">Security & Compliance</h5>
+                            <p class="card-text">Enterprise-level security with multi-tenant architecture and role-based access control.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card feature-card h-100">
+                        <div class="card-body text-center">
+                            <i class="bi bi-phone text-primary mb-3" style="font-size: 3rem;"></i>
+                            <h5 class="card-title">Mobile Responsive</h5>
+                            <p class="card-text">Fully responsive design that works perfectly on desktop, tablet, and mobile devices.</p>
+>>>>>>> b5053293d01ba10c025b4a2821ec94760e3b0555
                         </div>
                     </div>
                 </div>
             </div>
+<<<<<<< HEAD
             <div class="col-lg-4">
                 <div class="feature-card expandable-card" data-bs-toggle="collapse" data-bs-target="#analyticsDetails" aria-expanded="false">
                     <div class="feature-icon">
@@ -433,6 +603,46 @@
                                 <li><strong>Task Templates:</strong> Pre-configured task sets for common operations</li>
                                 <li><strong>Progress Tracking:</strong> Mark tasks complete with timestamps and notes</li>
                             </ul>
+=======
+        </div>
+    </section>
+
+    <!-- Demo Section -->
+    <section id="demo" class="py-5 bg-light">
+        <div class="container">
+            <div class="row">
+                <div class="col-12 text-center mb-5">
+                    <h2 class="display-5 fw-bold">Ready to Get Started?</h2>
+                    <p class="lead text-muted">Experience the full HomeCare Management System with our live demo</p>
+                </div>
+            </div>
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="card shadow-lg">
+                        <div class="card-body text-center p-5">
+                            <i class="bi bi-heart-pulse-fill text-primary mb-4" style="font-size: 4rem;"></i>
+                            <h3 class="mb-4">Launch HomeCare Management System</h3>
+                            <p class="lead mb-4">Access the full application with pre-configured demo accounts</p>
+                            <div class="row mb-4">
+                                <div class="col-md-6">
+                                    <div class="alert alert-primary">
+                                        <strong>Administrator Access</strong><br>
+                                        Full system management<br>
+                                        <small class="text-muted">Contact admin for credentials</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="alert alert-success">
+                                        <strong>Developer Access</strong><br>
+                                        Technical configuration<br>
+                                        <small class="text-muted">Contact IT for credentials</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <a href="homecare-management.html" class="btn btn-primary btn-lg">
+                                <i class="bi bi-rocket-takeoff me-2"></i>Launch Application
+                            </a>
+>>>>>>> b5053293d01ba10c025b4a2821ec94760e3b0555
                         </div>
                     </div>
                 </div>
@@ -691,6 +901,7 @@
     </div>
 
     <!-- Footer -->
+<<<<<<< HEAD
     <div class="footer">
         <div class="container">
             <div class="row">
@@ -718,6 +929,24 @@
         </div>
     </div>
 
+=======
+    <footer class="bg-dark text-white py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>HomeCare Management System</h5>
+                    <p class="text-muted">Professional Care Coordination Platform</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="text-muted mb-0">&copy; 2024 HomeCare Management System. All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+>>>>>>> b5053293d01ba10c025b4a2821ec94760e3b0555
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+
