@@ -2219,7 +2219,7 @@ function showProfileModal() {
                             <i class="bi bi-person-circle" style="font-size: 4rem; color: var(--dark-yellow);"></i>
                         </div>
                         <h5>${currentUser ? currentUser.username : 'User'}</h5>
-                        ${isAdmin ? '<span class="badge admin-badge">ADMIN</span>' : '<span class="badge bg-secondary">Employee</span>'}
+                        ${isAdmin ? '<span class="badge admin-badge">ADMIN</span>' : '<span class="badge employee-badge">EMPLOYEE</span>'}
                     </div>
                     <div class="mb-3">
                         <label class="form-label fw-bold">Email</label>
