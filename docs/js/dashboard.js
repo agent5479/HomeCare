@@ -245,9 +245,9 @@ function updateDashboard() {
     }) : [];
     
     // Set numbers directly without animation (active sites only)
-    document.getElementById('statSites').textContent = activeSites.length;
-    const statHivesEl = document.getElementById('statHives');
-    if (statHivesEl) statHivesEl.textContent = totalClients;
+    // Update client count (sites and clients are now the same concept)
+    const statClientsEl = document.getElementById('statClients');
+    if (statClientsEl) statClientsEl.textContent = activeSites.length;
     document.getElementById('statActions').textContent = activeActions.length;
     document.getElementById('statFlagged').textContent = flaggedCount;
     // Emphasize flagged card severity by count with progressive transition
@@ -895,28 +895,24 @@ window.forceDashboardRefresh = function() {
 window.checkDashboardElements = function() {
     console.log('🔍 Checking dashboard elements...');
     
-    const statSites = document.getElementById('statSites');
-    const statHives = document.getElementById('statHives');
+    const statClients = document.getElementById('statClients');
     const statActions = document.getElementById('statActions');
     const statFlagged = document.getElementById('statFlagged');
     
     console.log('📊 Dashboard elements found:', {
-        statSites: !!statSites,
-        statHives: !!statHives,
+        statClients: !!statClients,
         statActions: !!statActions,
         statFlagged: !!statFlagged
     });
     
-    if (statSites) console.log('📊 statSites current value:', statSites.textContent);
-    if (statHives) console.log('📊 statHives current value:', statHives.textContent);
+    if (statClients) console.log('📊 statClients current value:', statClients.textContent);
     if (statActions) console.log('📊 statActions current value:', statActions.textContent);
     if (statFlagged) console.log('📊 statFlagged current value:', statFlagged.textContent);
     
     return {
-        elements: { statSites: !!statSites, statHives: !!statHives, statActions: !!statActions, statFlagged: !!statFlagged },
+        elements: { statClients: !!statClients, statActions: !!statActions, statFlagged: !!statFlagged },
         values: {
-            statSites: statSites ? statSites.textContent : 'not found',
-            statHives: statHives ? statHives.textContent : 'not found',
+            statClients: statClients ? statClients.textContent : 'not found',
             statActions: statActions ? statActions.textContent : 'not found',
             statFlagged: statFlagged ? statFlagged.textContent : 'not found'
         }
