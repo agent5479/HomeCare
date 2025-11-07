@@ -961,9 +961,9 @@ function handleSaveSite(e) {
             nucs: 0,
             empty: 0
         }),
-        harvestTimeline: document.getElementById('siteHarvest').value,
-        sugarRequirements: document.getElementById('siteSugar').value,
-        notes: document.getElementById('siteNotes').value,
+        harvestTimeline: document.getElementById('siteHarvest')?.value || '',
+        sugarRequirements: document.getElementById('siteSugar')?.value || '',
+        notes: document.getElementById('siteNotes')?.value || '',
         functionalClassification: document.getElementById('functionalClassification').value || 'production',
         seasonalClassification: document.getElementById('seasonalClassification').value || 'summer',
         landownerName: document.getElementById('landownerName').value,
@@ -1145,8 +1145,8 @@ window.editSite = function(id) {
         harvestDateInput.value = '';
     }
     
-    document.getElementById('siteSugar').value = site.sugarRequirements || '';
-    document.getElementById('siteNotes').value = site.notes || '';
+    if (document.getElementById('siteSugar')) document.getElementById('siteSugar').value = site.sugarRequirements || '';
+    if (document.getElementById('siteNotes')) document.getElementById('siteNotes').value = site.notes || '';
     document.getElementById('functionalClassification').value = site.functionalClassification || site.siteType || 'production';
     document.getElementById('seasonalClassification').value = site.seasonalClassification || site.seasonal_classification || 'summer';
     document.getElementById('landownerName').value = site.landownerName || '';

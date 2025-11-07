@@ -3805,32 +3805,19 @@
         
         // Auto-distribute hives when total count changes
         function autoDistributeHives() {
-            const totalHives = parseInt(document.getElementById('siteHiveCount').value) || 0;
-            if (totalHives > 0) {
-                // Suggest a proportional distribution
-                const strong = Math.round(totalHives * 0.4); // 40% strong
-                const medium = Math.round(totalHives * 0.3); // 30% medium
-                const weak = Math.round(totalHives * 0.2); // 20% weak
-                const nuc = Math.round(totalHives * 0.05); // 5% NUC
-                const dead = Math.round(totalHives * 0.05); // 5% dead
-                
-                document.getElementById('hiveStrong').value = strong;
-                document.getElementById('hiveMedium').value = medium;
-                document.getElementById('hiveWeak').value = weak;
-                document.getElementById('hiveNUC').value = nuc;
-                document.getElementById('hiveDead').value = dead;
-                
-                updateHiveStrengthTotals();
-            }
+            // Legacy function - no longer used in care management system
+            // Original function attempted to distribute beehive strength counts
+            // Care management system uses different data structures
+            console.log('⚠️ autoDistributeHives is a legacy function and has been disabled');
         }
         
         // Stack configuration functions
         function updateStackTotals() {
-            const doubles = parseInt(document.getElementById('stackDoubles').value) || 0;
-            const topSplits = parseInt(document.getElementById('stackTopSplits').value) || 0;
-            const singles = parseInt(document.getElementById('stackSingles').value) || 0;
-            const nucs = parseInt(document.getElementById('stackNUCs').value) || 0;
-            const empty = parseInt(document.getElementById('stackEmpty').value) || 0;
+            const doubles = parseInt(document.getElementById('stackDoubles')?.value) || 0;
+            const topSplits = parseInt(document.getElementById('stackTopSplits')?.value) || 0;
+            const singles = parseInt(document.getElementById('stackSingles')?.value) || 0;
+            const nucs = parseInt(document.getElementById('stackNUCs')?.value) || 0;
+            const empty = parseInt(document.getElementById('stackEmpty')?.value) || 0;
             
             const stackTotal = doubles + topSplits + singles + nucs + empty;
             const totalElement = document.getElementById('stackTotal');
