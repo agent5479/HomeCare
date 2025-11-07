@@ -952,6 +952,10 @@ function handleSaveSite(e) {
         id: id ? parseInt(id) : Date.now(),
         name: document.getElementById('siteName').value,
         description: document.getElementById('siteDescription').value,
+        // Client Demographics (NEW v0.7)
+        clientAge: parseInt(document.getElementById('clientAge')?.value) || null,
+        disabilityClassification: document.getElementById('disabilityClassification')?.value || '',
+        disabilityNotes: document.getElementById('disabilityNotes')?.value || '',
         latitude: parseFloat(document.getElementById('siteLat').value) || 0,
         longitude: parseFloat(document.getElementById('siteLng').value) || 0,
         hiveCount: parseInt(document.getElementById('siteHiveCount').value),
@@ -1124,6 +1128,10 @@ window.editSite = function(id) {
     document.getElementById('siteId').value = site.id;
     document.getElementById('siteName').value = site.name;
     document.getElementById('siteDescription').value = site.description || '';
+    // Client Demographics (NEW v0.7)
+    document.getElementById('clientAge').value = site.clientAge || '';
+    document.getElementById('disabilityClassification').value = site.disabilityClassification || '';
+    document.getElementById('disabilityNotes').value = site.disabilityNotes || '';
     // Ensure coordinates are properly formatted as numbers
     const lat = parseFloat(site.latitude);
     const lng = parseFloat(site.longitude);

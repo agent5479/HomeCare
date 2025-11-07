@@ -2042,6 +2042,47 @@
                                         </div>
                                     </div>
                                     
+                                    <!-- Client Demographics -->
+                                    <div class="card mt-3 mb-3 border-primary">
+                                        <div class="card-header bg-primary text-white">
+                                            <h6 class="mb-0"><i class="bi bi-person-badge"></i> Client Demographics</h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="row">
+                                                <div class="col-md-4 mb-3">
+                                                    <label for="clientAge" class="form-label">Client Age</label>
+                                                    <input type="number" class="form-control" id="clientAge" min="0" max="120" placeholder="Age in years">
+                                                    <div class="form-text">Current age of the client</div>
+                                                </div>
+                                                <div class="col-md-8 mb-3">
+                                                    <label for="disabilityClassification" class="form-label">Disability Classification</label>
+                                                    <select class="form-select" id="disabilityClassification">
+                                                        <option value="">Select if applicable...</option>
+                                                        <option value="Physical Disability">Physical Disability</option>
+                                                        <option value="Intellectual Disability">Intellectual Disability</option>
+                                                        <option value="Sensory Disability">Sensory Disability (Vision/Hearing)</option>
+                                                        <option value="Neurological Disability">Neurological Disability</option>
+                                                        <option value="Mental Health Condition">Mental Health Condition</option>
+                                                        <option value="Cognitive Disability">Cognitive Disability/Dementia</option>
+                                                        <option value="Multiple Disabilities">Multiple Disabilities</option>
+                                                        <option value="Age-Related Frailty">Age-Related Frailty</option>
+                                                        <option value="Chronic Illness">Chronic Illness</option>
+                                                        <option value="No Disability">No Disability</option>
+                                                        <option value="Other">Other</option>
+                                                    </select>
+                                                    <div class="form-text">Primary disability or health classification (NZ disability support criteria)</div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-12 mb-2">
+                                                    <label for="disabilityNotes" class="form-label">Disability/Health Notes</label>
+                                                    <textarea class="form-control" id="disabilityNotes" rows="2" 
+                                                              placeholder="Additional details about specific conditions, support needs, or accommodations required"></textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
                                     <div class="row">
                                         <div class="col-md-6 mb-3">
                                             <label for="functionalClassification" class="form-label">Functional Classification <span class="text-danger">*</span></label>
@@ -3508,6 +3549,8 @@
     <!-- CareMarshall JavaScript Modules -->
     <!-- Environment Variables (injected at build time) -->
     <script src="js/env-config.js"></script>
+    <!-- Comprehensive Task Library v0.7 -->
+    <script src="js/comprehensive-tasks-v07.js"></script>
     <!-- bcrypt for secure password hashing -->
     <script src="https://cdn.jsdelivr.net/npm/bcryptjs@2.4.3/dist/bcrypt.min.js"></script>
     <!-- Secure Configuration (must load first) -->

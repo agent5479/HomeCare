@@ -99,12 +99,47 @@ var scheduledTasks = [];
 var employees = [];
 var visits = []; // Visit-based scheduling (NEW: replaces individual task scheduling)
 var taskGroups = []; // Task group templates for quick visit scheduling (NEW)
-// Comprehensive task list for the HomeCare system
-const COMPREHENSIVE_TASKS = [
-    // Client Care & Assessment
-    { id: 'task_1', name: 'Client Health Assessment', category: 'Assessment', description: 'Regular client health and wellbeing check' },
-    { id: 'task_2', name: 'Medication Management', category: 'Health', description: 'Administer and monitor client medications' },
-    { id: 'task_3', name: 'Vital Signs Check', category: 'Health', description: 'Monitor blood pressure, temperature, pulse, and other vital signs' },
+
+// Load comprehensive task library from external file (v0.7)
+// This provides default tasks - admins can customize via the interface
+const COMPREHENSIVE_TASKS = window.COMPREHENSIVE_TASKS_V07 || [
+    // ===== PERSONAL CARE & HYGIENE =====
+    { id: 'task_1', name: 'Shower Assistance', category: 'Personal Care', description: 'Assist client with showering', common: true },
+    { id: 'task_2', name: 'Bath Assistance', category: 'Personal Care', description: 'Assist client with bathing', common: true },
+    { id: 'task_3', name: 'Bed Bath', category: 'Personal Care', description: 'Provide bed bath for immobile clients' },
+    { id: 'task_4', name: 'Hair Washing', category: 'Personal Care', description: 'Wash and dry client hair' },
+    { id: 'task_5', name: 'Hair Styling/Grooming', category: 'Personal Care', description: 'Style, brush, and groom hair' },
+    { id: 'task_6', name: 'Shaving', category: 'Personal Care', description: 'Assist with shaving (face, legs, etc.)' },
+    { id: 'task_7', name: 'Nail Care', category: 'Personal Care', description: 'Trim and file fingernails and toenails' },
+    { id: 'task_8', name: 'Oral Hygiene', category: 'Personal Care', description: 'Assist with teeth brushing and mouth care', common: true },
+    { id: 'task_9', name: 'Denture Care', category: 'Personal Care', description: 'Clean and maintain dentures' },
+    { id: 'task_10', name: 'Skin Care', category: 'Personal Care', description: 'Apply moisturizers and skin treatments' },
+    { id: 'task_11', name: 'Dressing Assistance', category: 'Personal Care', description: 'Help client get dressed', common: true },
+    { id: 'task_12', name: 'Undressing Assistance', category: 'Personal Care', description: 'Help client get undressed' },
+    { id: 'task_13', name: 'Toileting Assistance', category: 'Personal Care', description: 'Assist with toilet use', common: true },
+    { id: 'task_14', name: 'Incontinence Care', category: 'Personal Care', description: 'Change incontinence pads and provide hygiene care' },
+    { id: 'task_15', name: 'Catheter Care', category: 'Personal Care', description: 'Empty and maintain catheter bag' },
+    { id: 'task_16', name: 'Stoma Care', category: 'Personal Care', description: 'Change and clean stoma bags' },
+    
+    // ===== HEALTH & MEDICAL =====
+    { id: 'task_20', name: 'Medication Administration', category: 'Health', description: 'Administer prescribed medications', common: true },
+    { id: 'task_21', name: 'Medication Reminder', category: 'Health', description: 'Remind client to take medications' },
+    { id: 'task_22', name: 'Medication Check', category: 'Health', description: 'Verify medications are taken correctly', common: true },
+    { id: 'task_23', name: 'Medication Refill Coordination', category: 'Health', description: 'Arrange prescription refills' },
+    { id: 'task_24', name: 'Blood Pressure Check', category: 'Health', description: 'Monitor and record blood pressure', common: true },
+    { id: 'task_25', name: 'Blood Glucose Monitoring', category: 'Health', description: 'Test and record blood sugar levels', common: true },
+    { id: 'task_26', name: 'Temperature Check', category: 'Health', description: 'Monitor body temperature' },
+    { id: 'task_27', name: 'Pulse Check', category: 'Health', description: 'Monitor heart rate and rhythm' },
+    { id: 'task_28', name: 'Oxygen Saturation Check', category: 'Health', description: 'Monitor blood oxygen levels' },
+    { id: 'task_29', name: 'Weight Monitoring', category: 'Health', description: 'Weigh client and record weight changes' },
+    { id: 'task_30', name: 'Wound Care', category: 'Health', description: 'Clean and dress wounds' },
+    { id: 'task_31', name: 'Pressure Sore Prevention', category: 'Health', description: 'Reposition and monitor for pressure sores' },
+    { id: 'task_32', name: 'Pressure Sore Treatment', category: 'Health', description: 'Treat existing pressure sores' },
+    { id: 'task_33', name: 'Oxygen Therapy', category: 'Health', description: 'Administer oxygen therapy' },
+    { id: 'task_34', name: 'Nebulizer Treatment', category: 'Health', description: 'Administer nebulizer medication' },
+    { id: 'task_35', name: 'Insulin Injection', category: 'Health', description: 'Administer insulin injections' },
+    { id: 'task_36', name: 'Pain Assessment', category: 'Health', description: 'Assess and document pain levels' },
+    { id: 'task_37', name: 'Pain Management', category: 'Health', description: 'Implement pain management strategies' },
     { id: 'task_4', name: 'Health Screening', category: 'Health', description: 'Screen for health conditions and concerns' },
     { id: 'task_5', name: 'Care Plan Review', category: 'Administration', description: 'Review and update individual care plans' },
     { id: 'task_6', name: 'Equipment Maintenance', category: 'Maintenance', description: 'Clean and maintain care equipment and aids' },
