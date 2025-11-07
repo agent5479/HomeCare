@@ -247,9 +247,12 @@ function updateDashboard() {
     // Set numbers directly without animation (active sites only)
     // Update client count (sites and clients are now the same concept)
     const statClientsEl = document.getElementById('statClients');
+    const statActionsEl = document.getElementById('statActions');
+    const statFlaggedEl = document.getElementById('statFlagged');
+    
     if (statClientsEl) statClientsEl.textContent = activeSites.length;
-    document.getElementById('statActions').textContent = activeActions.length;
-    document.getElementById('statFlagged').textContent = flaggedCount;
+    if (statActionsEl) statActionsEl.textContent = activeActions.length;
+    if (statFlaggedEl) statFlaggedEl.textContent = flaggedCount;
     // Emphasize flagged card severity by count with progressive transition
     const flaggedCard = document.querySelector('.dashboard-stat-card.flagged-card');
     if (flaggedCard) {
