@@ -1766,87 +1766,16 @@
                                     </div>
                                 </div>
                                 <!-- Correlation Display -->
-                                <div class="row mt-2">
-                                    <div class="col-12 text-center">
-                                        <small class="text-muted" style="font-style: italic;">
-                                            <strong style="color: var(--gray-700);">Total strength-appraised hives:</strong> 
-                                            <span id="hiveBreakdownTotal" style="color: var(--gray-700); font-weight: 600;">0</span>
-                                        </small>
-                                    </div>
-                                </div>
+                                <!-- Removed: beekeeping terminology -->
                             </div>
                         </div>
                     </div>
 
-                    <!-- Equipment Breakdown -->
-                    <div class="col-12 col-lg-6" style="flex: 0 0 50%; max-width: 50%; padding-left: 0.5rem; padding-right: 0.5rem;">
+                    <!-- Equipment Breakdown - HIDDEN (beekeeping terminology) -->
+                    <div class="col-12 col-lg-6" style="flex: 0 0 50%; max-width: 50%; padding-left: 0.5rem; padding-right: 0.5rem; display: none;">
                         <div class="card h-100">
                             <div class="card-body py-2 px-2 px-md-3">
-                                <div class="row g-1 g-sm-2">
-                                    <!-- Doubles -->
-                                    <div class="col" style="flex: 0 0 20%; max-width: 20%;">
-                                        <div class="hive-category-card-compact">
-                                            <div class="hive-icon-compact" style="color: #0d6efd;">
-                                                <i class="bi bi-stack"></i>
-                                            </div>
-                                            <div class="hive-count-compact" id="equipmentDoublesCount">0</div>
-                                            <div class="hive-label-compact">Doubles</div>
-                                        </div>
-                                    </div>
-                                    
-                                    <!-- Singles -->
-                                    <div class="col" style="flex: 0 0 20%; max-width: 20%;">
-                                        <div class="hive-category-card-compact">
-                                            <div class="hive-icon-compact" style="color: #ffc107;">
-                                                <i class="bi bi-square-half"></i>
-                                            </div>
-                                            <div class="hive-count-compact" id="equipmentSinglesCount">0</div>
-                                            <div class="hive-label-compact">Singles</div>
-                                        </div>
-                                    </div>
-                                    
-                                    <!-- NUCs -->
-                                    <div class="col" style="flex: 0 0 20%; max-width: 20%;">
-                                        <div class="hive-category-card-compact">
-                                            <div class="hive-icon-compact" style="color: #0dcaf0;">
-                                                <i class="bi bi-circle"></i>
-                                            </div>
-                                            <div class="hive-count-compact" id="equipmentNUCsCount">0</div>
-                                            <div class="hive-label-compact">NUCs</div>
-                                        </div>
-                                    </div>
-                                    
-                                    <!-- Top Splits -->
-                                    <div class="col" style="flex: 0 0 20%; max-width: 20%;">
-                                        <div class="hive-category-card-compact">
-                                            <div class="hive-icon-compact" style="color: #6f42c1;">
-                                                <i class="bi bi-layers"></i>
-                                            </div>
-                                            <div class="hive-count-compact" id="equipmentTopSplitsCount">0</div>
-                                            <div class="hive-label-compact">Top Splits</div>
-                                        </div>
-                                    </div>
-                                    
-                                    <!-- Empty -->
-                                    <div class="col" style="flex: 0 0 20%; max-width: 20%;">
-                                        <div class="hive-category-card-compact">
-                                            <div class="hive-icon-compact empty">
-                                                <i class="bi bi-square"></i>
-                                            </div>
-                                            <div class="hive-count-compact" id="equipmentEmptyCount">0</div>
-                                            <div class="hive-label-compact">Empty</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- Total Equipment Display -->
-                                <div class="row mt-2">
-                                    <div class="col-12 text-center">
-                                        <small class="text-muted" style="font-style: italic;">
-                                            <strong style="color: var(--gray-700);">Total Care Equipment:</strong> 
-                                            <span id="equipmentTotalCount" style="color: var(--gray-700); font-weight: 600;">0</span>
-                                        </small>
-                                    </div>
-                                </div>
+                                <p class="text-muted">Equipment tracking disabled</p>
                             </div>
                         </div>
                     </div>
@@ -3032,36 +2961,7 @@
                     </div>
                 </div>
 
-                <!-- Honey Type Management (Admin Only) -->
-                <div class="row mb-4" id="honeyTypeManagement" style="display: none;">
-                    <div class="col-12">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5 class="mb-0"><i class="bi bi-flower1"></i> Honey Type Management</h5>
-                                <small class="text-muted">Manage honey types for site selection</small>
-                            </div>
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <h6>Add New Honey Type</h6>
-                                        <div class="input-group mb-3">
-                                            <input type="text" class="form-control" id="newHoneyType" placeholder="Enter honey type name">
-                                            <button class="btn btn-success" onclick="addHoneyType()">
-                                                <i class="bi bi-plus"></i> Add
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <h6>Existing Honey Types</h6>
-                                        <div id="honeyTypesList" class="list-group" style="max-height: 200px; overflow-y: auto;">
-                                            <!-- Honey types will be loaded here -->
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <!-- Honey Type Management - REMOVED (beekeeping terminology) -->
                 
                 <!-- Task List -->
                 <div class="row">
