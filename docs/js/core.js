@@ -2391,6 +2391,11 @@ function showMainApp() {
     mainApp.classList.remove('hidden');
     currentUserDisplay.textContent = currentUser.username;
     
+    // Load custom branding settings
+    if (typeof loadBrandingSettings === 'function') {
+        loadBrandingSettings();
+    }
+    
     if (isAdmin) {
         const adminBadge = document.getElementById('adminBadge');
         if (adminBadge) {
