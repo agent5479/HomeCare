@@ -79,13 +79,18 @@ class SecureConfig {
             };
         }
         
-        // Demo account (also hash this for consistency)
-        accounts['Demo'] = {
-            username: 'Demo',
-            passwordHash: this.hashPassword('Password1!'),
-            tenantId: 'demo',
-            role: 'demo_admin'
-        };
+        // Demo account - load from environment or disable in production
+        // SECURITY: For production use, remove this or set DEMO_PASSWORD in GitHub Secrets
+        if (window.ENV_DEMO_PASSWORD || window.location.hostname === 'localhost') {
+            const demoPassword = window.ENV_DEMO_PASSWORD || 'DemoOnly2025!';
+            accounts['Demo'] = {
+                username: 'Demo',
+                passwordHash: this.hashPassword(demoPassword),
+                tenantId: 'demo',
+                role: 'demo_admin'
+            };
+            console.warn('⚠️ Demo account enabled - disable in production by not setting DEMO_PASSWORD secret');
+        }
         
         return accounts;
     }
