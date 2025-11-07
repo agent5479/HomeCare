@@ -65,6 +65,7 @@ function showComplianceView() {
             view.classList.remove('hidden');
             view.style.display = '';
         }
+        updateActiveNav('compliance');
         const tasksList = document.getElementById('scheduledTasksList');
         const timeline = document.getElementById('scheduleTimeline');
         if (tasksList) {

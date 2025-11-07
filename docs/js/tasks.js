@@ -88,6 +88,7 @@ function showTasks() {
         alert('Only administrators can manage tasks.');
         return;
     }
+    updateActiveNav('tasks');
     hideAllViews();
     scrollToTop();
     setTimeout(() => {

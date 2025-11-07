@@ -1,5 +1,34 @@
 // HomeCare - Navigation Module
 
+// Update active navbar link highlighting
+function updateActiveNav(sectionName) {
+    // Remove active class from all nav links
+    document.querySelectorAll('.navbar .nav-link').forEach(link => {
+        link.classList.remove('active');
+    });
+    
+    // Add active class to the current section's nav link
+    const navLinks = {
+        'dashboard': 'Dashboard',
+        'sites': 'Clients',
+        'actions': 'Actions',
+        'schedule': 'Schedule',
+        'tasks': 'Tasks',
+        'compliance': 'Compliance',
+        'integrity': 'Data Integrity',
+        'employees': 'Team'
+    };
+    
+    const linkText = navLinks[sectionName.toLowerCase()] || sectionName;
+    document.querySelectorAll('.navbar .nav-link').forEach(link => {
+        if (link.textContent.trim().includes(linkText)) {
+            link.classList.add('active');
+        }
+    });
+    
+    console.log(`🎯 Active nav updated: ${sectionName}`);
+}
+
 // Universal minimal scroll-to-top function
 function scrollToTop() {
     // Force scroll to absolute top before any view changes
@@ -97,7 +126,7 @@ function showSites() {
             view.classList.remove('hidden');
             view.style.display = '';
         }
-        updateActiveNav('Sites');
+        updateActiveNav('sites');
         renderSites();
         renderSiteTypeFilter();
         // Setup return-to-top button after view is shown
@@ -122,7 +151,7 @@ function showActions() {
             view.classList.remove('hidden');
             view.style.display = '';
         }
-        updateActiveNav('Actions');
+        updateActiveNav('actions');
         // Scroll reset immediately after showing view (everything already rendered)
         window.scrollTo(0, 0);
         document.documentElement.scrollTop = 0;
@@ -170,7 +199,7 @@ function showScheduledTasks() {
             timeline.style.display = '';
             timeline.classList.remove('hidden');
         }
-        updateActiveNav('Schedule');
+        updateActiveNav('schedule');
         renderScheduledTasks();
         renderScheduleTimeline();
     }, 10);
@@ -202,6 +231,7 @@ function showEmployees() {
             view.classList.remove('hidden');
             view.style.display = '';
         }
+        updateActiveNav('employees');
         const tasksList = document.getElementById('scheduledTasksList');
         const timeline = document.getElementById('scheduleTimeline');
         if (tasksList) {

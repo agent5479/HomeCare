@@ -4592,6 +4592,7 @@
                     view.classList.remove('hidden');
                     view.style.display = '';
                 }
+                updateActiveNav('integrity');
                 const tasksList = document.getElementById('scheduledTasksList');
                 const timeline = document.getElementById('scheduleTimeline');
                 if (tasksList) {
@@ -4602,7 +4603,6 @@
                     timeline.style.display = 'none';
                     timeline.classList.add('hidden');
                 }
-                updateActiveNav('Data Integrity');
                 runIntegrityCheck();
             }, 10);
         }
