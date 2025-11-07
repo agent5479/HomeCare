@@ -209,11 +209,11 @@ function _renderSitesInternal() {
                 const landownerName = c.landownerName || '';
                 const landownerPhone = c.landownerPhone || '';
                 const landownerEmail = c.landownerEmail || '';
-                const landownerAddress = c.landownerAddress || '';
+                const contactNotes = c.contactNotes || c.landownerAddress || '';
                 const contactLine = [landownerName, landownerPhone].filter(Boolean).join(' • ');
-                const addressLine = landownerAddress;
-                const landownerDisplay = [contactLine, addressLine].filter(Boolean).join(', ');
-                const landownerTitle = [contactLine, addressLine].filter(Boolean).join(' — ');
+                const notesLine = contactNotes;
+                const landownerDisplay = [contactLine, notesLine].filter(Boolean).join(', ');
+                const landownerTitle = [contactLine, notesLine].filter(Boolean).join(' — ');
                 
                 // Get clients at this site
                 const siteClients = (window.clients || window.individualHives || []).filter(client => client.siteId === c.id);
@@ -343,8 +343,8 @@ function _renderSitesInternal() {
                                         ${landownerPhone ? ` • <a href="tel:${landownerPhone}" onclick="event.stopPropagation();" class="text-decoration-none"><i class="bi bi-telephone"></i> ${landownerPhone}</a>` : ''}
                                         ${landownerEmail ? ` • <a href="mailto:${landownerEmail}" onclick="event.stopPropagation();" class="text-decoration-none"><i class="bi bi-envelope"></i> Email</a>` : ''}
                                     </div>` : '<span class="text-muted small">No contact information</span>'}
-                                    ${landownerAddress ? `<div class="small text-muted mt-1">
-                                        <i class="bi bi-geo-alt"></i> ${landownerAddress}
+                                    ${contactNotes ? `<div class="small text-muted mt-1">
+                                        <i class="bi bi-journal-text"></i> ${contactNotes}
                                     </div>` : ''}
                                 </div>
                                 
@@ -928,6 +928,9 @@ function handleSaveSite(e) {
     const nucElement = document.getElementById('hiveStateNUC');
     const deadElement = document.getElementById('hiveStateDead');
     
+    const contactNotesField = document.getElementById('landownerNotes');
+    const contactNotes = contactNotesField ? contactNotesField.value : '';
+    
     const site = {
         id: id ? parseInt(id) : Date.now(),
         name: document.getElementById('siteName').value,
@@ -969,7 +972,9 @@ function handleSaveSite(e) {
         landownerName: document.getElementById('landownerName').value,
         landownerPhone: document.getElementById('landownerPhone').value,
         landownerEmail: document.getElementById('landownerEmail').value,
-        landownerAddress: document.getElementById('landownerAddress').value,
+        contactNotes,
+        // Backward compatibility - legacy property
+        landownerAddress: contactNotes,
         accessType: document.getElementById('accessType').value,
         contactBeforeVisit: document.getElementById('contactBeforeVisit').checked,
         isQuarantine: document.getElementById('isQuarantine').checked,
@@ -1152,7 +1157,9 @@ window.editSite = function(id) {
     document.getElementById('landownerName').value = site.landownerName || '';
     document.getElementById('landownerPhone').value = site.landownerPhone || '';
     document.getElementById('landownerEmail').value = site.landownerEmail || '';
-    document.getElementById('landownerAddress').value = site.landownerAddress || '';
+    if (document.getElementById('landownerNotes')) {
+        document.getElementById('landownerNotes').value = site.contactNotes || site.landownerAddress || '';
+    }
     document.getElementById('accessType').value = site.accessType || '';
     document.getElementById('contactBeforeVisit').checked = site.contactBeforeVisit || false;
     document.getElementById('isQuarantine').checked = site.isQuarantine || false;
@@ -1597,7 +1604,7 @@ function viewSiteDetails(id) {
                                 ${site.landownerName ? `<p><strong>Name:</strong> ${site.landownerName}</p>` : ''}
                                 ${site.landownerPhone ? `<p><strong>Phone:</strong> <a href="tel:${site.landownerPhone}" class="btn btn-sm btn-outline-primary"><i class="bi bi-telephone-fill"></i> ${site.landownerPhone}</a></p>` : ''}
                                 ${site.landownerEmail ? `<p><strong>Email:</strong> <a href="mailto:${site.landownerEmail}" class="btn btn-sm btn-outline-primary"><i class="bi bi-envelope-fill"></i> ${site.landownerEmail}</a></p>` : ''}
-                                ${site.landownerAddress ? `<p><strong>Address:</strong> ${site.landownerAddress}</p>` : ''}
+                                ${(site.contactNotes || site.landownerAddress) ? `<p><strong>Contact Notes:</strong> ${site.contactNotes || site.landownerAddress}</p>` : ''}
                                 
                                 <!-- Clients at this site -->
                                 ${(() => {
@@ -3438,13 +3445,10 @@ function showContactDetails(siteId) {
                                 </p>
                             </div>
                         ` : ''}
-                        ${site.landownerAddress ? `
+                        ${(site.contactNotes || site.landownerAddress) ? `
                             <div class="mb-3">
-                                <h6><i class="bi bi-geo-alt"></i> Address</h6>
-                                <p class="mb-0">${site.landownerAddress}</p>
-                                <button class="btn btn-sm btn-outline-primary mt-2" onclick="openInMaps(${site.id})">
-                                    <i class="bi bi-map"></i> View on Map
-                                </button>
+                                <h6><i class="bi bi-journal-text"></i> Contact Notes</h6>
+                                <p class="mb-0">${site.contactNotes || site.landownerAddress}</p>
                             </div>
                         ` : ''}
                         ${site.contactBeforeVisit ? `

@@ -3932,7 +3932,7 @@
                     'Contact Name': site.landownerName || '',
                     'Contact Phone': site.landownerPhone || '',
                     'Contact Email': site.landownerEmail || '',
-                    'Contact Address': site.landownerAddress || '',
+                    'Contact Notes': site.contactNotes || site.landownerAddress || '',
                     // Legal & Compliance
                     'HDS Registration': site.legalCompliance?.hdsRegistrationNumber || '',
                     'Registration Expiry': site.legalCompliance?.registrationExpiry || '',
@@ -4393,7 +4393,7 @@
                         'Landowner Name': site.landownerName || '',
                         'Landowner Phone': site.landownerPhone || '',
                         'Landowner Email': site.landownerEmail || '',
-                        'Landowner Address': site.landownerAddress || '',
+                        'Contact Notes': site.contactNotes || site.landownerAddress || '',
                         'Access Type': site.accessType || '',
                         'Contact Before Visit': site.contactBeforeVisit ? 'Yes' : 'No',
                         'Quarantine': site.isQuarantine ? 'Yes' : 'No',
