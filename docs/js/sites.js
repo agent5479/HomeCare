@@ -1052,7 +1052,8 @@ function handleSaveSite(e) {
     if (navigator.onLine && window.database) {
         database.ref(`${tenantPath}/${site.id}`).set(site)
             .then(() => {
-                careMarshallAlert(`✅ Site "${site.name}" has been saved successfully!`, 'success');
+                const tenantInfo = currentTenantId ? ` to tenant: ${currentTenantId}` : '';
+                careMarshallAlert(`✅ Client "${site.name}" has been saved successfully${tenantInfo}!\n\nData saved to: ${tenantPath}/${site.id}`, 'success');
                 if (window.syncStatusManager) {
                     window.syncStatusManager.updateSyncStatus('synced');
                 }
@@ -1079,7 +1080,8 @@ function handleSaveSite(e) {
                         method: 'set'
                     });
                 }
-                careMarshallAlert('⚠️ Site saved locally. Will sync when connection is restored.', 'warning');
+                const tenantInfo = currentTenantId ? ` to tenant: ${currentTenantId}` : '';
+                careMarshallAlert(`⚠️ Client "${site.name}" saved locally${tenantInfo}.\n\nWill sync to ${tenantPath}/${site.id} when connection is restored.`, 'warning');
                 // Close the form and return to sites view, then scroll to the site card
                 setTimeout(() => {
                     showSites();
@@ -1102,7 +1104,8 @@ function handleSaveSite(e) {
                 method: 'set'
             });
         }
-        careMarshallAlert('⚠️ Site saved locally. Will sync when connection is restored.', 'warning');
+        const tenantInfo = currentTenantId ? ` to tenant: ${currentTenantId}` : '';
+        careMarshallAlert(`⚠️ Client "${site.name}" saved locally${tenantInfo}.\n\nWill sync to ${tenantPath}/${site.id} when connection is restored.`, 'warning');
         // Close the form and return to sites view
         setTimeout(() => {
             showSites();
