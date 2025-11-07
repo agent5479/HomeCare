@@ -723,7 +723,7 @@
             border-color: var(--primary-accent);
         }
         
-        .hives-card:hover {
+        .clients-card:hover {
             border-color: var(--success);
         }
         
@@ -1397,7 +1397,7 @@
             letter-spacing: 0.5px;
         }
         
-        /* Clickable Hive State Numbers */
+        /* Clickable Client State Elements */
         .cursor-pointer {
             cursor: pointer;
             transition: transform 0.2s ease, opacity 0.2s ease;
@@ -2037,37 +2037,7 @@
                                         <textarea class="form-control" id="siteDescription" rows="3"></textarea>
                                     </div>
                                     
-                                    <!-- Client Health Status Summary -->
-                                    <div class="card mt-4" id="hiveStateCard" style="display: none;">
-                                        <div class="card-header">
-                                            <h6 class="mb-0"><i class="bi bi-heart-pulse"></i> Client Health Status</h6>
-                                            <small class="text-muted">Click numbers to update counts. Changes are automatically saved.</small>
-                                        </div>
-                                        <div class="card-body">
-                                            <div class="row g-2">
-                                                <div class="col-6 col-md-4 text-center">
-                                                    <h3 class="mb-1 fw-bold text-success cursor-pointer" id="hiveStateStrong" onclick="editHiveStateCount('Strong')">0</h3>
-                                                    <small class="text-muted">Strong</small>
-                                                </div>
-                                                <div class="col-6 col-md-4 text-center">
-                                                    <h3 class="mb-1 fw-bold text-warning cursor-pointer" id="hiveStateMedium" onclick="editHiveStateCount('Medium')">0</h3>
-                                                    <small class="text-muted">Medium</small>
-                                                </div>
-                                                <div class="col-6 col-md-4 text-center">
-                                                    <h3 class="mb-1 fw-bold text-danger cursor-pointer" id="hiveStateWeak" onclick="editHiveStateCount('Weak')">0</h3>
-                                                    <small class="text-muted">Weak</small>
-                                                </div>
-                                                <div class="col-6 col-md-4 text-center">
-                                                    <h3 class="mb-1 fw-bold text-info cursor-pointer" id="hiveStateNUC" onclick="editHiveStateCount('NUC')">0</h3>
-                                                    <small class="text-muted">NUC</small>
-                                                </div>
-                                                <div class="col-6 col-md-4 text-center">
-                                                    <h3 class="mb-1 fw-bold text-dark cursor-pointer" id="hiveStateDead" onclick="editHiveStateCount('Dead')">0</h3>
-                                                    <small class="text-muted">Dead</small>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    <!-- Client Health Status Summary - REMOVED (beekeeping strength terminology) -->
                                     
                                     <!-- Client Care Details -->
                                     <div class="card mt-4">
@@ -2169,7 +2139,7 @@
                                     <div class="row">
                                         <div class="col-md-12 mb-3">
                                             <label for="siteHiveCount" class="form-label">Total Client Count *</label>
-                                            <input type="number" class="form-control" id="siteHiveCount" min="0" required onchange="updateHiveStrengthTotals()">
+                                            <input type="number" class="form-control" id="siteHiveCount" min="0" required>
                                             <div class="form-text">Total number of clients at this location (0 allowed for temporary or inactive sites)</div>
                                         </div>
                                     </div>
@@ -2444,60 +2414,7 @@
                                         </div>
                                     </div>
                                     
-                                    <!-- Honey Potentials -->
-                                    <div class="card mb-3">
-                                        <div class="card-header">
-                                            <h6><i class="bi bi-flower1"></i> Honey Potentials</h6>
-                                        </div>
-                                        <div class="card-body">
-                                            <p class="small text-muted mb-3">Select likely honey types for this location. Manage the list of available honey types in Task Management.</p>
-                                            <div id="honeyPotentialsContainer" class="d-flex flex-wrap gap-2">
-                                                <!-- Honey type checkboxes will be dynamically generated here -->
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="row">
-                                        <div class="col-md-6 mb-3">
-                                            <label for="siteHarvest" class="form-label">Expected Harvest Date</label>
-                                            <input type="date" class="form-control" id="siteHarvest">
-                                            <div class="form-text">Date when honey harvest is expected</div>
-                                        </div>
-                                        <div class="col-md-6 mb-3">
-                                            <label for="siteSugar" class="form-label">Sugar Requirements</label>
-                                            <input type="text" class="form-control" id="siteSugar" placeholder="e.g., 20kg for winter">
-                                        </div>
-                                    </div>
-                                    
-                                    <!-- Historical Harvest Records -->
-                                    <div class="card mb-3">
-                                        <div class="card-header">
-                                            <h6><i class="bi bi-archive"></i> Historical Harvest Records</h6>
-                                        </div>
-                                        <div class="card-body">
-                                            <div id="harvestRecordsContainer">
-                                                <p class="text-muted small">No harvest records yet. Add your first harvest below.</p>
-                                            </div>
-                                            <hr>
-                                            <div class="row">
-                                                <div class="col-md-4">
-                                                    <label for="harvestDate" class="form-label">Harvest Date</label>
-                                                    <input type="date" class="form-control" id="harvestDate">
-                                                </div>
-                                                <div class="col-md-4">
-                                                    <label for="harvestQuantity" class="form-label">Quantity (kg)</label>
-                                                    <input type="number" step="0.1" class="form-control" id="harvestQuantity" placeholder="e.g., 25.5">
-                                                </div>
-                                                <div class="col-md-4">
-                                                    <label for="harvestNotes" class="form-label">Notes</label>
-                                                    <input type="text" class="form-control" id="harvestNotes" placeholder="e.g., Late harvest due to weather">
-                                                </div>
-                                            </div>
-                                            <button type="button" class="btn btn-outline-success btn-sm mt-2" onclick="addHarvestRecord()">
-                                                <i class="bi bi-plus"></i> Add Harvest Record
-                                            </button>
-                                        </div>
-                                    </div>
+                                    <!-- Honey Potentials & Harvest - REMOVED (beekeeping terminology) -->
                                     
                                     <div class="mb-3">
                                         <label for="siteNotes" class="form-label">Notes</label>
@@ -3511,13 +3428,13 @@
             document.getElementById('map').style.display = 'block';
             
             // Check if map is already initialized
-            if (window.homeCareMap || window.beeMarshallMap) {
-                const mapInstance = window.homeCareMap || window.beeMarshallMap;
+            if (window.homeCareMap || window.careMarshallMap) {
+                const mapInstance = window.homeCareMap || window.careMarshallMap;
                 console.log('🗺️ Map already initialized, refreshing markers...');
                 // Clear existing markers
-                if (window.beeMarshallMarkers) {
-                    window.beeMarshallMarkers.forEach(marker => marker.remove());
-                    window.beeMarshallMarkers = [];
+                if (window.careMarshallMarkers) {
+                    window.careMarshallMarkers.forEach(marker => marker.remove());
+                    window.careMarshallMarkers = [];
                 }
                 // Re-render sites
                 renderSitesOnMap();
@@ -3535,7 +3452,7 @@
                 });
                 
                 // Backward compatibility alias
-                window.beeMarshallMap = window.homeCareMap;
+                window.careMarshallMap = window.homeCareMap;
                 
                 // Add OpenStreetMap tiles with better loading
                 const tileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -3575,21 +3492,21 @@
         
         // Function to render sites on map with proper marker management
         function renderSitesOnMap() {
-            const mapInstance = window.homeCareMap || window.beeMarshallMap;
+            const mapInstance = window.homeCareMap || window.careMarshallMap;
             if (!mapInstance) {
                 console.log('🗺️ Map not initialized, skipping marker rendering');
                 return;
             }
             
             // Support both new and old marker array names
-            const markersArray = window.homeCareMarkers || window.beeMarshallMarkers;
+            const markersArray = window.homeCareMarkers || window.careMarshallMarkers;
             if (markersArray) {
                 markersArray.forEach(marker => marker.remove());
             }
             
             // Initialize markers array with new name, maintain backward compatibility
             window.homeCareMarkers = [];
-            window.beeMarshallMarkers = window.homeCareMarkers;
+            window.careMarshallMarkers = window.homeCareMarkers;
             
             // Add site markers
             if (typeof sites !== 'undefined' && sites.length > 0) {
@@ -3659,10 +3576,8 @@
                                     </h6>
                                     <p class="mb-1"><small>${site.description || 'No description'}</small></p>
                                     <p class="mb-1"><strong>Type:</strong> <span style="color: ${typeInfo.color};">${typeInfo.name}</span></p>
-                                    <p class="mb-1"><strong>Hives:</strong> ${site.hiveCount || 0}</p>
-                                    ${site.harvestTimeline ? `<p class="mb-1"><strong>Harvest:</strong> ${site.harvestTimeline}</p>` : ''}
-                                    ${site.sugarRequirements ? `<p class="mb-1"><strong>Sugar:</strong> ${site.sugarRequirements}</p>` : ''}
-                                    ${site.landownerName ? `<p class="mb-1"><strong>Landowner:</strong> ${site.landownerName}</p>` : ''}
+                                    <p class="mb-1"><strong>Clients:</strong> ${site.hiveCount || 0}</p>
+                                    ${site.landownerName ? `<p class="mb-1"><strong>Contact:</strong> ${site.landownerName}</p>` : ''}
                                     
                                     ${siteTasks.length > 0 ? `
                                         <div class="mt-3">
@@ -3720,7 +3635,7 @@
                                 className: 'site-popup'
                             });
                         
-                        const markersArray = window.homeCareMarkers || window.beeMarshallMarkers;
+                        const markersArray = window.homeCareMarkers || window.careMarshallMarkers;
                         if (markersArray) {
                             markersArray.push(marker);
                         }
@@ -3730,7 +3645,7 @@
                     }
                 });
                 
-                const markersArray = window.homeCareMarkers || window.beeMarshallMarkers;
+                const markersArray = window.homeCareMarkers || window.careMarshallMarkers;
                 console.log(`📍 Added ${markersArray ? markersArray.length : 0} site markers`);
             } else {
                 console.log('📍 No sites to render on map');
