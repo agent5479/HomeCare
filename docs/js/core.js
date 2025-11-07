@@ -97,6 +97,8 @@ var clients = []; // Renamed from individualHives for backward compatibility
 var individualHives = clients; // Backward compatibility alias
 var scheduledTasks = [];
 var employees = [];
+var visits = []; // Visit-based scheduling (NEW: replaces individual task scheduling)
+var taskGroups = []; // Task group templates for quick visit scheduling (NEW)
 // Comprehensive task list for the HomeCare system
 const COMPREHENSIVE_TASKS = [
     // Client Care & Assessment
@@ -3418,6 +3420,33 @@ function loadAllData() {
             console.error('❌ Error loading deleted tasks:', error);
             window.deletedTasks = {};
         });
+    
+    // Load visits (NEW: visit-based scheduling)
+    database.ref(`${tenantPath}/visits`).once('value')
+        .then(snapshot => {
+            const data = snapshot.val();
+            window.visits = data ? Object.values(data) : [];
+            console.log('✅ Visits loaded:', window.visits.length);
+            if (typeof updateDashboard === 'function') {
+                updateDashboard();
+            }
+        })
+        .catch(error => {
+            console.error('❌ Error loading visits:', error);
+            window.visits = [];
+        });
+    
+    // Load task groups (NEW: task templates)
+    database.ref(`${tenantPath}/taskGroups`).once('value')
+        .then(snapshot => {
+            const data = snapshot.val();
+            window.taskGroups = data ? Object.values(data) : [];
+            console.log('✅ Task groups loaded:', window.taskGroups.length);
+        })
+        .catch(error => {
+            console.error('❌ Error loading task groups:', error);
+            window.taskGroups = [];
+        });
 }
 
 // Initialize data loading after successful login
@@ -3505,6 +3534,25 @@ function initializeDataLoading() {
             }
         });
         
+        // NEW: Real-time listener for visits
+        firebaseListeners.visits = database.ref(`${tenantPath}/visits`);
+        firebaseListeners.visits.on('value', snapshot => {
+            const data = snapshot.val();
+            window.visits = data ? Object.values(data) : [];
+            console.log('🔄 Visits updated:', window.visits.length);
+            if (typeof updateDashboard === 'function') {
+                updateDashboard();
+            }
+        });
+        
+        // NEW: Real-time listener for task groups
+        firebaseListeners.taskGroups = database.ref(`${tenantPath}/taskGroups`);
+        firebaseListeners.taskGroups.on('value', snapshot => {
+            const data = snapshot.val();
+            window.taskGroups = data ? Object.values(data) : [];
+            console.log('🔄 Task groups updated:', window.taskGroups.length);
+        });
+        
         firebaseListeners.deletedTasks = database.ref(`${tenantPath}/deletedTasks`);
         firebaseListeners.deletedTasks.on('value', snapshot => {
             const data = snapshot.val();
@@ -3531,3 +3579,194 @@ function renderSeasonalRequirements() {
     // This function is called but not implemented yet
     // Should render seasonal requirements view
 }
+
+// =====================================================
+// NEW: Task Group Management Functions (v0.7)
+// =====================================================
+
+/**
+ * Save a task group template to Firebase
+ * @param {Object} taskGroup - Task group object {name, description, taskIds, category, color}
+ * @returns {Promise} Firebase promise
+ */
+window.saveTaskGroup = function(taskGroup) {
+    if (!database || !currentTenantId) {
+        console.error('❌ Database not available or no tenant ID');
+        return Promise.reject('Database not available');
+    }
+    
+    const groupData = {
+        id: taskGroup.id || `taskgroup_${Date.now()}`,
+        name: taskGroup.name,
+        description: taskGroup.description || '',
+        taskIds: taskGroup.taskIds || [],
+        category: taskGroup.category || 'General',
+        color: taskGroup.color || '#0d6efd',
+        createdBy: currentUser?.username || 'Unknown',
+        createdAt: taskGroup.createdAt || new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+    };
+    
+    const taskGroupsPath = `tenants/${currentTenantId}/taskGroups`;
+    return database.ref(`${taskGroupsPath}/${groupData.id}`).set(groupData)
+        .then(() => {
+            console.log('✅ Task group saved:', groupData.name);
+            logAction('Task Group Created', `Created task group: ${groupData.name}`, null, null, null);
+            return groupData;
+        })
+        .catch(error => {
+            console.error('❌ Error saving task group:', error);
+            throw error;
+        });
+};
+
+/**
+ * Delete a task group
+ * @param {string} groupId - Task group ID
+ * @returns {Promise} Firebase promise
+ */
+window.deleteTaskGroup = function(groupId) {
+    if (!database || !currentTenantId) {
+        console.error('❌ Database not available or no tenant ID');
+        return Promise.reject('Database not available');
+    }
+    
+    const taskGroup = taskGroups.find(g => g.id === groupId);
+    const groupName = taskGroup ? taskGroup.name : groupId;
+    
+    const taskGroupsPath = `tenants/${currentTenantId}/taskGroups`;
+    return database.ref(`${taskGroupsPath}/${groupId}`).remove()
+        .then(() => {
+            console.log('✅ Task group deleted:', groupId);
+            logAction('Task Group Deleted', `Deleted task group: ${groupName}`, null, null, null);
+        })
+        .catch(error => {
+            console.error('❌ Error deleting task group:', error);
+            throw error;
+        });
+};
+
+// =====================================================
+// NEW: Visit Management Functions (v0.7)
+// =====================================================
+
+/**
+ * Save a visit to Firebase
+ * @param {Object} visit - Visit object {siteId, date, time, tasks, notes, status}
+ * @returns {Promise} Firebase promise
+ */
+window.saveVisit = function(visit) {
+    if (!database || !currentTenantId) {
+        console.error('❌ Database not available or no tenant ID');
+        return Promise.reject('Database not available');
+    }
+    
+    const visitData = {
+        id: visit.id || `visit_${Date.now()}`,
+        siteId: visit.siteId,
+        date: visit.date,
+        time: visit.time || '',
+        duration: visit.duration || 60, // Default 60 minutes
+        assignedTasks: visit.assignedTasks || [], // Array of {taskId, status, completedAt, notes}
+        priority: visit.priority || 'normal',
+        status: visit.status || 'scheduled', // scheduled, in_progress, completed, cancelled
+        notes: visit.notes || '',
+        assignedTo: visit.assignedTo || currentUser?.username || '',
+        createdBy: currentUser?.username || 'Unknown',
+        createdAt: visit.createdAt || new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+    };
+    
+    const visitsPath = `tenants/${currentTenantId}/visits`;
+    return database.ref(`${visitsPath}/${visitData.id}`).set(visitData)
+        .then(() => {
+            const site = sites.find(s => s.id === visit.siteId);
+            const siteName = site ? site.name : `Site ${visit.siteId}`;
+            console.log('✅ Visit saved:', visitData.id);
+            logAction('Visit Scheduled', `Scheduled visit to ${siteName}`, visit.siteId, null, null);
+            return visitData;
+        })
+        .catch(error => {
+            console.error('❌ Error saving visit:', error);
+            throw error;
+        });
+};
+
+/**
+ * Update visit task status (mark task as complete within a visit)
+ * @param {string} visitId - Visit ID
+ * @param {string} taskId - Task ID within the visit
+ * @param {string} status - Task status ('pending', 'completed', 'skipped')
+ * @param {string} notes - Optional notes
+ * @returns {Promise} Firebase promise
+ */
+window.updateVisitTaskStatus = function(visitId, taskId, status, notes = '') {
+    if (!database || !currentTenantId) {
+        console.error('❌ Database not available or no tenant ID');
+        return Promise.reject('Database not available');
+    }
+    
+    const visit = visits.find(v => v.id === visitId);
+    if (!visit) {
+        return Promise.reject('Visit not found');
+    }
+    
+    // Update the specific task within the visit
+    const taskIndex = visit.assignedTasks.findIndex(t => t.taskId === taskId);
+    if (taskIndex === -1) {
+        return Promise.reject('Task not found in visit');
+    }
+    
+    visit.assignedTasks[taskIndex] = {
+        ...visit.assignedTasks[taskIndex],
+        status: status,
+        completedAt: status === 'completed' ? new Date().toISOString() : null,
+        notes: notes
+    };
+    
+    // Check if all tasks are complete
+    const allTasksComplete = visit.assignedTasks.every(t => t.status === 'completed' || t.status === 'skipped');
+    if (allTasksComplete && visit.status === 'in_progress') {
+        visit.status = 'completed';
+        visit.completedAt = new Date().toISOString();
+    }
+    
+    visit.updatedAt = new Date().toISOString();
+    
+    const visitsPath = `tenants/${currentTenantId}/visits`;
+    return database.ref(`${visitsPath}/${visitId}`).set(visit)
+        .then(() => {
+            console.log('✅ Visit task updated:', taskId, status);
+            return visit;
+        })
+        .catch(error => {
+            console.error('❌ Error updating visit task:', error);
+            throw error;
+        });
+};
+
+/**
+ * Delete a visit
+ * @param {string} visitId - Visit ID
+ * @returns {Promise} Firebase promise
+ */
+window.deleteVisit = function(visitId) {
+    if (!database || !currentTenantId) {
+        console.error('❌ Database not available or no tenant ID');
+        return Promise.reject('Database not available');
+    }
+    
+    const visit = visits.find(v => v.id === visitId);
+    const visitInfo = visit ? `${visit.date} ${visit.time}` : visitId;
+    
+    const visitsPath = `tenants/${currentTenantId}/visits`;
+    return database.ref(`${visitsPath}/${visitId}`).remove()
+        .then(() => {
+            console.log('✅ Visit deleted:', visitId);
+            logAction('Visit Cancelled', `Cancelled visit: ${visitInfo}`, visit?.siteId, null, null);
+        })
+        .catch(error => {
+            console.error('❌ Error deleting visit:', error);
+            throw error;
+        });
+};

@@ -836,3 +836,189 @@ function toggleHoneyType(index) {
         }
     }
 }
+
+// =====================================================
+// NEW: Task Group Management Functions (v0.7)
+// =====================================================
+
+/**
+ * Show task group management modal
+ */
+window.showTaskGroupModal = function() {
+    // Populate existing task groups
+    renderExistingTaskGroups();
+    
+    // Populate task selection checkboxes
+    renderTaskGroupTaskSelection();
+    
+    // Show modal
+    const modal = new bootstrap.Modal(document.getElementById('taskGroupModal'));
+    modal.show();
+};
+
+/**
+ * Render existing task groups in the modal
+ */
+function renderExistingTaskGroups() {
+    const container = document.getElementById('existingTaskGroups');
+    
+    if (!taskGroups || taskGroups.length === 0) {
+        container.innerHTML = '<p class="text-muted">No task groups created yet.</p>';
+        return;
+    }
+    
+    container.innerHTML = taskGroups.map(group => `
+        <div class="list-group-item d-flex justify-content-between align-items-center">
+            <div class="flex-grow-1">
+                <div class="d-flex align-items-center mb-1">
+                    <div class="me-2" style="width: 20px; height: 20px; background-color: ${group.color}; border-radius: 3px;"></div>
+                    <strong>${group.name}</strong>
+                    <span class="badge bg-secondary ms-2">${group.category}</span>
+                </div>
+                <div class="text-muted small">
+                    ${group.description || 'No description'}
+                </div>
+                <div class="mt-2">
+                    <span class="badge bg-info text-dark">${group.taskIds.length} tasks</span>
+                    <span class="text-muted small ms-2">Created by ${group.createdBy}</span>
+                </div>
+            </div>
+            <div>
+                <button class="btn btn-sm btn-outline-danger" onclick="deleteTaskGroupConfirm('${group.id}')">
+                    <i class="bi bi-trash"></i>
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
+/**
+ * Render task groups list in the Tasks view
+ */
+window.renderTaskGroupsList = function() {
+    const container = document.getElementById('taskGroupsList');
+    
+    if (!taskGroups || taskGroups.length === 0) {
+        container.innerHTML = '<p class="text-center text-muted my-3">No task groups created yet. Click "Manage Task Groups" to create one.</p>';
+        return;
+    }
+    
+    container.innerHTML = taskGroups.map(group => `
+        <div class="badge bg-light text-dark border me-2 mb-2 p-2" style="font-size: 0.9rem; border-left: 4px solid ${group.color} !important;">
+            <i class="bi bi-collection me-1"></i>
+            ${group.name}
+            <span class="badge bg-secondary ms-1">${group.taskIds.length}</span>
+        </div>
+    `).join('');
+};
+
+/**
+ * Render task selection checkboxes for creating a task group
+ */
+function renderTaskGroupTaskSelection() {
+    const container = document.getElementById('taskGroupTaskSelection');
+    
+    // Get all available tasks from COMPREHENSIVE_TASKS
+    const allTasks = window.COMPREHENSIVE_TASKS || [];
+    
+    if (allTasks.length === 0) {
+        container.innerHTML = '<p class="text-muted">No tasks available</p>';
+        return;
+    }
+    
+    // Group tasks by category
+    const tasksByCategory = {};
+    allTasks.forEach(task => {
+        if (!tasksByCategory[task.category]) {
+            tasksByCategory[task.category] = [];
+        }
+        tasksByCategory[task.category].push(task);
+    });
+    
+    container.innerHTML = Object.keys(tasksByCategory).map(category => `
+        <div class="mb-3">
+            <h6 class="fw-bold text-primary">${category}</h6>
+            ${tasksByCategory[category].map(task => `
+                <div class="form-check">
+                    <input class="form-check-input task-group-checkbox" type="checkbox" 
+                           value="${task.id}" id="taskcheck_${task.id}">
+                    <label class="form-check-label" for="taskcheck_${task.id}">
+                        ${task.name}
+                        ${task.common ? '<span class="badge bg-success ms-1">Common</span>' : ''}
+                    </label>
+                </div>
+            `).join('')}
+        </div>
+    `).join('');
+}
+
+/**
+ * Save new task group
+ */
+window.saveNewTaskGroup = function() {
+    const name = document.getElementById('taskGroupName').value.trim();
+    const description = document.getElementById('taskGroupDescription').value.trim();
+    const category = document.getElementById('taskGroupCategory').value;
+    const color = document.getElementById('taskGroupColor').value;
+    
+    // Get selected tasks
+    const checkboxes = document.querySelectorAll('.task-group-checkbox:checked');
+    const taskIds = Array.from(checkboxes).map(cb => cb.value);
+    
+    if (!name) {
+        careMarshallAlert('❌ Please enter a group name', 'error');
+        return;
+    }
+    
+    if (taskIds.length === 0) {
+        careMarshallAlert('❌ Please select at least one task', 'error');
+        return;
+    }
+    
+    const taskGroup = {
+        name: name,
+        description: description,
+        category: category,
+        color: color,
+        taskIds: taskIds
+    };
+    
+    // Save using the global function from core.js
+    window.saveTaskGroup(taskGroup)
+        .then(() => {
+            careMarshallAlert(`✅ Task group "${name}" created successfully!`, 'success');
+            
+            // Reset form
+            document.getElementById('taskGroupForm').reset();
+            document.querySelectorAll('.task-group-checkbox').forEach(cb => cb.checked = false);
+            
+            // Refresh existing groups
+            renderExistingTaskGroups();
+            renderTaskGroupsList();
+        })
+        .catch(error => {
+            console.error('Error saving task group:', error);
+            careMarshallAlert('❌ Error creating task group. Please try again.', 'error');
+        });
+};
+
+/**
+ * Confirm and delete a task group
+ */
+window.deleteTaskGroupConfirm = function(groupId) {
+    const group = taskGroups.find(g => g.id === groupId);
+    if (!group) return;
+    
+    if (confirm(`Are you sure you want to delete the task group "${group.name}"?\n\nThis will not affect existing visits using this group.`)) {
+        window.deleteTaskGroup(groupId)
+            .then(() => {
+                careMarshallAlert(`✅ Task group "${group.name}" deleted successfully!`, 'success');
+                renderExistingTaskGroups();
+                renderTaskGroupsList();
+            })
+            .catch(error => {
+                console.error('Error deleting task group:', error);
+                careMarshallAlert('❌ Error deleting task group. Please try again.', 'error');
+            });
+    }
+};

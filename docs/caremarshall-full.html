@@ -2931,9 +2931,31 @@
             <div id="tasksView" class="hidden">
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h2><i class="bi bi-list-task"></i> Task Management</h2>
-                    <button class="btn btn-primary" onclick="showAddTaskForm()">
-                        <i class="bi bi-plus-circle"></i> Add New Task
-                    </button>
+                    <div>
+                        <button class="btn btn-success me-2" onclick="showTaskGroupModal()">
+                            <i class="bi bi-collection"></i> Manage Task Groups
+                        </button>
+                        <button class="btn btn-primary" onclick="showAddTaskForm()">
+                            <i class="bi bi-plus-circle"></i> Add New Task
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Task Groups Section (NEW v0.7) -->
+                <div class="row mb-4" id="taskGroupsSection">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header bg-success text-white">
+                                <h5 class="mb-0"><i class="bi bi-collection"></i> Task Groups (Quick Templates)</h5>
+                                <small>Create task groups for common visit types</small>
+                            </div>
+                            <div class="card-body">
+                                <div id="taskGroupsList">
+                                    <p class="text-center text-muted my-3">No task groups created yet. Click "Manage Task Groups" to create one.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 
                 <!-- Task Display Options -->
@@ -3349,6 +3371,78 @@
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                     <button type="button" class="btn btn-success" onclick="handleComplianceDetails()">
                         <i class="bi bi-check-circle"></i> Mark as Achieved
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Task Group Management Modal (NEW v0.7) -->
+    <div class="modal fade" id="taskGroupModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title"><i class="bi bi-collection"></i> Manage Task Groups</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Existing Task Groups -->
+                    <div class="mb-4">
+                        <h6 class="fw-bold mb-3">Existing Task Groups</h6>
+                        <div id="existingTaskGroups" class="list-group">
+                            <p class="text-muted">No task groups created yet.</p>
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <!-- Create New Task Group -->
+                    <div>
+                        <h6 class="fw-bold mb-3">Create New Task Group</h6>
+                        <form id="taskGroupForm">
+                            <div class="mb-3">
+                                <label for="taskGroupName" class="form-label">Group Name *</label>
+                                <input type="text" class="form-control" id="taskGroupName" required 
+                                       placeholder="e.g., Weekly Check-Up, Morning Care, Medication Round">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="taskGroupDescription" class="form-label">Description</label>
+                                <textarea class="form-control" id="taskGroupDescription" rows="2" 
+                                          placeholder="Brief description of this task group"></textarea>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="taskGroupCategory" class="form-label">Category</label>
+                                <select class="form-select" id="taskGroupCategory">
+                                    <option value="General">General</option>
+                                    <option value="Personal Care">Personal Care</option>
+                                    <option value="Health">Health</option>
+                                    <option value="Assessment">Assessment</option>
+                                    <option value="Administration">Administration</option>
+                                    <option value="Support Services">Support Services</option>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Select Tasks *</label>
+                                <div class="form-text mb-2">Choose tasks to include in this group</div>
+                                <div id="taskGroupTaskSelection" class="border rounded p-3" style="max-height: 300px; overflow-y: auto;">
+                                    <p class="text-muted">Loading tasks...</p>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="taskGroupColor" class="form-label">Color</label>
+                                <input type="color" class="form-control form-control-color" id="taskGroupColor" value="#0d6efd">
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-success" onclick="saveNewTaskGroup()">
+                        <i class="bi bi-check-circle"></i> Create Task Group
                     </button>
                 </div>
             </div>
