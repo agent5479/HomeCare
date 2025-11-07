@@ -1899,9 +1899,18 @@
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h2><i class="bi bi-geo-alt"></i> Client Locations</h2>
                     <div>
-                        <button class="btn btn-outline-success me-2" onclick="exportSitesCSV()">
-                            <i class="bi bi-download"></i> Export CSV
-                        </button>
+                        <div class="btn-group me-2" role="group">
+                            <button type="button" class="btn btn-outline-success dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-download"></i> Export Data
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#" onclick="exportClientsCSV(); return false;"><i class="bi bi-people me-2"></i>Clients</a></li>
+                                <li><a class="dropdown-item" href="#" onclick="exportVisitsCSV(); return false;"><i class="bi bi-calendar-check me-2"></i>Visits</a></li>
+                                <li><a class="dropdown-item" href="#" onclick="exportTaskGroupsCSV(); return false;"><i class="bi bi-collection me-2"></i>Task Groups</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="#" onclick="exportAllTenantData(); return false;"><i class="bi bi-database me-2"></i>Complete Export (All Data)</a></li>
+                            </ul>
+                        </div>
                         <button class="btn btn-primary admin-only" onclick="showAddSiteForm()">
                             <i class="bi bi-plus"></i> Add Client
                         </button>
@@ -2647,9 +2656,17 @@
                         <button class="btn btn-primary" onclick="showScheduleForNextVisit()">
                             <i class="bi bi-calendar-plus"></i> Schedule New Task
                         </button>
-                        <button class="btn btn-outline-success ms-2" onclick="generateCalendarFeed()">
-                            <i class="bi bi-download"></i> Export Calendar
-                        </button>
+                        <div class="btn-group ms-2" role="group">
+                            <button type="button" class="btn btn-outline-success dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-download"></i> Export
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#" onclick="exportVisitsCSV(); return false;"><i class="bi bi-calendar-check me-2"></i>Visits (CSV)</a></li>
+                                <li><a class="dropdown-item" href="#" onclick="exportScheduledTasksCSV(); return false;"><i class="bi bi-list-task me-2"></i>Scheduled Tasks (CSV)</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="#" onclick="generateCalendarFeed(); return false;"><i class="bi bi-calendar3 me-2"></i>Calendar Feed (ICS)</a></li>
+                            </ul>
+                        </div>
                         <button class="btn btn-outline-primary ms-2" onclick="copyCalendarFeedLink()">
                             <i class="bi bi-link-45deg"></i> Copy Feed Link
                         </button>
@@ -2906,6 +2923,11 @@
             <div id="employeesView" class="hidden">
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h2><i class="bi bi-people"></i> Team Management</h2>
+                    <div>
+                        <button class="btn btn-outline-success" onclick="exportEmployeesCSV()">
+                            <i class="bi bi-download"></i> Export Team CSV
+                        </button>
+                    </div>
                 </div>
                 
                 
@@ -3784,77 +3806,287 @@
         }
         
         // CSV Export Functions
-        function exportSitesCSV() {
+        // =====================================================
+        // UPDATED v0.8: Comprehensive CSV Export Functions
+        // =====================================================
+        
+        /**
+         * Export Clients/Sites data to CSV
+         */
+        function exportClientsCSV() {
             if (!window.sites || window.sites.length === 0) {
-                careMarshallAlert('No site data available to export.', 'info');
+                careMarshallAlert('No client data available to export.', 'info');
                 return;
             }
             
-            // Filter out archived and deleted sites (exclude cluster branch - sites are tenant-scoped)
+            // Filter out archived and deleted sites
             const activeSites = window.sites.filter(site => {
-                // Exclude archived sites (handle various data types from Firebase)
                 if (site.archived === true || site.archived === 'true' || site.archived === 1) return false;
-                // Exclude deleted sites
                 if (site.deleted === true || site.deleted === 'true' || site.deleted === 1) return false;
                 return true;
             });
             
             if (activeSites.length === 0) {
-                careMarshallAlert('No active site data available to export.', 'info');
+                careMarshallAlert('No active client data available to export.', 'info');
                 return;
             }
             
             const csvData = activeSites.map(site => {
-                // Format last visit date if it exists
+                // Format last visit date
                 let lastVisitDateFormatted = '';
                 if (site.lastVisitDate) {
                     const visitDate = new Date(site.lastVisitDate);
                     if (!isNaN(visitDate.getTime())) {
                         lastVisitDateFormatted = visitDate.toLocaleDateString('en-NZ', { 
-                            day: 'numeric', 
-                            month: 'short', 
-                            year: 'numeric' 
+                            day: 'numeric', month: 'short', year: 'numeric' 
                         });
                     }
                 }
                 
+                // Get care facility type name
+                const facilityType = SITE_TYPES[site.functionalClassification]?.name || site.functionalClassification || 'Other';
+                
                 return {
-                    'Site ID': site.id,
+                    'Client ID': site.id,
                     'Name': site.name,
+                    'Address': site.address || '',
                     'Description': site.description || '',
+                    // Client Demographics
+                    'Client Age': site.clientAge || '',
+                    'Disability Classification': site.disabilityClassification || '',
+                    'Disability Notes': site.disabilityNotes || '',
+                    // Location
                     'Latitude': site.latitude,
                     'Longitude': site.longitude,
-                    'Total Hives': site.hiveCount,
-                    'Strong Hives': site.hiveStrength?.strong || 0,
-                    'Medium Hives': site.hiveStrength?.medium || 0,
-                    'Weak Hives': site.hiveStrength?.weak || 0,
-                    'NUC Hives': site.hiveStrength?.nuc || 0,
-                    'Dead Hives': site.hiveStrength?.dead || 0,
-                    'Double Stacks': site.hiveStacks?.doubles || 0,
-                    'Top-Splits': site.hiveStacks?.topSplits || 0,
-                    'Single Stacks': site.hiveStacks?.singles || 0,
-                    'NUC Stacks': site.hiveStacks?.nucs || 0,
-                    'Empty Platforms': site.hiveStacks?.empty || 0,
-                    'Functional Classification': site.functionalClassification || site.siteType || '',
-                    'Seasonal Classification': site.seasonalClassification || site.seasonal_classification || '',
-                    'Landowner Name': site.landownerName || '',
-                    'Landowner Phone': site.landownerPhone || '',
-                    'Landowner Email': site.landownerEmail || '',
-                    'Landowner Address': site.landownerAddress || '',
+                    // Care Details
+                    'Total Clients': site.hiveCount || 0,
+                    'Care Facility Type': facilityType,
+                    'Seasonal Classification': site.seasonalClassification || '',
+                    // Contact Information
+                    'Contact Name': site.landownerName || '',
+                    'Contact Phone': site.landownerPhone || '',
+                    'Contact Email': site.landownerEmail || '',
+                    'Contact Address': site.landownerAddress || '',
+                    // Legal & Compliance
+                    'HDS Registration': site.legalCompliance?.hdsRegistrationNumber || '',
+                    'Registration Expiry': site.legalCompliance?.registrationExpiry || '',
+                    'Insurance Provider': site.legalCompliance?.insuranceProvider || '',
+                    'Insurance Policy': site.legalCompliance?.insurancePolicyNumber || '',
+                    'Insurance Expiry': site.legalCompliance?.insuranceExpiry || '',
+                    'Privacy Officer': site.legalCompliance?.privacyOfficer || '',
+                    'Health & Safety Officer': site.legalCompliance?.healthSafetyOfficer || '',
+                    // Special Needs Flags
+                    'Wheelchair Accessible': site.specialNeeds?.wheelchairAccessible ? 'Yes' : 'No',
+                    'Medical Equipment On Site': site.specialNeeds?.medicalEquipmentOnSite ? 'Yes' : 'No',
+                    'Dementia Care': site.specialNeeds?.dementiaCare ? 'Yes' : 'No',
+                    'Fall Risk': site.specialNeeds?.fallRisk ? 'Yes' : 'No',
+                    'Wound Care Required': site.specialNeeds?.woundCareRequired ? 'Yes' : 'No',
+                    // Visit Information
                     'Access Type': site.accessType || '',
                     'Contact Before Visit': site.contactBeforeVisit ? 'Yes' : 'No',
-                    'Quarantine': site.isQuarantine ? 'Yes' : 'No',
                     'Last Visit Date': lastVisitDateFormatted,
-                    'Harvest Timeline': site.harvestTimeline || '',
-                    'Sugar Requirements': site.sugarRequirements || '',
                     'Notes': site.notes || '',
+                    // Metadata
                     'Created At': site.createdAt || '',
                     'Last Modified By': site.lastModifiedBy || '',
                     'Last Modified At': site.lastModifiedAt || ''
                 };
             });
             
-            downloadCSV(csvData, `sites_export_${new Date().toISOString().split('T')[0]}.csv`);
+            downloadCSV(csvData, `clients_export_${new Date().toISOString().split('T')[0]}.csv`);
+        }
+        
+        // Backward compatibility
+        const exportSitesCSV = exportClientsCSV;
+        
+        /**
+         * Export Visits data to CSV (NEW v0.8)
+         */
+        function exportVisitsCSV() {
+            if (!window.visits || window.visits.length === 0) {
+                careMarshallAlert('No visit data available to export.', 'info');
+                return;
+            }
+            
+            const csvData = window.visits.map(visit => {
+                const site = sites.find(s => s.id === visit.siteId);
+                const siteName = site ? site.name : `Site ${visit.siteId}`;
+                
+                // Get task names
+                const taskNames = visit.assignedTasks.map(t => {
+                    const task = COMPREHENSIVE_TASKS.find(ct => ct.id === t.taskId);
+                    return task ? task.name : t.taskId;
+                }).join('; ');
+                
+                // Count completed tasks
+                const completedCount = visit.assignedTasks.filter(t => t.status === 'completed').length;
+                const totalTasks = visit.assignedTasks.length;
+                
+                return {
+                    'Visit ID': visit.id,
+                    'Site/Client': siteName,
+                    'Site ID': visit.siteId,
+                    'Date': visit.date,
+                    'Time': visit.time || '',
+                    'Duration (min)': visit.duration || '',
+                    'Status': visit.status || 'scheduled',
+                    'Priority': visit.priority || 'normal',
+                    'Assigned To': visit.assignedTo || '',
+                    'Tasks Count': totalTasks,
+                    'Completed Tasks': completedCount,
+                    'Tasks': taskNames,
+                    'Notes': visit.notes || '',
+                    'Created By': visit.createdBy || '',
+                    'Created At': visit.createdAt || '',
+                    'Updated At': visit.updatedAt || '',
+                    'Completed At': visit.completedAt || ''
+                };
+            });
+            
+            downloadCSV(csvData, `visits_export_${new Date().toISOString().split('T')[0]}.csv`);
+        }
+        
+        /**
+         * Export Task Groups to CSV (NEW v0.8)
+         */
+        function exportTaskGroupsCSV() {
+            if (!window.taskGroups || window.taskGroups.length === 0) {
+                careMarshallAlert('No task groups available to export.', 'info');
+                return;
+            }
+            
+            const csvData = window.taskGroups.map(group => {
+                // Get task names
+                const taskNames = group.taskIds.map(taskId => {
+                    const task = COMPREHENSIVE_TASKS.find(t => t.id === taskId);
+                    return task ? task.name : taskId;
+                }).join('; ');
+                
+                return {
+                    'Group ID': group.id,
+                    'Name': group.name,
+                    'Description': group.description || '',
+                    'Category': group.category || 'General',
+                    'Color': group.color || '#0d6efd',
+                    'Task Count': group.taskIds.length,
+                    'Tasks': taskNames,
+                    'Created By': group.createdBy || '',
+                    'Created At': group.createdAt || '',
+                    'Updated At': group.updatedAt || ''
+                };
+            });
+            
+            downloadCSV(csvData, `task_groups_export_${new Date().toISOString().split('T')[0]}.csv`);
+        }
+        
+        /**
+         * Export ALL tenant data (comprehensive export) (NEW v0.8)
+         */
+        function exportAllTenantData() {
+            const timestamp = new Date().toISOString().split('T')[0];
+            
+            // Create a ZIP-like structure (multiple CSVs downloaded)
+            careMarshallAlert('Preparing complete data export...', 'info');
+            
+            // Export each data type
+            setTimeout(() => {
+                if (window.sites && window.sites.length > 0) {
+                    exportClientsCSV();
+                }
+            }, 100);
+            
+            setTimeout(() => {
+                if (window.visits && window.visits.length > 0) {
+                    exportVisitsCSV();
+                }
+            }, 500);
+            
+            setTimeout(() => {
+                if (window.taskGroups && window.taskGroups.length > 0) {
+                    exportTaskGroupsCSV();
+                }
+            }, 900);
+            
+            setTimeout(() => {
+                if (window.actions && window.actions.length > 0) {
+                    exportActionsCSV();
+                }
+            }, 1300);
+            
+            setTimeout(() => {
+                if (window.scheduledTasks && window.scheduledTasks.length > 0) {
+                    exportScheduledTasksCSV();
+                }
+            }, 1700);
+            
+            setTimeout(() => {
+                if (window.employees && window.employees.length > 0) {
+                    exportEmployeesCSV();
+                }
+            }, 2100);
+            
+            setTimeout(() => {
+                careMarshallAlert(`✅ Complete tenant data export finished! Check your downloads folder.`, 'success');
+            }, 2500);
+        }
+        
+        /**
+         * Export Scheduled Tasks to CSV (NEW v0.8)
+         */
+        function exportScheduledTasksCSV() {
+            if (!window.scheduledTasks || window.scheduledTasks.length === 0) {
+                return; // Silent return for batch export
+            }
+            
+            const csvData = window.scheduledTasks.map(task => {
+                const site = sites.find(s => s.id === task.siteId);
+                const siteName = site ? site.name : `Site ${task.siteId}`;
+                const taskObj = COMPREHENSIVE_TASKS.find(t => t.id === task.taskId);
+                const taskName = taskObj ? taskObj.name : task.taskId;
+                
+                return {
+                    'Task ID': task.id,
+                    'Site/Client': siteName,
+                    'Site ID': task.siteId,
+                    'Task': taskName,
+                    'Task ID': task.taskId,
+                    'Due Date': task.dueDate,
+                    'Scheduled Time': task.scheduledTime || '',
+                    'Priority': task.priority || 'normal',
+                    'Status': task.completed ? 'Completed' : 'Pending',
+                    'Notes': task.notes || '',
+                    'Created By': task.createdBy || '',
+                    'Created At': task.createdAt || '',
+                    'Completed At': task.completedAt || ''
+                };
+            });
+            
+            downloadCSV(csvData, `scheduled_tasks_export_${new Date().toISOString().split('T')[0]}.csv`);
+        }
+        
+        /**
+         * Export Employees to CSV (NEW v0.8)
+         */
+        function exportEmployeesCSV() {
+            if (!window.employees || window.employees.length === 0) {
+                return; // Silent return for batch export
+            }
+            
+            const csvData = window.employees.map(emp => {
+                return {
+                    'Username': emp.username,
+                    'Display Name': emp.displayName || emp.username,
+                    'Role': emp.role || 'employee',
+                    'Status': emp.status || 'active',
+                    'Activated': emp.activated ? 'Yes' : 'No',
+                    'Activation Date': emp.activatedAt || '',
+                    'Password Expires': emp.passwordExpiry || '',
+                    'Created By': emp.createdBy || '',
+                    'Created At': emp.createdAt || ''
+                };
+            });
+            
+            downloadCSV(csvData, `employees_export_${new Date().toISOString().split('T')[0]}.csv`);
         }
         
         function exportActionsCSV() {
