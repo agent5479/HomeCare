@@ -30,18 +30,19 @@
     --gray-800: #212529;
     --gray-900: #1a1e21;
     
-    /* Background Colors */
-    --bg-primary: var(--white);
-    --bg-secondary: var(--light-blue);
+    /* Background Colors - Warmed Up */
+    --bg-primary: var(--cream);         /* Page background - warm cream */
+    --bg-secondary: var(--soft-peach);  /* Section backgrounds */
     --bg-accent: var(--primary-blue);
-    --bg-success: #d4edda;
-    --bg-warning: #fff3cd;
-    --bg-danger: #f8d7da;
-    --bg-info: #d1ecf1;
+    --bg-success: #E8F5E9;              /* Soft green background */
+    --bg-warning: #FFF4E5;              /* Warm peach warning */
+    --bg-danger: #FFEBEE;               /* Soft coral danger */
+    --bg-info: #E0F7FA;                 /* Warm teal info */
     
-    /* Glass Morphism */
-    --glass-bg: rgba(227, 242, 253, 0.95);
-    --glass-border: rgba(25, 118, 210, 0.3);
+    /* Glass Morphism - Warmed Up */
+    --glass-bg: rgba(255, 248, 240, 0.95);      /* Warm cream glass */
+    --glass-border: rgba(255, 107, 107, 0.2);    /* Warm coral border */
+    --glass-blue: rgba(227, 242, 253, 0.9);      /* Blue glass for cards */
     
     /* ===== TYPOGRAPHY SYSTEM ===== */
     --font-family-primary: 'Inter', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -103,14 +104,15 @@
     --radius-2xl: 1.5rem;    /* 24px */
     --radius-full: 9999px;
     
-    /* ===== SHADOWS ===== */
-    --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
-    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
-    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
-    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
-    --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1);
-    --shadow-2xl: 0 25px 50px rgba(0, 0, 0, 0.15);
-    --shadow-homecare: 0 8px 32px rgba(25, 118, 210, 0.15);
+    /* ===== SHADOWS - Warm Tinted ===== */
+    --shadow-xs: 0 1px 2px rgba(255, 107, 107, 0.08);
+    --shadow-sm: 0 1px 3px rgba(255, 107, 107, 0.12);
+    --shadow-md: 0 4px 6px rgba(255, 107, 107, 0.12);
+    --shadow-lg: 0 10px 15px rgba(255, 107, 107, 0.15);
+    --shadow-xl: 0 20px 25px rgba(255, 107, 107, 0.15);
+    --shadow-2xl: 0 25px 50px rgba(255, 107, 107, 0.2);
+    --shadow-homecare: 0 8px 32px rgba(255, 107, 107, 0.18);  /* Warm coral shadow */
+    --shadow-blue: 0 8px 32px rgba(25, 118, 210, 0.15);       /* Keep blue option */
     
     /* ===== TRANSITIONS & ANIMATIONS ===== */
     --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
@@ -125,7 +127,7 @@ html, body {
     font-size: var(--font-size-base);
     line-height: var(--line-height-normal);
     color: var(--black);
-    background: var(--white);
+    background: var(--cream);  /* Warm cream background */
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
@@ -207,15 +209,15 @@ a:hover {
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+    background: linear-gradient(135deg, var(--primary-blue), var(--warm-teal));
     color: var(--white);
     border-color: var(--primary-blue);
 }
 
 .btn-primary:hover {
-    background: linear-gradient(135deg, var(--secondary-blue), var(--primary-blue));
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-md);
+    background: linear-gradient(135deg, var(--warm-teal), var(--warm-coral));
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(255, 107, 107, 0.25);  /* Warm glow */
 }
 
 .btn-outline-primary {
@@ -230,9 +232,28 @@ a:hover {
 }
 
 .btn-success {
-    background: var(--success);
+    background: linear-gradient(135deg, var(--success), var(--warm-teal));
     color: var(--white);
     border-color: var(--success);
+}
+
+.btn-success:hover {
+    background: linear-gradient(135deg, var(--warm-teal), var(--success));
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(102, 187, 106, 0.3);
+}
+
+/* NEW: Warm Coral Button for Friendly Actions */
+.btn-coral {
+    background: linear-gradient(135deg, var(--warm-coral), var(--sunset-orange));
+    color: var(--white);
+    border-color: var(--warm-coral);
+}
+
+.btn-coral:hover {
+    background: linear-gradient(135deg, var(--sunset-orange), var(--warm-coral));
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(255, 107, 107, 0.3);
 }
 
 .btn-warning {
@@ -257,24 +278,26 @@ a:hover {
     font-size: var(--font-size-lg);
 }
 
-/* ===== CARD COMPONENTS ===== */
+/* ===== CARD COMPONENTS - Warm Touch ===== */
 .card {
     background: var(--white);
-    border-radius: var(--radius-lg);
-    border: 2px solid var(--primary-blue);
+    border-radius: var(--radius-xl);  /* Softer corners */
+    border: 2px solid rgba(255, 107, 107, 0.15);  /* Soft coral border */
     box-shadow: var(--shadow-homecare);
     overflow: hidden;
+    transition: all var(--transition-base);
 }
 
 .card:hover {
-    /* Subtle shadow change only, no transform for performance */
-    box-shadow: var(--shadow-xl);
+    box-shadow: 0 12px 35px rgba(255, 107, 107, 0.22);  /* Warm glow */
+    border-color: var(--warm-coral);
+    transform: translateY(-2px);
 }
 
 .card-header {
     padding: var(--spacing-4);
-    background: var(--glass-bg);
-    border-bottom: 2px solid var(--primary-blue);
+    background: linear-gradient(135deg, rgba(255, 248, 240, 0.8), rgba(255, 229, 180, 0.3));  /* Warm gradient */
+    border-bottom: 2px solid rgba(255, 107, 107, 0.2);
     font-weight: var(--font-weight-semibold);
 }
 
@@ -331,23 +354,36 @@ a:hover {
 }
 
 .badge-primary {
-    background: linear-gradient(135deg, var(--primary-accent), var(--info));
+    background: linear-gradient(135deg, var(--primary-blue), var(--warm-teal));
     color: var(--white);
 }
 
 .badge-success {
-    background: var(--success);
+    background: linear-gradient(135deg, var(--success), var(--warm-teal));
     color: var(--white);
 }
 
 .badge-warning {
-    background: var(--warning);
-    color: var(--black);
+    background: var(--sunset-orange);
+    color: var(--white);
+    box-shadow: 0 2px 8px rgba(255, 184, 77, 0.3);
 }
 
 .badge-danger {
-    background: var(--danger);
+    background: var(--warm-coral);
     color: var(--white);
+}
+
+/* NEW: Warm accent badges */
+.badge-coral {
+    background: var(--warm-coral);
+    color: var(--white);
+}
+
+.badge-peach {
+    background: var(--soft-peach);
+    color: var(--black);
+    border: 1px solid rgba(255, 107, 107, 0.2);
 }
 
 /* ===== ALERT COMPONENTS ===== */
