@@ -691,59 +691,35 @@ function renderSiteTypeFilter() {
     const filterContainer = document.getElementById('functionalClassificationFilter');
     if (!filterContainer) return;
     
+    // Generate filter options dynamically from SITE_TYPES
+    let filterOptionsHtml = `
+        <input type="radio" class="btn-check" name="siteTypeFilter" id="filterAll" value="all" checked>
+        <label class="btn btn-outline-secondary btn-sm" for="filterAll">All Types</label>
+    `;
+    
+    // Add each care facility type from SITE_TYPES
+    Object.entries(SITE_TYPES).forEach(([key, type]) => {
+        const safeId = `filter${key.replace(/_/g, '')}`;
+        filterOptionsHtml += `
+            <input type="radio" class="btn-check" name="siteTypeFilter" id="${safeId}" value="${key}">
+            <label class="btn btn-outline-secondary btn-sm" for="${safeId}" style="border-color: ${type.color}; color: ${type.color};">
+                <i class="${type.icon}"></i> ${type.name}
+            </label>
+        `;
+    });
+    
     const filterHtml = `
         <div class="mb-3">
             <div class="d-flex justify-content-between align-items-center">
                 <label class="form-label mb-0"><strong>Filter:</strong></label>
                 <button class="btn btn-sm btn-outline-secondary" type="button" onclick="toggleSiteFilter()" id="filterToggleBtn">
-                    <i class="bi bi-chevron-down" id="filterToggleIcon"></i> Functional Classifications
+                    <i class="bi bi-chevron-down" id="filterToggleIcon"></i> Care Facility Types
                 </button>
             </div>
             <div class="collapse" id="siteFilterOptions">
                 <div class="mt-2">
                     <div class="btn-group-vertical w-100" role="group">
-                        <input type="radio" class="btn-check" name="siteTypeFilter" id="filterAll" value="all" checked>
-                        <label class="btn btn-outline-secondary btn-sm" for="filterAll">All Types</label>
-                        
-                        <input type="radio" class="btn-check" name="siteTypeFilter" id="filterProduction" value="production">
-                        <label class="btn btn-outline-secondary btn-sm" for="filterProduction" style="border-color: #28a745; color: #28a745;">
-                            <i class="bi bi-house-heart-fill"></i> Production
-                        </label>
-                        
-                        <input type="radio" class="btn-check" name="siteTypeFilter" id="filterNucleus" value="nucleus">
-                        <label class="btn btn-outline-secondary btn-sm" for="filterNucleus" style="border-color: #17a2b8; color: #17a2b8;">
-                            <i class="bi bi-circle-fill"></i> NUC
-                        </label>
-                        
-                        <input type="radio" class="btn-check" name="siteTypeFilter" id="filterQueenRearing" value="queen-rearing">
-                        <label class="btn btn-outline-secondary btn-sm" for="filterQueenRearing" style="border-color: #ffc107; color: #ffc107;">
-                            <i class="bi bi-star-fill"></i> Queen Rearing
-                        </label>
-                        
-                        <input type="radio" class="btn-check" name="siteTypeFilter" id="filterResearch" value="research">
-                        <label class="btn btn-outline-secondary btn-sm" for="filterResearch" style="border-color: #6f42c1; color: #6f42c1;">
-                            <i class="bi bi-flask"></i> Research
-                        </label>
-                        
-                        <input type="radio" class="btn-check" name="siteTypeFilter" id="filterEducation" value="education">
-                        <label class="btn btn-outline-secondary btn-sm" for="filterEducation" style="border-color: #fd7e14; color: #fd7e14;">
-                            <i class="bi bi-book"></i> Education
-                        </label>
-                        
-                        <input type="radio" class="btn-check" name="siteTypeFilter" id="filterQuarantine" value="quarantine">
-                        <label class="btn btn-outline-secondary btn-sm" for="filterQuarantine" style="border-color: #dc3545; color: #dc3545;">
-                            <i class="bi bi-shield-exclamation"></i> Quarantine
-                        </label>
-                        
-                        <input type="radio" class="btn-check" name="siteTypeFilter" id="filterBackup" value="backup">
-                        <label class="btn btn-outline-secondary btn-sm" for="filterBackup" style="border-color: #6c757d; color: #6c757d;">
-                            <i class="bi bi-archive"></i> Backup
-                        </label>
-                        
-                        <input type="radio" class="btn-check" name="siteTypeFilter" id="filterCustom" value="custom">
-                        <label class="btn btn-outline-secondary btn-sm" for="filterCustom" style="border-color: #20c997; color: #20c997;">
-                            <i class="bi bi-gear"></i> Custom
-                        </label>
+                        ${filterOptionsHtml}
                     </div>
                 </div>
             </div>
@@ -788,12 +764,12 @@ function toggleSiteFilter() {
             // Collapse
             filterOptions.classList.remove('show');
             toggleIcon.className = 'bi bi-chevron-down';
-            toggleBtn.innerHTML = '<i class="bi bi-chevron-down"></i> Types';
+            toggleBtn.innerHTML = '<i class="bi bi-chevron-down"></i> Care Facility Types';
         } else {
             // Expand
             filterOptions.classList.add('show');
             toggleIcon.className = 'bi bi-chevron-up';
-            toggleBtn.innerHTML = '<i class="bi bi-chevron-up"></i> Types';
+            toggleBtn.innerHTML = '<i class="bi bi-chevron-up"></i> Care Facility Types';
         }
     }
 }
