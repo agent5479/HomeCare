@@ -1,4 +1,4 @@
-// CareMarshall - Site Management Module with Custom Groupingbeemarshall setup
+// CareMarshall - Site Management Module (v0.7)
 
 // Global variable to track whether to show archived sites
 let showArchivedSites = false;
@@ -1970,7 +1970,7 @@ function initMap() {
     console.log('📍 Map center set to Takaka, NZ');
     
     // Use global map if it exists, otherwise skip (support both new and old names)
-    const globalMap = window.homeCareMap || window.beeMarshallMap;
+    const globalMap = window.homeCareMap || window.careMarshallMap;
     if (!globalMap) {
         console.log('🗺️ Global map not initialized, skipping site rendering');
         return;
@@ -1979,8 +1979,8 @@ function initMap() {
     // Use the global map
     map = globalMap;
     // Maintain backward compatibility
-    if (!window.homeCareMap && window.beeMarshallMap) {
-        window.homeCareMap = window.beeMarshallMap;
+    if (!window.homeCareMap && window.careMarshallMap) {
+        window.homeCareMap = window.careMarshallMap;
     }
     
     // Clear existing markers
@@ -2035,7 +2035,7 @@ function initMap() {
                 .bindPopup(`
                     <div style="padding:10px; min-width:250px;">
                         <h6>
-                            <a href="#" onclick="event.stopPropagation(); const mapInstance = window.homeCareMap || window.beeMarshallMap; if (mapInstance) { mapInstance.closePopup(); } setTimeout(() => viewSiteDetails(${site.id}), 100); return false;" style="color: ${typeInfo.color}; text-decoration: none; font-weight: bold; cursor: pointer;">
+                            <a href="#" onclick="event.stopPropagation(); const mapInstance = window.homeCareMap || window.careMarshallMap; if (mapInstance) { mapInstance.closePopup(); } setTimeout(() => viewSiteDetails(${site.id}), 100); return false;" style="color: ${typeInfo.color}; text-decoration: none; font-weight: bold; cursor: pointer;">
                                 <i class="bi ${typeInfo.icon}"></i> ${site.name}
                             </a>
                         </h6>
@@ -2095,7 +2095,7 @@ function initMap() {
                         `}
                         
                         <div class="mt-3 d-grid gap-1">
-                            <button class="btn btn-sm btn-primary" onclick="event.stopPropagation(); const mapInstance = window.homeCareMap || window.beeMarshallMap; if (mapInstance) { mapInstance.closePopup(); } scrollToSiteCard(${site.id}); return false;">
+                            <button class="btn btn-sm btn-primary" onclick="event.stopPropagation(); const mapInstance = window.homeCareMap || window.careMarshallMap; if (mapInstance) { mapInstance.closePopup(); } scrollToSiteCard(${site.id}); return false;">
                                 <i class="bi bi-eye"></i> View Details
                             </button>
                             <button class="btn btn-sm btn-outline-primary" onclick="openInMaps(${site.id}); return false;">
@@ -3647,7 +3647,7 @@ function scrollToSiteCard(siteId) {
     console.log(`🔍 scrollToSiteCard called for site ID: ${siteId}`);
     
     // Close map popup if it's open
-    const mapInstance = window.homeCareMap || window.beeMarshallMap;
+    const mapInstance = window.homeCareMap || window.careMarshallMap;
     if (mapInstance) {
         mapInstance.closePopup();
     }

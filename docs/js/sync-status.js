@@ -214,7 +214,7 @@ class SyncStatusManager {
     // Load pending changes from localStorage
     loadPendingChanges() {
         try {
-            const stored = localStorage.getItem('homeCarePendingChanges') || localStorage.getItem('beeMarshallPendingChanges'); // Backward compatibility
+            const stored = localStorage.getItem('homeCarePendingChanges') || localStorage.getItem('beeMarshallPendingChanges'); // LEGACY: Backward compatibility for old localStorage keys
             if (stored) {
                 this.pendingChanges = JSON.parse(stored);
                 console.log(`📦 Loaded ${this.pendingChanges.length} pending changes from storage`);

@@ -57,7 +57,7 @@ function careMarshallAlert(message, type = 'info') {
 // Override default alert function
 // Backward compatibility aliases
 window.alert = careMarshallAlert;
-const beeMarshallAlert = careMarshallAlert; // Backward compatibility
+const beeMarshallAlert = careMarshallAlert; // LEGACY: Backward compatibility alias (can be removed in future versions)
 const homeCareAlert = careMarshallAlert; // Alias for consistency
 
 // Admin accounts are now loaded securely from environment variables
@@ -2837,7 +2837,7 @@ function exportAllData() {
 function debugHomeCare() {
     console.log('=== HomeCare Debug Information ===');
     // Backward compatibility
-    const debugBeeMarshall = debugHomeCare;
+    const debugBeeMarshall = debugHomeCare; // LEGACY: Backward compatibility alias
     console.log('Version:', APP_VERSION);
     console.log('Current User:', currentUser);
     console.log('Current Tenant ID:', currentTenantId);
