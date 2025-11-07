@@ -287,8 +287,8 @@ function updateDashboard() {
         const factor = Math.min(c / 10, 1.0); // Smooth progression: 0 flags = 0, 10 flags = 1.0
         
         if (c === 0) {
-            // 0 flags: Same as normal cards (factor = 0)
-            bg = normalColor;
+            // 0 flags: Same as normal cards - use transparent version to match glass effect
+            bg = 'rgba(230, 230, 250, 0.95)'; // Matches var(--glass)
             fg = '#000000';
             border = 'rgba(255,255,255,0.2)';
         } else if (c >= 11) {
