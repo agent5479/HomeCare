@@ -838,7 +838,7 @@ function toggleHoneyType(index) {
 }
 
 // =====================================================
-// NEW: Task Group Management Functions (v0.7)
+// NEW: Task Group Management Functions (v0.8)
 // =====================================================
 
 /**

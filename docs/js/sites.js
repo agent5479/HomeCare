@@ -1,4 +1,4 @@
-// CareMarshall - Site Management Module (v0.7)
+// CareMarshall - Site Management Module (v0.8)
 
 // Global variable to track whether to show archived sites
 let showArchivedSites = false;
@@ -956,7 +956,7 @@ function handleSaveSite(e) {
         id: id ? parseInt(id) : Date.now(),
         name: document.getElementById('siteName').value,
         description: document.getElementById('siteDescription').value,
-        // Client Demographics (NEW v0.7)
+        // Client Demographics (NEW v0.8)
         clientAge: parseInt(document.getElementById('clientAge')?.value) || null,
         disabilityClassification: document.getElementById('disabilityClassification')?.value || '',
         disabilityNotes: document.getElementById('disabilityNotes')?.value || '',

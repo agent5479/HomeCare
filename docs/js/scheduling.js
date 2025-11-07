@@ -331,7 +331,7 @@ function renderScheduleTimeline() {
     }
 }
 
-// NEW v0.7: Visit-based scheduling functions
+// NEW v0.8: Visit-based scheduling functions
 function showScheduleTaskModal() {
     // Populate site select
     const siteSelect = document.getElementById('scheduleSite');
@@ -442,7 +442,7 @@ window.applyTaskGroup = function(groupId) {
     careMarshallAlert(`✅ Applied task group: ${group.name} (${group.taskIds.length} tasks)`, 'success');
 };
 
-// NEW v0.7: Handle visit scheduling (replaces individual task scheduling)
+// NEW v0.8: Handle visit scheduling (replaces individual task scheduling)
 window.handleScheduleVisit = function(e) {
     if (e) e.preventDefault();
     
@@ -983,7 +983,7 @@ function generateEnhancedICS(tasks) {
     
     let icsContent = [
         'BEGIN:VCALENDAR',
-        'VERSION:0.7',
+        'VERSION:0.8',
         'PRODID:-//CareMarshall//Scheduled Tasks//EN',
         'CALSCALE:GREGORIAN',
         'METHOD:PUBLISH',
@@ -1046,7 +1046,7 @@ function generateICS(tasks) {
     
     let icsContent = [
         'BEGIN:VCALENDAR',
-        'VERSION:0.7',
+        'VERSION:0.8',
         'PRODID:-//CareMarshall//Scheduled Tasks//EN',
         'CALSCALE:GREGORIAN',
         'METHOD:PUBLISH',

@@ -3,7 +3,7 @@
 // Employees: Can add/view, cannot delete
 
 // Version Management
-const APP_VERSION = '0.7';
+const APP_VERSION = '0.8';
 const VERSION_HISTORY = [
     { version: '0.91', date: '2024-12-19', changes: ['Fixed dashboard loading issue', 'Enhanced login system', 'Added welcome popup', 'Improved map initialization'] },
     { version: '0.92', date: '2024-12-19', changes: ['Added version tag to login screen', 'Implemented lazy map loading', 'Enhanced error prevention', 'Improved user experience'] },
@@ -100,7 +100,7 @@ var employees = [];
 var visits = []; // Visit-based scheduling (NEW: replaces individual task scheduling)
 var taskGroups = []; // Task group templates for quick visit scheduling (NEW)
 
-// Load comprehensive task library from external file (v0.7)
+// Load comprehensive task library from external file (v0.8)
 // This provides default tasks - admins can customize via the interface
 const COMPREHENSIVE_TASKS = window.COMPREHENSIVE_TASKS_V07 || [
     // ===== PERSONAL CARE & HYGIENE =====
@@ -3616,7 +3616,7 @@ function renderSeasonalRequirements() {
 }
 
 // =====================================================
-// NEW: Task Group Management Functions (v0.7)
+// NEW: Task Group Management Functions (v0.8)
 // =====================================================
 
 /**
@@ -3682,7 +3682,7 @@ window.deleteTaskGroup = function(groupId) {
 };
 
 // =====================================================
-// NEW: Visit Management Functions (v0.7)
+// NEW: Visit Management Functions (v0.8)
 // =====================================================
 
 /**
