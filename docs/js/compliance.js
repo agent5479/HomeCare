@@ -338,7 +338,7 @@ function renderAllObligations() {
     return obligations.map((period, index) => `
         <div class="card mb-3">
             <div class="card-header">
-                <strong>${period.period} ΓåÆ Due: ${period.deadline}</strong>
+                <strong>${period.period} — Due: ${period.deadline}</strong>
             </div>
             <div class="card-body">
                 ${period.obligations.map(obligation => {
@@ -726,7 +726,7 @@ function markObligationCompleted(obligationType, year) {
     
     database.ref(tenantPath).update({ complianceProfile: profile })
         .then(() => {
-            careMarshallAlert(`Γ£à ${obligationType} marked as completed`, 'success');
+            careMarshallAlert(`✅ ${obligationType} marked as completed`, 'success');
             currentUser.complianceProfile = profile;
             renderComplianceDashboard();
         });
@@ -768,7 +768,7 @@ function checkComplianceDeadlines() {
             upcoming.forEach(item => {
                 if (item.daysUntil <= 3) { // Critical deadlines
                     careMarshallAlert(
-                        `ΓÜá∩╕Å Compliance Deadline: ${item.label} in ${item.daysUntil} days`,
+                        `⚠️ Compliance Deadline: ${item.label} in ${item.daysUntil} days`,
                         item.daysUntil === 0 ? 'error' : 'warning'
                     );
                 }
