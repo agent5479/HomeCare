@@ -1899,7 +1899,7 @@
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h2><i class="bi bi-geo-alt"></i> Client Locations</h2>
                     <div>
-                        <div class="btn-group me-2" role="group">
+                        <div class="btn-group me-2 admin-only" role="group">
                             <button type="button" class="btn btn-outline-success dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
                                 <i class="bi bi-download"></i> Export Data
                             </button>
@@ -1907,8 +1907,11 @@
                                 <li><a class="dropdown-item" href="#" onclick="exportClientsCSV(); return false;"><i class="bi bi-people me-2"></i>Clients</a></li>
                                 <li><a class="dropdown-item" href="#" onclick="exportVisitsCSV(); return false;"><i class="bi bi-calendar-check me-2"></i>Visits</a></li>
                                 <li><a class="dropdown-item" href="#" onclick="exportTaskGroupsCSV(); return false;"><i class="bi bi-collection me-2"></i>Task Groups</a></li>
+                                <li><a class="dropdown-item" href="#" onclick="exportActionsCSV(); return false;"><i class="bi bi-list-check me-2"></i>Actions Log</a></li>
+                                <li><a class="dropdown-item" href="#" onclick="exportScheduledTasksCSV(); return false;"><i class="bi bi-calendar3 me-2"></i>Scheduled Tasks</a></li>
+                                <li><a class="dropdown-item" href="#" onclick="exportEmployeesCSV(); return false;"><i class="bi bi-people me-2"></i>Team Members</a></li>
                                 <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="#" onclick="exportAllTenantData(); return false;"><i class="bi bi-database me-2"></i>Complete Export (All Data)</a></li>
+                                <li><a class="dropdown-item fw-bold" href="#" onclick="exportAllTenantData(); return false;"><i class="bi bi-database me-2"></i>Complete Export (All Data)</a></li>
                             </ul>
                         </div>
                         <button class="btn btn-primary admin-only" onclick="showAddSiteForm()">
@@ -2450,7 +2453,7 @@
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h2><i class="bi bi-list-check"></i> Actions</h2>
                     <div>
-                        <button class="btn btn-outline-success me-2" onclick="exportActionsCSV()">
+                        <button class="btn btn-outline-success me-2 admin-only" onclick="exportActionsCSV()">
                             <i class="bi bi-download"></i> Export CSV
                         </button>
                         <button class="btn btn-primary" onclick="showLogActionForm()">
@@ -2656,7 +2659,7 @@
                         <button class="btn btn-primary" onclick="showScheduleForNextVisit()">
                             <i class="bi bi-calendar-plus"></i> Schedule New Task
                         </button>
-                        <div class="btn-group ms-2" role="group">
+                        <div class="btn-group ms-2 admin-only" role="group">
                             <button type="button" class="btn btn-outline-success dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
                                 <i class="bi bi-download"></i> Export
                             </button>
@@ -2924,7 +2927,7 @@
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h2><i class="bi bi-people"></i> Team Management</h2>
                     <div>
-                        <button class="btn btn-outline-success" onclick="exportEmployeesCSV()">
+                        <button class="btn btn-outline-success admin-only" onclick="exportEmployeesCSV()">
                             <i class="bi bi-download"></i> Export Team CSV
                         </button>
                     </div>
@@ -3812,8 +3815,15 @@
         
         /**
          * Export Clients/Sites data to CSV
+         * ADMIN ONLY - Contains private client information
          */
         function exportClientsCSV() {
+            // Security check - admin only
+            if (!isAdmin) {
+                careMarshallAlert('⛔ Access Denied: Only administrators can export client data.', 'error');
+                return;
+            }
+            
             if (!window.sites || window.sites.length === 0) {
                 careMarshallAlert('No client data available to export.', 'info');
                 return;
@@ -3901,8 +3911,15 @@
         
         /**
          * Export Visits data to CSV (NEW v0.8)
+         * ADMIN ONLY - Contains private scheduling information
          */
         function exportVisitsCSV() {
+            // Security check - admin only
+            if (!isAdmin) {
+                careMarshallAlert('⛔ Access Denied: Only administrators can export visit data.', 'error');
+                return;
+            }
+            
             if (!window.visits || window.visits.length === 0) {
                 careMarshallAlert('No visit data available to export.', 'info');
                 return;
@@ -3948,8 +3965,15 @@
         
         /**
          * Export Task Groups to CSV (NEW v0.8)
+         * ADMIN ONLY - Contains operational data
          */
         function exportTaskGroupsCSV() {
+            // Security check - admin only
+            if (!isAdmin) {
+                careMarshallAlert('⛔ Access Denied: Only administrators can export task groups.', 'error');
+                return;
+            }
+            
             if (!window.taskGroups || window.taskGroups.length === 0) {
                 careMarshallAlert('No task groups available to export.', 'info');
                 return;
@@ -3981,12 +4005,19 @@
         
         /**
          * Export ALL tenant data (comprehensive export) (NEW v0.8)
+         * ADMIN ONLY - Contains all private tenant information
          */
         function exportAllTenantData() {
+            // Security check - admin only
+            if (!isAdmin) {
+                careMarshallAlert('⛔ Access Denied: Only administrators can export complete tenant data.', 'error');
+                return;
+            }
+            
             const timestamp = new Date().toISOString().split('T')[0];
             
             // Create a ZIP-like structure (multiple CSVs downloaded)
-            careMarshallAlert('Preparing complete data export...', 'info');
+            careMarshallAlert('🔐 Preparing complete tenant data export...', 'info');
             
             // Export each data type
             setTimeout(() => {
@@ -4032,8 +4063,17 @@
         
         /**
          * Export Scheduled Tasks to CSV (NEW v0.8)
+         * ADMIN ONLY - Contains private scheduling data
          */
         function exportScheduledTasksCSV() {
+            // Security check - admin only (silent for batch export)
+            if (!isAdmin) {
+                if (arguments.length === 0) { // Called directly
+                    careMarshallAlert('⛔ Access Denied: Only administrators can export scheduled tasks.', 'error');
+                }
+                return;
+            }
+            
             if (!window.scheduledTasks || window.scheduledTasks.length === 0) {
                 return; // Silent return for batch export
             }
@@ -4066,8 +4106,17 @@
         
         /**
          * Export Employees to CSV (NEW v0.8)
+         * ADMIN ONLY - Contains sensitive employee data
          */
         function exportEmployeesCSV() {
+            // Security check - admin only (silent for batch export)
+            if (!isAdmin) {
+                if (arguments.length === 0) { // Called directly
+                    careMarshallAlert('⛔ Access Denied: Only administrators can export employee data.', 'error');
+                }
+                return;
+            }
+            
             if (!window.employees || window.employees.length === 0) {
                 return; // Silent return for batch export
             }
@@ -4089,7 +4138,17 @@
             downloadCSV(csvData, `employees_export_${new Date().toISOString().split('T')[0]}.csv`);
         }
         
+        /**
+         * Export Actions Log to CSV
+         * ADMIN ONLY - Contains private action history
+         */
         function exportActionsCSV() {
+            // Security check - admin only
+            if (!isAdmin) {
+                careMarshallAlert('⛔ Access Denied: Only administrators can export action logs.', 'error');
+                return;
+            }
+            
             if (!window.actions || window.actions.length === 0) {
                 careMarshallAlert('No action data available to export.', 'info');
                 return;
