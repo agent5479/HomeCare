@@ -274,11 +274,11 @@ function updateDashboard() {
             return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
         }
         
-        // Color scale: 0 = normal card color, 11+ = warning red/orange
-        // Normal card color (light yellow/cream): #FFFACD (var(--glass) equivalent)
-        // Warning red/orange: #FF6B35 (vibrant orange-red) or #D93A2F (warning red)
-        const normalColor = '#FFFACD'; // Same as other cards
-        const warningColor = '#FF6B35'; // Vibrant orange-red warning color
+        // Color scale: 0 = normal card color, 11+ = warning red
+        // Normal card color (pale lavender): #E6E6FA (lavender theme)
+        // Warning red: #FF6B6B (soft red through lavender spectrum)
+        const normalColor = '#E6E6FA'; // Pale lavender - same theme as other cards
+        const warningColor = '#FF6B6B'; // Soft red warning color
         
         let bg, fg, border;
         
@@ -309,8 +309,8 @@ function updateDashboard() {
             }
             
             // Border color also interpolates smoothly
-            const borderNormal = '#E1A77A'; // Light border (matches normal card style)
-            const borderWarning = '#E85A2A'; // Darker border (matches warning)
+            const borderNormal = '#DCD0FF'; // Lavender mist border (matches normal card style)
+            const borderWarning = '#E85A5A'; // Red-tinted border (matches warning)
             border = interpolateColor(borderNormal, borderWarning, factor);
         }
         

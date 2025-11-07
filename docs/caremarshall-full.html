@@ -455,7 +455,7 @@
         
         /* Navbar sticky positioning - ensure it works across all views */
         .navbar {
-            background: var(--primary-blue) !important;
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--turquoise) 50%, var(--lavender-mist) 100%) !important;
             border-bottom: 2px solid var(--black);
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             position: -webkit-sticky !important; /* Safari */
@@ -1350,8 +1350,8 @@
         
         /* Admin badge */
         .admin-badge {
-            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
-            color: white;
+            background: linear-gradient(135deg, var(--lavender-mist) 0%, var(--turquoise) 100%);
+            color: var(--black);
             font-weight: 600;
         }
         
@@ -3217,7 +3217,7 @@
                     
                     <!-- Version Tag -->
                     <div class="mb-3">
-                        <span class="badge bg-primary" style="font-size: 0.75rem; padding: 0.4rem 0.8rem;">
+                        <span class="badge" style="font-size: 0.75rem; padding: 0.4rem 0.8rem; background: linear-gradient(135deg, var(--pale-lavender) 0%, var(--soft-turquoise) 100%); color: var(--black);">
                             <i class="bi bi-tag-fill me-1"></i>v<span id="welcomeVersionTag"></span> 
                         </span>
                     </div>
@@ -3234,7 +3234,7 @@
                     </div>
                 </div>
                 <div class="modal-footer border-0 justify-content-center">
-                    <button type="button" class="btn care-button" id="welcomeContinueBtn" data-bs-dismiss="modal" onclick="dismissWelcomeModal()" style="background: var(--primary-blue, #1976D2); color: white; cursor: pointer;">
+                    <button type="button" class="btn care-button" id="welcomeContinueBtn" data-bs-dismiss="modal" onclick="dismissWelcomeModal()" style="background: linear-gradient(135deg, var(--turquoise) 0%, var(--lavender-mist) 100%); color: var(--black); cursor: pointer;">
                         <div class="care-content">
                             <i class="bi bi-house-heart-fill"></i>
                             <span class="care-text" id="welcomeBtnText">Continue</span>
