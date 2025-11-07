@@ -2364,8 +2364,19 @@
                                         </div>
                                     </div>
                                     
+                                    <!-- Legal & Compliance Information Toggle -->
+                                    <div class="mb-3">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="enableLegalCompliance" onchange="toggleLegalComplianceCard()">
+                                            <label class="form-check-label" for="enableLegalCompliance">
+                                                <strong><i class="bi bi-shield-check"></i> Enable Legal & Compliance Information</strong>
+                                            </label>
+                                            <div class="form-text">Tick to add regulatory compliance details (HDS registration, insurance, etc.)</div>
+                                        </div>
+                                    </div>
+                                    
                                     <!-- Legal & Compliance Information -->
-                                    <div class="card mb-3">
+                                    <div class="card mb-3 hidden" id="legalComplianceCard">
                                         <div class="card-header">
                                             <h6><i class="bi bi-shield-check"></i> Legal & Compliance Information</h6>
                                             <small class="text-muted">Required for NZ care provider compliance</small>
@@ -4592,6 +4603,20 @@
             beeMarshallAlert(`CSV exported successfully!\n\nFile: ${filename}\nRecords: ${data.length}\nUser: ${currentUser ? currentUser.username : 'Unknown'}`, 'success');
         }
         
+        
+        // Toggle Legal & Compliance Information Card
+        function toggleLegalComplianceCard() {
+            const checkbox = document.getElementById('enableLegalCompliance');
+            const card = document.getElementById('legalComplianceCard');
+            
+            if (checkbox && card) {
+                if (checkbox.checked) {
+                    card.classList.remove('hidden');
+                } else {
+                    card.classList.add('hidden');
+                }
+            }
+        }
         
         // Data Integrity Check Functions
         function showIntegrityCheck() {

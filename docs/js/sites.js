@@ -1171,6 +1171,18 @@ window.editSite = function(id) {
     if (document.getElementById('healthSafetyCompliance')) document.getElementById('healthSafetyCompliance').checked = legalCompliance.healthSafetyCompliance || false;
     if (document.getElementById('incidentReportingEnabled')) document.getElementById('incidentReportingEnabled').checked = legalCompliance.incidentReportingEnabled || false;
     
+    // Check if there's any legal compliance data and enable the checkbox if so
+    const hasLegalComplianceData = legalCompliance.hdsRegistrationNumber || legalCompliance.insuranceProvider || 
+                                    legalCompliance.privacyOfficer || legalCompliance.healthSafetyOfficer;
+    const enableLegalComplianceCheckbox = document.getElementById('enableLegalCompliance');
+    if (enableLegalComplianceCheckbox) {
+        enableLegalComplianceCheckbox.checked = !!hasLegalComplianceData;
+        // Trigger the toggle to show/hide the card
+        if (typeof toggleLegalComplianceCard === 'function') {
+            toggleLegalComplianceCard();
+        }
+    }
+    
     // Populate special needs flags
     const specialNeeds = site.specialNeeds || {};
     const flagCheckboxes = {
