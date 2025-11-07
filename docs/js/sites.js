@@ -807,7 +807,7 @@ function showAddSiteForm() {
     
     hideAllViews();
     document.getElementById('siteFormView').classList.remove('hidden');
-    document.getElementById('siteFormTitle').textContent = 'Add New Site';
+    document.getElementById('siteFormTitle').textContent = 'Add New Client';
     document.getElementById('siteForm').reset();
     document.getElementById('siteId').value = '';
     document.getElementById('anomalySection')?.classList.add('hidden');
@@ -815,9 +815,6 @@ function showAddSiteForm() {
     
     // Populate functional classification dropdown
     populateFunctionalClassificationDropdown();
-    
-    // Render honey potentials checkboxes (empty for new site)
-    renderHoneyPotentials([]);
     
     // Add event listener for seasonal classification changes
     const seasonalClassificationSelect = document.getElementById('seasonalClassification');
@@ -1029,8 +1026,7 @@ function handleSaveSite(e) {
             fallRisk: document.getElementById('fallRisk')?.checked || false,
             woundCareRequired: document.getElementById('woundCareRequired')?.checked || false
         },
-        // Get selected honey potentials from checkboxes
-        honeyPotentials: getSelectedHoneyPotentials(),
+        // Care service types (removed - use task groups instead)
         lastModifiedBy: currentUser.username,
         lastModifiedAt: new Date().toISOString(),
         createdAt: id ? (window.sites.find(c => c.id === parseInt(id))?.createdAt || new Date().toISOString()) : new Date().toISOString()
