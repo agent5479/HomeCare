@@ -690,8 +690,7 @@ function loadHoneyTypes() {
     const container = document.getElementById('honeyTypesList');
     if (!container) return;
     
-    // Use the appropriate array (CARE_SERVICE_TYPES or HONEY_TYPES)
-    const serviceTypes = typeof CARE_SERVICE_TYPES !== 'undefined' ? CARE_SERVICE_TYPES : HONEY_TYPES;
+    // serviceTypes already declared above - use existing variable
     container.innerHTML = serviceTypes.map((type, index) => `
         <div class="list-group-item d-flex justify-content-between align-items-center">
             <div class="d-flex align-items-center">

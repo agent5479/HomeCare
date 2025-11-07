@@ -461,7 +461,12 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Check if this is first time setup and initialize master account
+// DISABLED: Legacy feature - using JESS_USERNAME/JESS_PASSWORD from GitHub Secrets instead
 function checkFirstTimeSetup() {
+    console.log('ℹ️ Legacy master account setup disabled - using GitHub Secrets authentication');
+    return;
+    
+    /* LEGACY CODE - DISABLED
     if (!database) {
         console.warn('⚠️ Database not available - skipping first time setup check');
         return;
@@ -474,9 +479,14 @@ function checkFirstTimeSetup() {
             initializeMasterAccount();
         }
     });
+    */
 }
 
 function initializeMasterAccount() {
+    console.log('ℹ️ Legacy master account initialization disabled - using GitHub Secrets authentication');
+    return;
+    
+    /* LEGACY CODE - DISABLED (requires MASTER_USERNAME and MASTER_PASSWORD secrets)
     if (!database) {
         console.warn('⚠️ Database not available - cannot initialize master account');
         return;
@@ -498,6 +508,7 @@ function initializeMasterAccount() {
     }).catch(error => {
         console.error('❌ Failed to initialize master account:', error);
     });
+    */
 }
 
 // Emergency reset function - call from browser console if needed
@@ -1256,10 +1267,19 @@ function handleLogin(e) {
     
     // SECURITY: Admin accounts now use hashed passwords
     const adminAccount = Object.values(ADMIN_ACCOUNTS).find(account => {
+        console.log('🔍 Checking account:', account.username);
         if (account.username.toLowerCase() === username.toLowerCase()) {
+            console.log('✅ Username match found:', account.username);
             // Use the passwordHash field for secure comparison
             if (account.passwordHash) {
-                return verifyPassword(password, account.passwordHash);
+                console.log('🔐 Password hash exists, verifying...');
+                console.log('🔐 Hash type:', typeof account.passwordHash);
+                console.log('🔐 Hash starts with:', account.passwordHash.substring(0, 20));
+                const verified = verifyPassword(password, account.passwordHash);
+                console.log('🔐 Verification result:', verified);
+                return verified;
+            } else {
+                console.warn('⚠️ No password hash found for account');
             }
         }
         return false;
@@ -1911,11 +1931,15 @@ function verifyPassword(password, hash) {
         } else {
             // This is likely a simpleHash or Web Crypto hash - verify
             console.log('🔄 Detected fallback password hash, verifying...');
+            console.log('🔄 Hash ends with _secure:', hash.endsWith('_secure'));
             
             // Check if it's the new secure format
             if (hash.endsWith('_secure')) {
                 const expectedHash = simpleHash(password) + '_secure';
+                console.log('🔄 Expected hash:', expectedHash);
+                console.log('🔄 Actual hash:', hash);
                 const isValid = expectedHash === hash;
+                console.log('🔄 Hashes match:', isValid);
                 if (isValid) {
                     console.log('✅ Secure fallback password verified');
                 }
