@@ -2027,11 +2027,22 @@
                                     <input type="hidden" id="siteId">
                                     
                                     <div class="row">
-                                        <div class="col-md-6 mb-3">
+                                        <div class="col-md-12 mb-3">
                                             <label for="siteName" class="form-label">Site Name <span class="text-danger">*</span></label>
                                             <input type="text" class="form-control" id="siteName" required placeholder="e.g., Main Care Facility, North Branch">
                                             <div class="form-text">Give your client location a descriptive name</div>
                                         </div>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-12 mb-3">
+                                            <label for="siteAddress" class="form-label"><strong>Physical Address <span class="text-danger">*</span></strong></label>
+                                            <input type="text" class="form-control" id="siteAddress" required placeholder="Full street address (e.g., 123 Main Street, Takaka, Tasman 7110)">
+                                            <div class="form-text"><i class="bi bi-geo-alt-fill"></i> This address will be used for mapping and navigation</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row">
                                         <div class="col-md-6 mb-3">
                                             <label for="functionalClassification" class="form-label">Functional Classification <span class="text-danger">*</span></label>
                                             <select class="form-select" id="functionalClassification" required>
@@ -2201,53 +2212,6 @@
                                     </div>
                                     
 
-                                            
-                                            <!-- Stack Configuration Summary -->
-                                            <div class="row mt-3" id="stackBreakdownSummary" style="display: none;">
-                                                <div class="col-12">
-                                                    <div class="card">
-                                                        <div class="card-header">
-                                                            <h6 class="mb-0"><i class="bi bi-stack"></i> Stack Configuration Summary</h6>
-                                                        </div>
-                                                        <div class="card-body">
-                                                            <div class="row">
-                                                                <div class="col-md-4">
-                                                                    <div class="text-center">
-                                                                        <h5 class="text-primary" id="doublesCount">0</h5>
-                                                                        <small class="text-muted">Double Stacks</small>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="col-md-4">
-                                                                    <div class="text-center">
-                                                                        <h5 class="text-success" id="topSplitsCount">0</h5>
-                                                                        <small class="text-muted">Top-Splits</small>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="col-md-4">
-                                                                    <div class="text-center">
-                                                                        <h5 class="text-warning" id="singlesCount">0</h5>
-                                                                        <small class="text-muted">Single Stacks</small>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="row mt-3">
-                                                                <div class="col-md-6">
-                                                                    <div class="text-center">
-                                                                        <h5 class="text-info" id="nucsCount">0</h5>
-                                                                        <small class="text-muted">NUC Stacks</small>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="col-md-6">
-                                                                    <div class="text-center">
-                                                                        <h5 class="text-secondary" id="emptyStacksCount">0</h5>
-                                                                        <small class="text-muted">Empty Platforms</small>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
                                             </div>
                                         </div>
                                     </div>
@@ -2429,9 +2393,9 @@
                                                     <label for="landownerEmail" class="form-label">Email</label>
                                                     <input type="email" class="form-control" id="landownerEmail" placeholder="contact@example.com">
                                                 </div>
-                                                <div class="col-md-6 mb-3">
-                                                    <label for="landownerAddress" class="form-label">Physical Address</label>
-                                                    <input type="text" class="form-control" id="landownerAddress" placeholder="Street address">
+                                                <div class="col-md-12 mb-3">
+                                                    <label for="landownerNotes" class="form-label">Contact Notes</label>
+                                                    <textarea class="form-control" id="landownerNotes" rows="2" placeholder="Additional contact information or notes"></textarea>
                                                 </div>
                                             </div>
                                         </div>
