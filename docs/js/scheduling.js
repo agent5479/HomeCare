@@ -331,63 +331,199 @@ function renderScheduleTimeline() {
     }
 }
 
+// NEW v0.7: Visit-based scheduling functions
 function showScheduleTaskModal() {
+    // Populate site select
     const siteSelect = document.getElementById('scheduleSite');
     siteSelect.innerHTML = '<option value="">Select site...</option>' +
         sites.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
     
-    const taskSelect = document.getElementById('scheduleTask');
-    taskSelect.innerHTML = '<option value="">Select task...</option>' +
-        tasks.map(t => `<option value="${t.id}">${t.category}: ${t.name}</option>`).join('');
+    // Populate assignedTo select with employees
+    const assignedSelect = document.getElementById('scheduleAssignedTo');
+    if (employees && employees.length > 0) {
+        assignedSelect.innerHTML = '<option value="">Current User</option>' +
+            employees.map(e => `<option value="${e.username}">${e.displayName || e.username}</option>`).join('');
+    }
     
     // Set default date to today
     document.getElementById('scheduleDueDate').valueAsDate = new Date();
+    
+    // Set default time to 9:00 AM
+    document.getElementById('scheduleTime').value = '09:00';
+    
+    // Render task selection checkboxes
+    renderVisitTaskSelection();
+    
+    // Render quick-apply task group buttons
+    renderTaskGroupQuickButtons();
     
     const modal = new bootstrap.Modal(document.getElementById('scheduleTaskModal'));
     modal.show();
 }
 
-function handleScheduleTask(e) {
-    e.preventDefault();
+/**
+ * Render task selection checkboxes for visit
+ */
+function renderVisitTaskSelection() {
+    const container = document.getElementById('visitTaskSelection');
     
-    const siteId = parseInt(document.getElementById('scheduleSite').value);
-    const taskId = document.getElementById('scheduleTask').value;
-    const dueDate = document.getElementById('scheduleDueDate').value;
-    const scheduledTime = document.getElementById('scheduleTime').value;
-    const priority = document.getElementById('schedulePriority').value;
-    const notes = document.getElementById('scheduleNotes').value;
-    const individualHiveId = document.getElementById('scheduleHive')?.value || null;
+    // Get all available tasks from COMPREHENSIVE_TASKS
+    const allTasks = window.COMPREHENSIVE_TASKS || [];
     
-    if (!siteId || !taskId) {
-        alert('Please select both site and task.');
+    if (allTasks.length === 0) {
+        container.innerHTML = '<p class="text-muted">No tasks available</p>';
         return;
     }
     
-    const task = {
-        id: Date.now().toString(),
+    // Group tasks by category
+    const tasksByCategory = {};
+    allTasks.forEach(task => {
+        if (!tasksByCategory[task.category]) {
+            tasksByCategory[task.category] = [];
+        }
+        tasksByCategory[task.category].push(task);
+    });
+    
+    container.innerHTML = Object.keys(tasksByCategory).map(category => `
+        <div class="mb-3">
+            <h6 class="fw-bold text-primary mb-2">${category}</h6>
+            ${tasksByCategory[category].map(task => `
+                <div class="form-check">
+                    <input class="form-check-input visit-task-checkbox" type="checkbox" 
+                           value="${task.id}" id="visittask_${task.id}">
+                    <label class="form-check-label" for="visittask_${task.id}">
+                        ${task.name}
+                        ${task.common ? '<span class="badge bg-success ms-1">Common</span>' : ''}
+                    </label>
+                </div>
+            `).join('')}
+        </div>
+    `).join('');
+}
+
+/**
+ * Render quick-apply task group buttons
+ */
+function renderTaskGroupQuickButtons() {
+    const container = document.getElementById('taskGroupQuickButtons');
+    
+    if (!taskGroups || taskGroups.length === 0) {
+        container.innerHTML = '<span class="text-muted small">No task groups available</span>';
+        return;
+    }
+    
+    container.innerHTML = taskGroups.map(group => `
+        <button type="button" class="btn btn-sm btn-outline-success me-1 mb-1" 
+                onclick="applyTaskGroup('${group.id}')" 
+                style="border-left: 3px solid ${group.color};">
+            <i class="bi bi-collection"></i> ${group.name}
+        </button>
+    `).join('');
+}
+
+/**
+ * Apply a task group to the visit (select all tasks in the group)
+ */
+window.applyTaskGroup = function(groupId) {
+    const group = taskGroups.find(g => g.id === groupId);
+    if (!group) return;
+    
+    // Clear all checkboxes first
+    document.querySelectorAll('.visit-task-checkbox').forEach(cb => cb.checked = false);
+    
+    // Check the tasks in this group
+    group.taskIds.forEach(taskId => {
+        const checkbox = document.getElementById(`visittask_${taskId}`);
+        if (checkbox) {
+            checkbox.checked = true;
+        }
+    });
+    
+    careMarshallAlert(`✅ Applied task group: ${group.name} (${group.taskIds.length} tasks)`, 'success');
+};
+
+// NEW v0.7: Handle visit scheduling (replaces individual task scheduling)
+window.handleScheduleVisit = function(e) {
+    if (e) e.preventDefault();
+    
+    const siteId = parseInt(document.getElementById('scheduleSite').value);
+    const date = document.getElementById('scheduleDueDate').value;
+    const time = document.getElementById('scheduleTime').value;
+    const duration = parseInt(document.getElementById('scheduleDuration').value) || 60;
+    const priority = document.getElementById('schedulePriority').value;
+    const assignedTo = document.getElementById('scheduleAssignedTo').value;
+    const notes = document.getElementById('scheduleNotes').value;
+    
+    // Get selected tasks
+    const checkboxes = document.querySelectorAll('.visit-task-checkbox:checked');
+    const selectedTaskIds = Array.from(checkboxes).map(cb => cb.value);
+    
+    if (!siteId) {
+        careMarshallAlert('❌ Please select a site', 'error');
+        return;
+    }
+    
+    if (!date || !time) {
+        careMarshallAlert('❌ Please enter visit date and time', 'error');
+        return;
+    }
+    
+    if (selectedTaskIds.length === 0) {
+        careMarshallAlert('❌ Please select at least one task for the visit', 'error');
+        return;
+    }
+    
+    // Create visit object
+    const visit = {
         siteId: siteId,
-        individualHiveId: individualHiveId,
-        taskId: taskId,
-        dueDate: dueDate,
-        scheduledTime: scheduledTime,
+        date: date,
+        time: time,
+        duration: duration,
         priority: priority,
+        assignedTo: assignedTo || currentUser?.username || '',
         notes: notes,
-        completed: false,
-        createdBy: currentUser.username,
-        createdAt: new Date().toISOString()
+        assignedTasks: selectedTaskIds.map(taskId => ({
+            taskId: taskId,
+            status: 'pending',
+            completedAt: null,
+            notes: ''
+        })),
+        status: 'scheduled'
     };
     
-    // Use tenant-specific path for data isolation
-    const tasksPath = currentTenantId ? `tenants/${currentTenantId}/scheduledTasks` : 'scheduledTasks';
-    database.ref(`${tasksPath}/${task.id}`).set(task)
+    // Save visit using the global function from core.js
+    window.saveVisit(visit)
         .then(() => {
-            careMarshallAlert('✅ Task scheduled successfully!', 'success');
+            const site = sites.find(s => s.id === siteId);
+            const siteName = site ? site.name : `Site ${siteId}`;
+            careMarshallAlert(`✅ Visit to ${siteName} scheduled successfully! (${selectedTaskIds.length} tasks)`, 'success');
+            
+            // Close modal and reset form
             bootstrap.Modal.getInstance(document.getElementById('scheduleTaskModal')).hide();
             document.getElementById('scheduleTaskForm').reset();
+            
+            // Refresh views
             renderScheduledTasks();
             renderScheduleTimeline();
+        })
+        .catch(error => {
+            console.error('Error scheduling visit:', error);
+            careMarshallAlert('❌ Error scheduling visit. Please try again.', 'error');
         });
+};
+
+// LEGACY: Keep old function for backward compatibility
+function handleScheduleTask(e) {
+    // Redirect to new visit-based scheduling
+    console.log('⚠️ handleScheduleTask is deprecated, use handleScheduleVisit');
+    handleScheduleVisit(e);
 }
+
+// Stub function referenced in HTML
+window.updateVisitSiteInfo = function() {
+    // Future: Show site info when site is selected
+    console.log('Site selected');
+};
 
 function completeScheduledTask(id) {
     // Check permission - all users can complete tasks

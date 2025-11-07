@@ -3140,58 +3140,94 @@
         </div>
 
         <!-- Schedule Task Modal -->
+        <!-- NEW v0.7: Visit Scheduling Modal (Replaces Task Scheduling) -->
         <div class="modal fade" id="scheduleTaskModal" tabindex="-1">
-            <div class="modal-dialog">
+            <div class="modal-dialog modal-lg">
                 <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Schedule New Task</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title"><i class="bi bi-calendar-plus"></i> Schedule New Visit</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body">
                         <form id="scheduleTaskForm">
+                            <!-- Site Selection -->
                             <div class="mb-3">
-                                <label for="scheduleSite" class="form-label">Site *</label>
-                                <select class="form-select" id="scheduleSite" required>
+                                <label for="scheduleSite" class="form-label fw-bold">Client/Site *</label>
+                                <select class="form-select" id="scheduleSite" required onchange="updateVisitSiteInfo()">
                                     <option value="">Select site...</option>
                                 </select>
                             </div>
                             
-                            <div class="mb-3">
-                                <label for="scheduleTask" class="form-label">Task *</label>
-                                <select class="form-select" id="scheduleTask" required>
-                                    <option value="">Select task...</option>
-                                </select>
-                            </div>
-                            
+                            <!-- Date and Time -->
                             <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="scheduleDueDate" class="form-label">Due Date *</label>
+                                <div class="col-md-4 mb-3">
+                                    <label for="scheduleDueDate" class="form-label fw-bold">Visit Date *</label>
                                     <input type="date" class="form-control" id="scheduleDueDate" required>
                                 </div>
-                                <div class="col-md-6 mb-3">
-                                    <label for="scheduleTime" class="form-label">Time (Optional)</label>
-                                    <input type="time" class="form-control" id="scheduleTime">
+                                <div class="col-md-4 mb-3">
+                                    <label for="scheduleTime" class="form-label fw-bold">Start Time *</label>
+                                    <input type="time" class="form-control" id="scheduleTime" required>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label for="scheduleDuration" class="form-label fw-bold">Duration (min)</label>
+                                    <input type="number" class="form-control" id="scheduleDuration" value="60" min="15" step="15">
                                 </div>
                             </div>
                             
-                            <div class="mb-3">
-                                <label for="schedulePriority" class="form-label">Priority</label>
-                                <select class="form-select" id="schedulePriority">
-                                    <option value="normal">Normal</option>
-                                    <option value="high">High</option>
-                                    <option value="urgent">Urgent</option>
-                                </select>
+                            <!-- Priority and Assignment -->
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="schedulePriority" class="form-label fw-bold">Priority</label>
+                                    <select class="form-select" id="schedulePriority">
+                                        <option value="normal">Normal</option>
+                                        <option value="high">High</option>
+                                        <option value="urgent">Urgent</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="scheduleAssignedTo" class="form-label fw-bold">Assign To</label>
+                                    <select class="form-select" id="scheduleAssignedTo">
+                                        <option value="">Current User</option>
+                                    </select>
+                                </div>
                             </div>
                             
+                            <hr>
+                            
+                            <!-- Task Selection -->
                             <div class="mb-3">
-                                <label for="scheduleNotes" class="form-label">Notes</label>
-                                <textarea class="form-control" id="scheduleNotes" rows="3"></textarea>
+                                <label class="form-label fw-bold">Tasks for this Visit *</label>
+                                <div class="form-text mb-2">Select tasks to perform during this visit</div>
+                                
+                                <!-- Quick Apply Task Groups -->
+                                <div class="mb-3" id="quickApplyTaskGroups">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <span class="text-muted small me-2">Quick Apply:</span>
+                                        <div id="taskGroupQuickButtons">
+                                            <span class="text-muted small">No task groups available</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Task Checkboxes -->
+                                <div id="visitTaskSelection" class="border rounded p-3" style="max-height: 300px; overflow-y: auto;">
+                                    <p class="text-muted">Loading tasks...</p>
+                                </div>
+                            </div>
+                            
+                            <!-- Notes -->
+                            <div class="mb-3">
+                                <label for="scheduleNotes" class="form-label fw-bold">Visit Notes</label>
+                                <textarea class="form-control" id="scheduleNotes" rows="3" 
+                                          placeholder="Any special instructions or notes for this visit..."></textarea>
                             </div>
                         </form>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-primary" onclick="handleScheduleTask(event)">Schedule Task</button>
+                        <button type="button" class="btn btn-primary" onclick="handleScheduleVisit(event)">
+                            <i class="bi bi-check-circle"></i> Schedule Visit
+                        </button>
                     </div>
                 </div>
             </div>
