@@ -19,14 +19,21 @@ function invalidateSitesRenderCache() {
 
 // Site types and their associated colors
 const SITE_TYPES = {
-    'production': { name: 'Production', color: '#28a745', icon: 'bi-house-heart-fill' },
-    'nucleus': { name: 'Nucleus', color: '#17a2b8', icon: 'bi-circle-fill' },
-    'queen-rearing': { name: 'Queen Rearing', color: '#ffc107', icon: 'bi-star-fill' },
-    'research': { name: 'Research', color: '#6f42c1', icon: 'bi-flask' },
-    'education': { name: 'Education', color: '#fd7e14', icon: 'bi-book' },
-    'quarantine': { name: 'Quarantine', color: '#dc3545', icon: 'bi-shield-exclamation' },
-    'backup': { name: 'Backup', color: '#6c757d', icon: 'bi-archive' },
-    'custom': { name: 'Custom', color: '#20c997', icon: 'bi-gear' }
+    'home_care': { name: 'Home Care', color: '#0d6efd', icon: 'bi-house-heart-fill' },
+    'residential_care': { name: 'Residential Care', color: '#28a745', icon: 'bi-building' },
+    'assisted_living': { name: 'Assisted Living', color: '#20c997', icon: 'bi-house-check-fill' },
+    'rest_home': { name: 'Rest Home', color: '#17a2b8', icon: 'bi-house-door-fill' },
+    'hospital_care': { name: 'Hospital Care', color: '#dc3545', icon: 'bi-hospital-fill' },
+    'dementia_care': { name: 'Dementia Care', color: '#6f42c1', icon: 'bi-heart-pulse-fill' },
+    'rehabilitation': { name: 'Rehabilitation', color: '#fd7e14', icon: 'bi-activity' },
+    'respite_care': { name: 'Respite Care', color: '#e83e8c', icon: 'bi-moon-stars-fill' },
+    'day_care': { name: 'Day Care', color: '#ffc107', icon: 'bi-sun-fill' },
+    'hospice': { name: 'Hospice', color: '#6c757d', icon: 'bi-heart-pulse' },
+    'independent_living': { name: 'Independent Living', color: '#198754', icon: 'bi-person-check-fill' },
+    'supported_living': { name: 'Supported Living', color: '#0dcaf0', icon: 'bi-people-fill' },
+    'disability_support': { name: 'Disability Support', color: '#d63384', icon: 'bi-universal-access-circle' },
+    'mental_health': { name: 'Mental Health', color: '#6610f2', icon: 'bi-emoji-smile-fill' },
+    'other': { name: 'Other/Custom', color: '#adb5bd', icon: 'bi-gear-fill' }
 };
 
 // Internal render function (actual rendering logic)
@@ -192,8 +199,8 @@ function _renderSitesInternal() {
                     </button>
                 ` : '';
                 
-                const functionalClassification = c.functionalClassification || 'production';
-                const typeInfo = SITE_TYPES[functionalClassification] || SITE_TYPES['custom'];
+                const functionalClassification = c.functionalClassification || 'home_care';
+                const typeInfo = SITE_TYPES[functionalClassification] || SITE_TYPES['other'];
                 
                 // Add archived indicator
                 const archivedBadge = c.archived ? `<span class="badge bg-secondary ms-2">Archived</span>` : '';
@@ -1571,7 +1578,7 @@ function viewSiteDetails(id) {
     const site = window.sites.find(c => c.id === id);
     if (!site) return;
     
-    const typeInfo = SITE_TYPES[site.siteType] || SITE_TYPES['custom'];
+    const typeInfo = SITE_TYPES[site.siteType] || SITE_TYPES['other'];
     
     const detailsHtml = `
         <div class="modal fade" id="siteDetailsModal" tabindex="-1">
@@ -1997,7 +2004,7 @@ function initMap() {
     // Add marker for each site with type-specific colors
     window.sites.forEach(site => {
         try {
-            const typeInfo = SITE_TYPES[site.siteType] || SITE_TYPES['custom'];
+            const typeInfo = SITE_TYPES[site.siteType] || SITE_TYPES['other'];
             
             // Create custom icon with site type color
             const customIcon = L.divIcon({
