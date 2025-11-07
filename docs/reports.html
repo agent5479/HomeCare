@@ -139,11 +139,11 @@
             margin-bottom: 1rem;
         }
         
-        .report-icon.hive-performance {
+        .report-icon.client-performance {
             background: linear-gradient(135deg, #28a745, #20c997);
         }
         
-        .report-icon.health-mortality {
+        .report-icon.health-status {
             background: linear-gradient(135deg, #dc3545, #fd7e14);
         }
         
@@ -151,8 +151,8 @@
             background: linear-gradient(135deg, #17a2b8, #6f42c1);
         }
         
-        /* Interactive Hive Category Cards */
-        .hive-category-card {
+        /* Interactive Client Category Cards */
+        .client-category-card {
             background: var(--glass);
             border-radius: var(--radius);
             padding: 1.5rem;
@@ -164,56 +164,56 @@
             overflow: hidden;
         }
         
-        .hive-category-card:hover {
+        .client-category-card:hover {
             transform: translateY(-4px);
             box-shadow: 0 12px 30px rgba(0,0,0,0.15);
             border-color: var(--accent);
         }
         
-        .hive-category-card.clickable {
+        .client-category-card.clickable {
             cursor: pointer;
         }
         
-        .hive-category-card:not(.clickable) {
+        .client-category-card:not(.clickable) {
             cursor: default;
         }
         
-        .hive-icon {
+        .client-icon {
             font-size: 2.5rem;
             margin-bottom: 0.5rem;
             transition: var(--transition);
         }
         
-        .hive-icon.weak { color: #fd7e14; }
-        .hive-icon.nuc { color: #6f42c1; }
-        .hive-icon.dead { color: #dc3545; }
-        .hive-icon.empty { color: #6c757d; }
-        .hive-icon.quarantine { color: #dc3545; }
+        .client-icon.dependent { color: #fd7e14; }
+        .client-icon.rehabilitation { color: #6f42c1; }
+        .client-icon.hospice { color: #dc3545; }
+        .client-icon.vacant { color: #6c757d; }
+        .client-icon.isolation { color: #dc3545; }
         
-        .hive-count {
+        .client-count {
             font-size: 2rem;
             font-weight: 700;
             color: var(--brand);
             margin-bottom: 0.25rem;
         }
         
-        .hive-label {
+        .client-label {
             font-size: 1.1rem;
             font-weight: 600;
             color: var(--brand);
             margin-bottom: 0.25rem;
         }
         
-        .hive-description {
+        .client-description {
             font-size: 0.9rem;
             color: var(--muted);
         }
         
-        .hive-category-card:hover .hive-icon {
+        .client-category-card:hover .client-icon {
             transform: scale(1.1);
         }
         
-        .hive-category-card:hover .hive-count {
+        .client-category-card:hover .client-count {
             color: var(--accent);
         }
         
@@ -298,19 +298,19 @@
         }
         
         /* Honey Type Cards */
-        .honey-type-card {
+        .service-type-card {
             transition: var(--transition);
             cursor: pointer;
             border: 2px solid transparent;
         }
         
-        .honey-type-card:hover {
+        .service-type-card:hover {
             transform: translateY(-4px);
             box-shadow: 0 8px 20px rgba(0,0,0,0.15);
             border-color: var(--accent);
         }
         
-        .honey-type-card.clickable {
+        .service-type-card.clickable {
             cursor: pointer;
         }
     </style>
@@ -369,61 +369,61 @@
                         <div class="row g-2">
                             <!-- Dependent Clients -->
                             <div class="col-6 col-sm-4 col-md-2 mb-2">
-                                <div class="hive-category-card clickable" data-category="weak" onclick="showSitesByCategory('weak')">
-                                    <div class="hive-icon weak">
+                                <div class="client-category-card clickable" data-category="weak" onclick="showSitesByCategory('weak')">
+                                    <div class="client-icon weak">
                                         <i class="bi bi-heart-pulse"></i>
                                     </div>
-                                    <div class="hive-count" id="weakCount">0</div>
-                                    <div class="hive-label">Dependent</div>
-                                    <div class="hive-description">Need Attention</div>
+                                    <div class="client-count" id="weakCount">0</div>
+                                    <div class="client-label">Dependent</div>
+                                    <div class="client-description">Need Attention</div>
                                 </div>
                             </div>
                             
                             <!-- Rehabilitation Clients -->
                             <div class="col-6 col-sm-4 col-md-2 mb-2">
-                                <div class="hive-category-card clickable" data-category="nuc" onclick="showSitesByCategory('nuc')">
-                                    <div class="hive-icon nuc">
+                                <div class="client-category-card clickable" data-category="nuc" onclick="showSitesByCategory('nuc')">
+                                    <div class="client-icon nuc">
                                         <i class="bi bi-hospital"></i>
                                     </div>
-                                    <div class="hive-count" id="nucCount">0</div>
-                                    <div class="hive-label">Rehabilitation</div>
-                                    <div class="hive-description">Active Recovery</div>
+                                    <div class="client-count" id="nucCount">0</div>
+                                    <div class="client-label">Rehabilitation</div>
+                                    <div class="client-description">Active Recovery</div>
                                 </div>
                             </div>
                             
                             <!-- Hospice Clients -->
                             <div class="col-6 col-sm-4 col-md-2 mb-2">
-                                <div class="hive-category-card clickable" data-category="dead" onclick="showSitesByCategory('dead')">
-                                    <div class="hive-icon dead">
+                                <div class="client-category-card clickable" data-category="dead" onclick="showSitesByCategory('dead')">
+                                    <div class="client-icon dead">
                                         <i class="bi bi-heart-fill"></i>
                                     </div>
-                                    <div class="hive-count" id="deadCount">0</div>
-                                    <div class="hive-label">Hospice</div>
-                                    <div class="hive-description">End-of-Life Care</div>
+                                    <div class="client-count" id="deadCount">0</div>
+                                    <div class="client-label">Hospice</div>
+                                    <div class="client-description">End-of-Life Care</div>
                                 </div>
                             </div>
                             
                             <!-- Empty Platforms -->
                             <div class="col-6 col-sm-4 col-md-2 mb-2">
-                                <div class="hive-category-card clickable" data-category="empty" onclick="showSitesByCategory('empty')">
-                                    <div class="hive-icon empty">
+                                <div class="client-category-card clickable" data-category="empty" onclick="showSitesByCategory('empty')">
+                                    <div class="client-icon empty">
                                         <i class="bi bi-square"></i>
                                     </div>
-                                    <div class="hive-count" id="emptyCount">0</div>
-                                    <div class="hive-label">Empty</div>
-                                    <div class="hive-description">Unused Platforms</div>
+                                    <div class="client-count" id="emptyCount">0</div>
+                                    <div class="client-label">Empty</div>
+                                    <div class="client-description">Unused Platforms</div>
                                 </div>
                             </div>
                             
                             <!-- Quarantine Sites -->
                             <div class="col-6 col-sm-4 col-md-2 mb-2">
-                                <div class="hive-category-card clickable" data-category="quarantine" onclick="showSitesByCategory('quarantine')">
-                                    <div class="hive-icon quarantine">
+                                <div class="client-category-card clickable" data-category="quarantine" onclick="showSitesByCategory('quarantine')">
+                                    <div class="client-icon quarantine">
                                         <i class="bi bi-shield-exclamation"></i>
                                     </div>
-                                    <div class="hive-count" id="quarantineCount">0</div>
-                                    <div class="hive-label">Quarantine</div>
-                                    <div class="hive-description">Isolated Sites</div>
+                                    <div class="client-count" id="quarantineCount">0</div>
+                                    <div class="client-label">Quarantine</div>
+                                    <div class="client-description">Isolated Sites</div>
                                 </div>
                             </div>
                         </div>
@@ -433,52 +433,7 @@
         </div>
 
         <!-- Historical Harvest Records -->
-        <div class="row mb-4">
-            <div class="col-12">
-                <div class="report-card">
-                    <div class="card-header">
-                        <h5 class="mb-0"><i class="bi bi-archive"></i> Historical Harvest Records</h5>
-                        <small class="text-muted">Year-on-year harvest accumulation and trends</small>
-                    </div>
-                    <div class="card-body">
-                        <div id="harvestHistorySection">
-                            <div class="d-flex align-items-center justify-content-center" style="min-height: 200px;">
-                                <div class="text-center">
-                                    <div class="spinner-border text-warning" role="status">
-                                        <span class="visually-hidden">Loading...</span>
-                                    </div>
-                                    <p class="text-muted mt-3">Loading harvest data...</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Honey Potentials -->
-        <div class="row mb-4">
-            <div class="col-12">
-                <div class="report-card">
-                    <div class="card-header">
-                        <h5 class="mb-0"><i class="bi bi-flower1"></i> Honey Potentials</h5>
-                        <small class="text-muted">Click on honey types to see associated sites</small>
-                    </div>
-                    <div class="card-body">
-                        <div id="honeyPotentialsSection">
-                            <div class="d-flex align-items-center justify-content-center" style="min-height: 200px;">
-                                <div class="text-center">
-                                    <div class="spinner-border text-primary" role="status">
-                                        <span class="visually-hidden">Loading...</span>
-                                    </div>
-                                    <p class="text-muted mt-3">Loading honey potential data...</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <!-- Harvest History & Honey Potentials - REMOVED (beekeeping terminology) -->
 
         <!-- Site Details Modal -->
         <div class="modal fade" id="siteDetailsModal" tabindex="-1">
@@ -508,15 +463,15 @@
 
         <!-- Report Categories -->
         <div class="row g-2">
-            <!-- Hive Performance -->
+            <!-- Client Performance -->
             <div class="col-12 col-md-6 col-lg-4 mb-2">
                 <div class="report-card h-100">
                     <div class="card-body text-center">
-                        <div class="report-icon hive-performance mx-auto">
+                        <div class="report-icon client-performance mx-auto">
                             <i class="bi bi-graph-up"></i>
                         </div>
-                        <h5 class="card-title">Hive Performance</h5>
-                        <p class="card-text text-muted">Track hive strength, productivity, and growth over time</p>
+                        <h5 class="card-title">Client Status Overview</h5>
+                        <p class="card-text text-muted">Track client care levels and status distribution</p>
                         <div class="chart-container position-relative">
                             <div id="hivePerformanceSkeleton" class="d-flex align-items-center justify-content-center" style="height: 100%; position: absolute; top: 0; left: 0; right: 0; bottom: 0;">
                                 <div class="text-center">
@@ -539,8 +494,8 @@
                         <div class="report-icon health-mortality mx-auto">
                             <i class="bi bi-heart-pulse"></i>
                         </div>
-                        <h5 class="card-title">Health & Mortality</h5>
-                        <p class="card-text text-muted">Monitor disease outbreaks, mortality rates, and health trends</p>
+                        <h5 class="card-title">Health Status</h5>
+                        <p class="card-text text-muted">Monitor client health conditions and care requirements</p>
                         <div class="chart-container position-relative">
                             <div id="healthMortalitySkeleton" class="d-flex align-items-center justify-content-center" style="height: 100%; position: absolute; top: 0; left: 0; right: 0; bottom: 0;">
                                 <div class="text-center">
