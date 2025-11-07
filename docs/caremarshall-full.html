@@ -1842,7 +1842,7 @@
                                 <div class="row mt-2">
                                     <div class="col-12 text-center">
                                         <small class="text-muted" style="font-style: italic;">
-                                            <strong style="color: var(--gray-700);">Total Hive Equipment:</strong> 
+                                            <strong style="color: var(--gray-700);">Total Care Equipment:</strong> 
                                             <span id="equipmentTotalCount" style="color: var(--gray-700); font-weight: 600;">0</span>
                                         </small>
                                     </div>
@@ -2063,10 +2063,10 @@
                                         <textarea class="form-control" id="siteDescription" rows="3"></textarea>
                                     </div>
                                     
-                                    <!-- Hive State Summary -->
+                                    <!-- Client Health Status Summary -->
                                     <div class="card mt-4" id="hiveStateCard" style="display: none;">
                                         <div class="card-header">
-                                            <h6 class="mb-0"><i class="bi bi-heart-pulse"></i> Hive State</h6>
+                                            <h6 class="mb-0"><i class="bi bi-heart-pulse"></i> Client Health Status</h6>
                                             <small class="text-muted">Click numbers to update counts. Changes are automatically saved.</small>
                                         </div>
                                         <div class="card-body">
@@ -2095,15 +2095,63 @@
                                         </div>
                                     </div>
                                     
-                                    <!-- Hive Boxes -->
+                                    <!-- Client Care Details -->
                                     <div class="card mt-4">
                                         <div class="card-header">
-                                            <h6 class="mb-0"><i class="bi bi-grid"></i> Hive Boxes</h6>
-                                            <small class="text-muted">Click boxes to update site inventory. Changes are automatically saved as actions.</small>
+                                            <h6 class="mb-0"><i class="bi bi-clipboard2-heart"></i> Client Care Details & Services</h6>
+                                            <small class="text-muted">Document client needs, services provided, and care requirements</small>
                                         </div>
                                         <div class="card-body">
-                                            <div id="visualHiveGrid" class="mb-3">
-                                                <p class="text-muted text-center">Loading visual hive grid...</p>
+                                            <div class="mb-3">
+                                                <label class="form-label"><strong>Primary Care Services Required</strong></label>
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="servicePersonalCare">
+                                                            <label class="form-check-label" for="servicePersonalCare">Personal Care (bathing, dressing, grooming)</label>
+                                                        </div>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="serviceMedicationManagement">
+                                                            <label class="form-check-label" for="serviceMedicationManagement">Medication Management</label>
+                                                        </div>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="serviceMealPreparation">
+                                                            <label class="form-check-label" for="serviceMealPreparation">Meal Preparation & Assistance</label>
+                                                        </div>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="serviceMobilityAssistance">
+                                                            <label class="form-check-label" for="serviceMobilityAssistance">Mobility Assistance</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="serviceCompanionship">
+                                                            <label class="form-check-label" for="serviceCompanionship">Companionship & Social Support</label>
+                                                        </div>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="serviceHousekeeping">
+                                                            <label class="form-check-label" for="serviceHousekeeping">Light Housekeeping</label>
+                                                        </div>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="serviceTransportation">
+                                                            <label class="form-check-label" for="serviceTransportation">Transportation to Appointments</label>
+                                                        </div>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="serviceRespite">
+                                                            <label class="form-check-label" for="serviceRespite">Respite Care</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="mb-3">
+                                                <label for="careNotes" class="form-label"><strong>Care Notes & Requirements</strong></label>
+                                                <textarea class="form-control" id="careNotes" rows="3" placeholder="Document specific care requirements, routines, preferences, or important notes..."></textarea>
+                                            </div>
+                                            
+                                            <div class="mb-3">
+                                                <label for="regularTasksList" class="form-label"><strong>Regular Tasks & Schedule</strong></label>
+                                                <textarea class="form-control" id="regularTasksList" rows="3" placeholder="List regular tasks (e.g., Daily medication check at 9am, Weekly physiotherapy on Tuesdays, etc.)"></textarea>
                                             </div>
                                         </div>
                                     </div>
@@ -2146,9 +2194,9 @@
                                     
                                     <div class="row">
                                         <div class="col-md-12 mb-3">
-                                            <label for="siteHiveCount" class="form-label">Total Hive Count *</label>
+                                            <label for="siteHiveCount" class="form-label">Total Client Count *</label>
                                             <input type="number" class="form-control" id="siteHiveCount" min="0" required onchange="updateHiveStrengthTotals()">
-                                            <div class="form-text">Total number of hives in this site (0 allowed for Summer Only/Winter Only sites)</div>
+                                            <div class="form-text">Total number of clients at this location (0 allowed for temporary or inactive sites)</div>
                                         </div>
                                     </div>
                                     
@@ -4617,7 +4665,7 @@
                     html += `
                         <div id="integrity-hive-mismatch" class="card mb-3 border-danger">
                             <div class="card-header bg-danger text-white">
-                                <i class="bi bi-exclamation-triangle"></i> Hive Count Mismatches (${issues.hiveCountMismatches.length})
+                                <i class="bi bi-exclamation-triangle"></i> Client Count Mismatches (${issues.hiveCountMismatches.length})
                             </div>
                             <div class="card-body">
                                 <p class="text-muted">Sites where hive strength counts don't match hive box counts:</p>
