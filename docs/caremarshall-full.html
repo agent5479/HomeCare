@@ -1871,7 +1871,7 @@
                         <div class="btn-group me-2 admin-only" role="group">
                             <button type="button" class="btn btn-outline-success dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
                                 <i class="bi bi-download"></i> Export Data
-                            </button>
+                        </button>
                             <ul class="dropdown-menu">
                                 <li><a class="dropdown-item" href="#" onclick="exportClientsCSV(); return false;"><i class="bi bi-people me-2"></i>Clients</a></li>
                                 <li><a class="dropdown-item" href="#" onclick="exportVisitsCSV(); return false;"><i class="bi bi-calendar-check me-2"></i>Visits</a></li>
@@ -2034,25 +2034,25 @@
                                                         <div class="form-check">
                                                             <input class="form-check-input" type="checkbox" id="servicePersonalCare">
                                                             <label class="form-check-label" for="servicePersonalCare">Personal Care (bathing, dressing, grooming)</label>
-                                                        </div>
+                                                </div>
                                                         <div class="form-check">
                                                             <input class="form-check-input" type="checkbox" id="serviceMedicationManagement">
                                                             <label class="form-check-label" for="serviceMedicationManagement">Medication Management</label>
-                                                        </div>
+                                                </div>
                                                         <div class="form-check">
                                                             <input class="form-check-input" type="checkbox" id="serviceMealPreparation">
                                                             <label class="form-check-label" for="serviceMealPreparation">Meal Preparation & Assistance</label>
-                                                        </div>
+                                                </div>
                                                         <div class="form-check">
                                                             <input class="form-check-input" type="checkbox" id="serviceMobilityAssistance">
                                                             <label class="form-check-label" for="serviceMobilityAssistance">Mobility Assistance</label>
-                                                        </div>
-                                                    </div>
+                                                </div>
+                                                </div>
                                                     <div class="col-md-6">
                                                         <div class="form-check">
                                                             <input class="form-check-input" type="checkbox" id="serviceCompanionship">
                                                             <label class="form-check-label" for="serviceCompanionship">Companionship & Social Support</label>
-                                                        </div>
+                                            </div>
                                                         <div class="form-check">
                                                             <input class="form-check-input" type="checkbox" id="serviceHousekeeping">
                                                             <label class="form-check-label" for="serviceHousekeeping">Light Housekeeping</label>
@@ -2066,13 +2066,13 @@
                                                             <label class="form-check-label" for="serviceRespite">Respite Care</label>
                                                         </div>
                                                     </div>
-                                                </div>
-                                            </div>
-                                            
+                                        </div>
+                                    </div>
+                                    
                                             <div class="mb-3">
                                                 <label for="careNotes" class="form-label"><strong>Care Notes & Requirements</strong></label>
                                                 <textarea class="form-control" id="careNotes" rows="4" placeholder="Document specific care requirements, routines, preferences, or important notes...&#10;&#10;Include details such as:&#10;• Property access instructions (key location, security code, parking)&#10;• Other persons in dwelling (family members, pets, other residents)&#10;• Emergency contacts and procedures&#10;• Specific care preferences or sensitivities"></textarea>
-                                            </div>
+                                        </div>
                                             
                                             <div class="mb-3">
                                                 <label for="regularTasksList" class="form-label"><strong>Regular Tasks & Schedule</strong></label>
@@ -2138,39 +2138,62 @@
                                         <div class="card-body">
                                             <div class="row">
                                                 <div class="col-md-6 mb-3">
-                                                    <label for="siteType" class="form-label">Site Type</label>
-                                                    <select class="form-select" id="siteType">
-                                                        <option value="">Select site type...</option>
-                                                        <option value="summer">Summer Site</option>
-                                                        <option value="winter">Winter Site</option>
-                                                        <option value="summer-only">Summer Only</option>
-                                                        <option value="winter-only">Winter Only</option>
-                                                        <option value="year-round">Year-round Site</option>
+                                                    <label for="functionalClassification" class="form-label">Care Facility Type <span class="text-danger">*</span></label>
+                                                    <select class="form-select" id="functionalClassification" required>
+                                                        <option value="">Select care facility type...</option>
+                                                        <option value="home_care">Home Care (In-Home Support)</option>
+                                                        <option value="residential_care">Residential Care Facility</option>
+                                                        <option value="assisted_living">Assisted Living</option>
+                                                        <option value="rest_home">Rest Home</option>
+                                                        <option value="hospital_care">Hospital-Level Care</option>
+                                                        <option value="dementia_care">Dementia/Memory Care Unit</option>
+                                                        <option value="rehabilitation">Rehabilitation Center</option>
+                                                        <option value="respite_care">Respite Care</option>
+                                                        <option value="day_care">Day Programme / Day Care</option>
+                                                        <option value="hospice">Hospice / Palliative Care</option>
+                                                        <option value="independent_living">Independent Living</option>
+                                                        <option value="supported_living">Supported Living</option>
+                                                        <option value="disability_support">Disability Support</option>
+                                                        <option value="mental_health">Mental Health Support</option>
+                                                        <option value="other">Other / Custom</option>
                                                     </select>
+                                                    <div class="form-text">Aligns with NZ care service classifications.</div>
                                                 </div>
                                                 <div class="col-md-6 mb-3">
-                                                    <label for="accessType" class="form-label">Access Type</label>
+                                                    <label for="accessType" class="form-label">Access Conditions</label>
                                                     <select class="form-select" id="accessType">
-                                                        <option value="">Select access type...</option>
-                                                        <option value="all-weather">All Weather</option>
-                                                        <option value="dry-only">Dry Only</option>
+                                                        <option value="">Select access requirements...</option>
+                                                        <option value="standard_access">Standard Access / Reception</option>
+                                                        <option value="secure_entry">Secure Entry (Keypad / Swipe)</option>
+                                                        <option value="lift_required">Lift or Multi-Level Access</option>
+                                                        <option value="rural_access">Rural / Unsealed Access</option>
+                                                        <option value="home_visit">Client Home Visit</option>
+                                                        <option value="shared_facility">Shared Facility / Sign-in</option>
                                                     </select>
+                                                    <div class="form-text">Note any travel or access considerations for staff.</div>
                                                 </div>
                                             </div>
                                             <div class="row">
                                                 <div class="col-md-6 mb-3">
-                                                    <div class="form-check">
+                                                    <label for="seasonalClassification" class="form-label">Service Availability Pattern</label>
+                                                    <select class="form-select" id="seasonalClassification">
+                                                        <option value="summer">Temporary / Seasonal</option>
+                                                        <option value="winter">Short-term Care</option>
+                                                        <option value="all-year">Long-term Care</option>
+                                                    </select>
+                                                    <div class="form-text">Helps scheduling allocate appropriate staffing coverage.</div>
+                                                </div>
+                                                <div class="col-md-6 mb-3">
+                                                    <div class="form-check mb-2">
                                                         <input class="form-check-input" type="checkbox" id="contactBeforeVisit">
                                                         <label class="form-check-label" for="contactBeforeVisit">
                                                             Contact Required Before Visit
                                                         </label>
                                                     </div>
-                                                </div>
-                                                <div class="col-md-6 mb-3">
                                                     <div class="form-check">
                                                         <input class="form-check-input" type="checkbox" id="isQuarantine">
                                                         <label class="form-check-label" for="isQuarantine">
-                                                            Isolation/Quarantine Required
+                                                            Isolation / Infection Control Precautions
                                                         </label>
                                                     </div>
                                                 </div>
@@ -2642,7 +2665,7 @@
                         <div class="btn-group ms-2 admin-only" role="group">
                             <button type="button" class="btn btn-outline-success dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
                                 <i class="bi bi-download"></i> Export
-                            </button>
+                        </button>
                             <ul class="dropdown-menu">
                                 <li><a class="dropdown-item" href="#" onclick="exportVisitsCSV(); return false;"><i class="bi bi-calendar-check me-2"></i>Visits (CSV)</a></li>
                                 <li><a class="dropdown-item" href="#" onclick="exportScheduledTasksCSV(); return false;"><i class="bi bi-list-task me-2"></i>Scheduled Tasks (CSV)</a></li>
@@ -2815,9 +2838,9 @@
                         <button class="btn btn-success me-2" onclick="showTaskGroupModal()">
                             <i class="bi bi-collection"></i> Manage Task Groups
                         </button>
-                        <button class="btn btn-primary" onclick="showAddTaskForm()">
-                            <i class="bi bi-plus-circle"></i> Add New Task
-                        </button>
+                    <button class="btn btn-primary" onclick="showAddTaskForm()">
+                        <i class="bi bi-plus-circle"></i> Add New Task
+                    </button>
                     </div>
                 </div>
                 
@@ -3034,11 +3057,11 @@
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label for="schedulePriority" class="form-label fw-bold">Priority</label>
-                                    <select class="form-select" id="schedulePriority">
-                                        <option value="normal">Normal</option>
-                                        <option value="high">High</option>
-                                        <option value="urgent">Urgent</option>
-                                    </select>
+                                <select class="form-select" id="schedulePriority">
+                                    <option value="normal">Normal</option>
+                                    <option value="high">High</option>
+                                    <option value="urgent">Urgent</option>
+                                </select>
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label for="scheduleAssignedTo" class="form-label fw-bold">Assign To</label>
@@ -3203,7 +3226,7 @@
                     <!-- Version Tag -->
                     <div class="mb-3">
                         <span class="badge" style="font-size: 0.75rem; padding: 0.4rem 0.8rem; background: linear-gradient(135deg, var(--pale-lavender) 0%, var(--soft-turquoise) 100%); color: var(--black);">
-                            <i class="bi bi-tag-fill me-1"></i>v<span id="welcomeVersionTag"></span> 
+                            <i class="bi bi-tag-fill me-1"></i>v<span id="welcomeVersionTag"></span>
                         </span>
                     </div>
                     
@@ -3371,9 +3394,9 @@
                     <button type="button" class="btn btn-primary" onclick="saveBrandingSettings()">
                         <i class="bi bi-check-lg"></i> Save Branding
                     </button>
-                </div>
             </div>
         </div>
+    </div>
     </div>
 
     <!-- Scripts -->

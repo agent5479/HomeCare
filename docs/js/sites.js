@@ -272,14 +272,14 @@ function _renderSitesInternal() {
                     const seasonalValue = c.seasonalClassification || c.seasonal_classification || '';
                     if (!seasonalValue) return '';
                     const seasonalMap = {
-                        'summer': 'Summer Site',
-                        'winter': 'Winter Site',
-                        'all-year': 'All Year Round',
-                        'summer-only': 'Summer Only',
-                        'winter-only': 'Winter Only',
-                        'All Year Round': 'All Year Round',
-                        'Summer Site': 'Summer Site',
-                        'Winter Site': 'Winter Site'
+                        'summer': 'Temporary / Seasonal',
+                        'winter': 'Short-term Care',
+                        'all-year': 'Long-term Care',
+                        'summer-only': 'Seasonal (Legacy)',
+                        'winter-only': 'Short-term (Legacy)',
+                        'All Year Round': 'Long-term Care',
+                        'Summer Site': 'Temporary / Seasonal',
+                        'Winter Site': 'Short-term Care'
                     };
                     return seasonalMap[seasonalValue] || seasonalValue;
                 })();
@@ -288,11 +288,11 @@ function _renderSitesInternal() {
                 const seasonalBadge = (() => {
                     if (!seasonalDisplay) return '';
                     const seasonalColorMap = {
-                        'Summer Site': '#ffc107',
-                        'Winter Site': '#0dcaf0',
-                        'All Year Round': '#20c997',
-                        'Summer Only': '#ffcd39',
-                        'Winter Only': '#39c0ed'
+                        'Temporary / Seasonal': '#ffc107',
+                        'Short-term Care': '#0dcaf0',
+                        'Long-term Care': '#20c997',
+                        'Seasonal (Legacy)': '#ffcd39',
+                        'Short-term (Legacy)': '#39c0ed'
                     };
                     const bg = seasonalColorMap[seasonalDisplay] || '#6c757d';
                     return `<span class="badge ms-2" style="background-color: ${bg}; color: #111;">${seasonalDisplay}</span>`;
