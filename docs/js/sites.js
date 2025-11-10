@@ -230,15 +230,6 @@ function _renderSitesInternal() {
                 const siteClients = (window.clients || window.individualHives || []).filter(client => client.siteId === c.id);
                 const clientCount = siteClients.length;
                 
-                // Get client status summary
-                const clientStatusSummary = {
-                    independent: siteClients.filter(c => (c.status || c.hiveStrength) === 'independent' || (c.status || c.hiveStrength) === 'strong').length,
-                    assisted: siteClients.filter(c => (c.status || c.hiveStrength) === 'assisted' || (c.status || c.hiveStrength) === 'medium').length,
-                    dependent: siteClients.filter(c => (c.status || c.hiveStrength) === 'dependent' || (c.status || c.hiveStrength) === 'weak').length,
-                    rehabilitation: siteClients.filter(c => (c.status || c.hiveStrength) === 'rehabilitation' || (c.status || c.hiveStrength) === 'nuc').length,
-                    hospice: siteClients.filter(c => (c.status || c.hiveStrength) === 'hospice' || (c.status || c.hiveStrength) === 'dead').length
-                };
-                
                 // Get pending tasks for this site
                 const siteTasks = (window.scheduledTasks || []).filter(task => 
                     task.siteId === c.id && !task.completed
@@ -361,13 +352,6 @@ function _renderSitesInternal() {
                                         <button class="btn btn-sm btn-outline-info" onclick="event.stopPropagation(); showSiteClients(${c.id})" title="View client details">
                                             <i class="bi bi-list-ul"></i> View All
                                         </button>
-                                    </div>
-                                    <div class="d-flex flex-wrap gap-1">
-                                        ${clientStatusSummary.independent > 0 ? `<span class="badge bg-success" title="Independent clients">Ind: ${clientStatusSummary.independent}</span>` : ''}
-                                        ${clientStatusSummary.assisted > 0 ? `<span class="badge bg-info" title="Assisted clients">Asst: ${clientStatusSummary.assisted}</span>` : ''}
-                                        ${clientStatusSummary.dependent > 0 ? `<span class="badge bg-warning text-dark" title="Dependent clients">Dep: ${clientStatusSummary.dependent}</span>` : ''}
-                                        ${clientStatusSummary.rehabilitation > 0 ? `<span class="badge bg-purple" style="background-color: #6f42c1;" title="Rehabilitation clients">Rehab: ${clientStatusSummary.rehabilitation}</span>` : ''}
-                                        ${clientStatusSummary.hospice > 0 ? `<span class="badge bg-danger" title="Hospice clients">Hospice: ${clientStatusSummary.hospice}</span>` : ''}
                                     </div>
                                 </div>
                                 ` : ''}
