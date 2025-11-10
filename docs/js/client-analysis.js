@@ -3,66 +3,66 @@
 
 // Update client status breakdown
 function updateClientStatusBreakdown() {
-    if (!window.sites || window.sites.length === 0) {
+    const container = document.getElementById('careTypeBreakdown');
+    const totalEl = document.getElementById('careTypeTotal');
+    
+    if (!container) {
         if (typeof Logger !== 'undefined') {
-            Logger.log('📭 No sites data for client status breakdown');
+            Logger.warn('⚠️ careTypeBreakdown container not found on dashboard.');
         }
         return;
     }
     
-    let totalIndependent = 0;
-    let totalAssisted = 0;
-    let totalDependent = 0;
-    let totalRehabilitation = 0;
-    let totalHospice = 0;
-    let totalQuarantine = 0;
+    const siteTypes = (typeof SITE_TYPES !== 'undefined') ? SITE_TYPES : {};
+    const counts = {};
+    Object.keys(siteTypes).forEach(key => counts[key] = 0);
     
-    window.sites.forEach(site => {
-        // Exclude archived and deleted sites from calculations (same filtering as dashboard)
-        if (site.archived === true || site.archived === 'true' || site.archived === 1) return;
-        if (site.deleted === true || site.deleted === 'true' || site.deleted === 1) return;
-        
-        // Support both old hiveStrength and new clientStatus field names for backward compatibility
-        const clientStatus = site.clientStatus || site.hiveStrength;
-        if (clientStatus) {
-            // Map old hive strength to new client status
-            totalIndependent += clientStatus.independent || clientStatus.strong || 0;
-            totalAssisted += clientStatus.assisted || clientStatus.medium || 0;
-            totalDependent += clientStatus.dependent || clientStatus.weak || 0;
-            totalRehabilitation += clientStatus.rehabilitation || clientStatus.nuc || 0;
-            totalHospice += clientStatus.hospice || clientStatus.dead || 0;
-        }
-        // Count quarantine sites
-        if (site.isQuarantine) {
-            totalQuarantine++;
-        }
-    });
+    let totalActiveSites = 0;
     
-    // Calculate total active clients (excluding hospice)
-    const totalActiveClients = totalIndependent + totalAssisted + totalDependent + totalRehabilitation;
-    
-    // Update the display - maintain backward compatibility with old IDs
-    const strongEl = document.getElementById('strongCount');
-    const mediumEl = document.getElementById('mediumCount');
-    const weakEl = document.getElementById('weakCount');
-    const nucEl = document.getElementById('nucCount');
-    const deadEl = document.getElementById('deadCount');
-    const quarantineEl = document.getElementById('quarantineCount');
-    
-    if (strongEl) strongEl.textContent = totalIndependent;
-    if (mediumEl) mediumEl.textContent = totalAssisted;
-    if (weakEl) weakEl.textContent = totalDependent;
-    if (nucEl) nucEl.textContent = totalRehabilitation;
-    if (deadEl) deadEl.textContent = totalHospice;
-    if (quarantineEl) quarantineEl.textContent = totalQuarantine;
-    
-    // Update correlation display if it exists
-    const correlationEl = document.getElementById('hiveBreakdownTotal');
-    if (correlationEl) {
-        correlationEl.textContent = totalActiveClients;
+    if (Array.isArray(window.sites)) {
+        window.sites.forEach(site => {
+            if (site.archived === true || site.archived === 'true' || site.archived === 1) return;
+            if (site.deleted === true || site.deleted === 'true' || site.deleted === 1) return;
+            
+            totalActiveSites++;
+            
+            const classification = site.functionalClassification || site.siteType || 'other';
+            if (typeof counts[classification] === 'undefined') {
+                counts[classification] = 0;
+            }
+            counts[classification]++;
+        });
     }
     
-    // Also update equipment breakdown
+    if (totalEl) {
+        totalEl.textContent = totalActiveSites;
+    }
+    
+    const typeEntries = Object.entries(siteTypes);
+    if (typeEntries.length === 0) {
+        container.innerHTML = `<div class="text-muted small">No care type definitions configured.</div>`;
+        return;
+    }
+    
+    const cardsHtml = typeEntries.map(([key, def]) => {
+        const count = counts[key] || 0;
+        const color = def.color || '#1976D2';
+        const icon = def.icon || 'bi-house-heart';
+        const cardClass = count === 0 ? 'care-type-card empty' : 'care-type-card';
+        return `
+            <div class="${cardClass}" style="--care-color: ${color};">
+                <div class="care-type-icon">
+                    <i class="bi ${icon}"></i>
+                </div>
+                <div class="care-type-count">${count}</div>
+                <div class="care-type-label">${def.name}</div>
+            </div>
+        `;
+    }).join('');
+    
+    container.innerHTML = cardsHtml;
+    
+    // Also update equipment breakdown (legacy compatibility)
     updateEquipmentBreakdown();
 }
 

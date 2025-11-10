@@ -411,6 +411,48 @@
             color: white;
         }
         
+        .care-type-breakdown-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 0.75rem;
+        }
+        
+        .care-type-card {
+            background: var(--white);
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            border-radius: var(--radius);
+            padding: 0.85rem 0.75rem;
+            text-align: center;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+        
+        .care-type-card:hover {
+            transform: translateY(-2px);
+        }
+        
+        .care-type-card.empty {
+            opacity: 0.55;
+        }
+        
+        .care-type-icon {
+            font-size: 1.5rem;
+            color: var(--care-color, var(--primary-blue));
+            margin-bottom: 0.4rem;
+        }
+        
+        .care-type-count {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--black);
+        }
+        
+        .care-type-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+        
         /* Mobile responsive adjustments */
         @media (max-width: 768px) {
             #siteTypeFilter {
@@ -432,36 +474,9 @@
                 padding: 0.35rem 0.7rem;
             }
             
-            /* Hive box cards - ensure all 5 fit on one row on mobile */
-            .hive-boxes-container {
-                display: flex !important;
-                flex-wrap: nowrap !important;
-                gap: 0.25rem !important;
-            }
-            
-            .hive-box-card {
-                flex: 1 1 0 !important;
-                min-width: 0 !important;
-                max-width: none !important;
-            }
-            
-            .hive-box-card .card-body {
-                padding: 0.25rem !important;
-            }
-            
-            .hive-box-icon {
-                font-size: 0.875rem !important;
-            }
-            
-            .hive-box-label {
-                font-size: 0.65rem !important;
-                margin-top: 0.125rem !important;
-                line-height: 1.1 !important;
-            }
-            
-            .hive-box-number {
-                font-size: 0.875rem !important;
-                font-weight: 600 !important;
+            .care-type-breakdown-grid {
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+                gap: 0.5rem;
             }
         }
         
@@ -1713,80 +1728,14 @@
                     </div>
                 </div>
 
-                <!-- Breakdown Cards Row - Responsive Layout -->
-                <div class="row mb-3 g-2 g-lg-2" style="display: flex; flex-wrap: nowrap;">
-                    <!-- Client Status Breakdown -->
-                    <div class="col-12 col-lg-6" style="flex: 0 0 50%; max-width: 50%; padding-left: 0.5rem; padding-right: 0.5rem;">
-                        <div class="card h-100">
-                            <div class="card-body py-2 px-2 px-md-3">
-                                <div class="row g-1 g-sm-2">
-                                    <!-- Independent Clients -->
-                                    <div class="col" style="flex: 0 0 20%; max-width: 20%;">
-                                        <div class="client-category-card-compact">
-                                            <div class="client-icon-compact independent">
-                                                <i class="bi bi-house-check-fill"></i>
-                                            </div>
-                                            <div class="client-count-compact" id="strongCount">0</div>
-                                            <div class="client-label-compact">Independent</div>
-                                        </div>
-                                    </div>
-                                    
-                                    <!-- Assisted Clients -->
-                                    <div class="col" style="flex: 0 0 20%; max-width: 20%;">
-                                        <div class="client-category-card-compact">
-                                            <div class="client-icon-compact assisted">
-                                                <i class="bi bi-house-heart"></i>
-                                            </div>
-                                            <div class="client-count-compact" id="mediumCount">0</div>
-                                            <div class="client-label-compact">Assisted</div>
-                                        </div>
-                                    </div>
-                                    
-                                    <!-- Dependent Clients -->
-                                    <div class="col" style="flex: 0 0 20%; max-width: 20%;">
-                                        <div class="client-category-card-compact">
-                                            <div class="client-icon-compact dependent">
-                                                <i class="bi bi-heart-pulse"></i>
-                                            </div>
-                                            <div class="client-count-compact" id="weakCount">0</div>
-                                            <div class="client-label-compact">Dependent</div>
-                                        </div>
-                                    </div>
-                                    
-                                    <!-- Rehabilitation Clients -->
-                                    <div class="col" style="flex: 0 0 20%; max-width: 20%;">
-                                        <div class="client-category-card-compact">
-                                            <div class="client-icon-compact rehabilitation">
-                                                <i class="bi bi-hospital"></i>
-                                            </div>
-                                            <div class="client-count-compact" id="nucCount">0</div>
-                                            <div class="client-label-compact">Rehabilitation</div>
-                                        </div>
-                                    </div>
-                                    
-                                    <!-- Hospice Clients -->
-                                    <div class="col" style="flex: 0 0 20%; max-width: 20%;">
-                                        <div class="client-category-card-compact">
-                                            <div class="client-icon-compact hospice">
-                                                <i class="bi bi-heart-fill"></i>
-                                            </div>
-                                            <div class="client-count-compact" id="deadCount">0</div>
-                                            <div class="client-label-compact">Hospice</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- Correlation Display -->
-                                <!-- Removed: beekeeping terminology -->
-                            </div>
-                        </div>
+                <div class="card mb-3">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0"><i class="bi bi-houses-fill"></i> Client Locations by Care Type</h6>
+                        <span class="badge bg-primary-subtle text-primary fw-semibold">Active Sites: <span id="careTypeTotal">0</span></span>
                     </div>
-
-                    <!-- Equipment Breakdown - HIDDEN (beekeeping terminology) -->
-                    <div class="col-12 col-lg-6" style="flex: 0 0 50%; max-width: 50%; padding-left: 0.5rem; padding-right: 0.5rem; display: none;">
-                        <div class="card h-100">
-                            <div class="card-body py-2 px-2 px-md-3">
-                                <p class="text-muted">Equipment tracking disabled</p>
-                            </div>
+                    <div class="card-body py-3">
+                        <div id="careTypeBreakdown" class="care-type-breakdown-grid">
+                            <div class="text-muted small">Loading care type breakdown...</div>
                         </div>
                     </div>
                 </div>
