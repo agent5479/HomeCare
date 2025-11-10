@@ -1766,6 +1766,47 @@ function cancelLogin() {
 window.confirmLogin = confirmLogin;
 window.cancelLogin = cancelLogin;
 
+function showMainApp() {
+    const loginScreen = document.getElementById('loginScreen');
+    const mainApp = document.getElementById('mainApp');
+    const currentUserDisplay = document.getElementById('currentUserDisplay');
+
+    if (!loginScreen || !mainApp) {
+        console.warn('⚠️ showMainApp called but required elements are missing.');
+        return;
+    }
+
+    loginScreen.classList.add('hidden');
+    mainApp.classList.remove('hidden');
+
+    if (currentUserDisplay && currentUser) {
+        currentUserDisplay.textContent = currentUser.username;
+    }
+
+    if (typeof loadBrandingSettings === 'function') {
+        loadBrandingSettings();
+    }
+
+    const adminBadge = document.getElementById('adminBadge');
+    if (isAdmin) {
+        if (adminBadge) adminBadge.classList.remove('hidden');
+        document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('employee-hidden'));
+    } else {
+        if (adminBadge) adminBadge.classList.add('hidden');
+        document.querySelectorAll('.admin-only').forEach(el => el.classList.add('employee-hidden'));
+    }
+
+    if (typeof showDashboard === 'function') {
+        showDashboard();
+    }
+
+    setTimeout(() => {
+        if (typeof showWelcomePopup === 'function') {
+            showWelcomePopup();
+        }
+    }, 1000);
+}
+
 function setupMasterUser(username, password) {
     const masterUser = {
         username: username,

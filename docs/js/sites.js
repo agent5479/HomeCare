@@ -1630,7 +1630,7 @@ function viewSiteDetails(id) {
                             </div>
                             <div class="col-md-6">
                                 <h6>Site Details</h6>
-                                <p><strong>Site Type:</strong> ${site.siteType || 'Not specified'}</p>
+                                <p><strong>Site Type:</strong> ${SITE_TYPES[classificationKey]?.name || site.functionalClassification || site.siteType || 'Not specified'}</p>
                                 <p><strong>Access Type:</strong> ${site.accessType || 'Not specified'}</p>
                                 <p><strong>Contact Before Visit:</strong> ${site.contactBeforeVisit ? 'Yes' : 'No'}</p>
                                 <p><strong>Isolation/Quarantine:</strong> ${site.isQuarantine ? 'Yes' : 'No'}</p>
@@ -1972,7 +1972,8 @@ function initMap() {
     // Add marker for each site with type-specific colors
     window.sites.forEach(site => {
         try {
-            const typeInfo = SITE_TYPES[site.siteType] || SITE_TYPES['other'];
+            const classificationKey = site.functionalClassification || site.siteType || 'other';
+            const typeInfo = SITE_TYPES[classificationKey] || SITE_TYPES['other'];
             
             // Create custom icon with site type color
             const customIcon = L.divIcon({
