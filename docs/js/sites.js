@@ -36,6 +36,17 @@ const SITE_TYPES = {
     'other': { name: 'Other/Custom', color: '#adb5bd', icon: 'bi-gear-fill' }
 };
 
+const CARE_SERVICE_DEFINITIONS = [
+    { key: 'personalCare', elementId: 'servicePersonalCare', label: 'Personal Care', icon: 'bi-person-hearts', color: '#1976D2' },
+    { key: 'medicationManagement', elementId: 'serviceMedicationManagement', label: 'Medication Management', icon: 'bi-capsule', color: '#D63384' },
+    { key: 'mealPreparation', elementId: 'serviceMealPreparation', label: 'Meal Preparation', icon: 'bi-egg-fried', color: '#FF8A65' },
+    { key: 'mobilityAssistance', elementId: 'serviceMobilityAssistance', label: 'Mobility Assistance', icon: 'bi-person-wheelchair', color: '#26A69A' },
+    { key: 'companionship', elementId: 'serviceCompanionship', label: 'Companionship', icon: 'bi-people-heart', color: '#6F42C1' },
+    { key: 'housekeeping', elementId: 'serviceHousekeeping', label: 'Housekeeping', icon: 'bi-broom', color: '#8D6E63' },
+    { key: 'transportation', elementId: 'serviceTransportation', label: 'Transportation', icon: 'bi-bus-front', color: '#0DCAF0' },
+    { key: 'respiteCare', elementId: 'serviceRespite', label: 'Respite Care', icon: 'bi-heart-pulse', color: '#FF6F91' }
+];
+
 // Internal render function (actual rendering logic)
 function _renderSitesInternal() {
     // Ensure window.sites is available and is an array
@@ -254,22 +265,16 @@ function _renderSitesInternal() {
                 // Check if contact before visit is required (handle both boolean and string values)
                 const needsContact = c.contactBeforeVisit === true || c.contactBeforeVisit === 'true' || c.contactBeforeVisit === 1 || c.contactBeforeVisit === '1';
                 
+                const careServicesData = c.careServices || {};
+                const selectedCareServices = CARE_SERVICE_DEFINITIONS.filter(service => careServicesData[service.key]);
+                const serviceCount = selectedCareServices.length;
+                
                 // Get hive strength breakdown for inline editing
                 const hiveStrong = c.hiveStrength?.strong || 0;
                 const hiveMedium = c.hiveStrength?.medium || 0;
                 const hiveWeak = c.hiveStrength?.weak || 0;
                 const hiveNUC = c.hiveStrength?.nuc || 0;
                 const hiveDead = c.hiveStrength?.dead || 0;
-                
-                // Get hive stacks for clickable cards
-                const hiveDoubles = c.hiveStacks?.doubles || 0;
-                const hiveTopSplits = c.hiveStacks?.topSplits || 0;
-                const hiveSingles = c.hiveStacks?.singles || 0;
-                const hiveNUCs = c.hiveStacks?.nucs || 0;
-                const hiveEmpty = c.hiveStacks?.empty || 0;
-                
-                // Calculate total hive count from hive box cards (excluding empty platforms)
-                const totalHiveCount = hiveDoubles + hiveTopSplits + hiveSingles + hiveNUCs;
                 
                 // Determine classification labels (compact for summary card)
                 const seasonalDisplay = (() => {
@@ -319,8 +324,8 @@ function _renderSitesInternal() {
                                         ${seasonalBadge}
                                         ${needsContact ? `<span class="badge bg-warning text-dark ms-2 contact-required-badge" style="font-weight: bold;" title="Contact required before visit"><i class="bi bi-telephone-fill"></i> Contact Required</span>` : ''}
                                         ${c.isQuarantine ? `<span class="badge bg-danger ms-2" style="font-weight: bold;" title="Isolation/Quarantine required"><i class="bi bi-shield-exclamation"></i> Isolation</span>` : ''}
-                                        <span class="badge ms-2" style="background-color: #ffffff; color: #000; border: 1px solid #ddd; border-radius: 4px; font-size: 1.25rem; font-weight: bold;">
-                                            ${totalHiveCount}
+                                        <span class="badge ms-2" style="background-color: #ffffff; color: #000; border: 1px solid #ddd; border-radius: 4px; font-size: 1.25rem; font-weight: bold;" title="Primary care services provided">
+                                            ${serviceCount}
                                         </span>
                                     </div>
                                 </div>
@@ -434,46 +439,18 @@ function _renderSitesInternal() {
                                     </div>
                                 </div>
                                 
-                                <!-- Hive Boxes (Clickable mini cards) - Order: doubles, singles, nucs, top splits, empty -->
-                                <div class="mb-2">
-                                    <strong><i class="bi bi-boxes"></i> Hive Boxes:</strong>
-                                    <div class="d-flex flex-wrap gap-1 gap-md-2 mt-1 hive-boxes-container">
-                                        <div class="card hive-box-card" onclick="quickEditHiveBox(${c.id}, 'doubles', ${hiveDoubles})" style="cursor: pointer; flex: 1 1 0; min-width: 60px; max-width: 120px; background-color: #e3f2fd; border: 2px solid #2196f3;">
-                                            <div class="card-body p-1 p-md-2 text-center">
-                                                <i class="bi bi-stack hive-box-icon" style="font-size: 1rem; color: #1976d2;"></i>
-                                                <div class="fw-bold mt-1 hive-box-label" style="font-size: 0.75rem; color: #1976d2;">Doubles</div>
-                                                <div class="hive-box-number mb-0" id="boxDoubles_${c.id}" style="font-size: 1rem; color: #1976d2; font-weight: 600;">${hiveDoubles}</div>
-                                            </div>
+                                <!-- Care Services Snapshot -->
+                                <div class="mb-3">
+                                    <strong><i class="bi bi-clipboard2-heart"></i> Care Services:</strong>
+                                    ${serviceCount > 0 ? `
+                                        <div class="d-flex flex-wrap gap-1 gap-md-2 mt-2">
+                                            ${selectedCareServices.map(service => `
+                                                <span class="badge" style="background: ${service.color}; color: #fff; font-size: 0.75rem; font-weight: 600;">
+                                                    <i class="bi ${service.icon}"></i> ${service.label}
+                                                </span>
+                                            `).join('')}
                                         </div>
-                                        <div class="card hive-box-card" onclick="quickEditHiveBox(${c.id}, 'singles', ${hiveSingles})" style="cursor: pointer; flex: 1 1 0; min-width: 60px; max-width: 120px; background-color: #e8f5e8; border: 2px solid #4caf50;">
-                                            <div class="card-body p-1 p-md-2 text-center">
-                                                <i class="bi bi-square hive-box-icon" style="font-size: 1rem; color: #388e3c;"></i>
-                                                <div class="fw-bold mt-1 hive-box-label" style="font-size: 0.75rem; color: #388e3c;">Singles</div>
-                                                <div class="hive-box-number mb-0" id="boxSingles_${c.id}" style="font-size: 1rem; color: #388e3c; font-weight: 600;">${hiveSingles}</div>
-                                            </div>
-                                        </div>
-                                        <div class="card hive-box-card" onclick="quickEditHiveBox(${c.id}, 'nucs', ${hiveNUCs})" style="cursor: pointer; flex: 1 1 0; min-width: 60px; max-width: 120px; background-color: #fff3e0; border: 2px solid #ff9800;">
-                                            <div class="card-body p-1 p-md-2 text-center">
-                                                <i class="bi bi-circle hive-box-icon" style="font-size: 1rem; color: #f57c00;"></i>
-                                                <div class="fw-bold mt-1 hive-box-label" style="font-size: 0.75rem; color: #f57c00;">NUCs</div>
-                                                <div class="hive-box-number mb-0" id="boxNucs_${c.id}" style="font-size: 1rem; color: #f57c00; font-weight: 600;">${hiveNUCs}</div>
-                                            </div>
-                                        </div>
-                                        <div class="card hive-box-card" onclick="quickEditHiveBox(${c.id}, 'topSplits', ${hiveTopSplits})" style="cursor: pointer; flex: 1 1 0; min-width: 60px; max-width: 120px; background-color: #f3e5f5; border: 2px solid #9c27b0;">
-                                            <div class="card-body p-1 p-md-2 text-center">
-                                                <i class="bi bi-layers-half hive-box-icon" style="font-size: 1rem; color: #7b1fa2;"></i>
-                                                <div class="fw-bold mt-1 hive-box-label" style="font-size: 0.75rem; color: #7b1fa2;">Top-Splits</div>
-                                                <div class="hive-box-number mb-0" id="boxTopSplits_${c.id}" style="font-size: 1rem; color: #7b1fa2; font-weight: 600;">${hiveTopSplits}</div>
-                                            </div>
-                                        </div>
-                                        <div class="card hive-box-card" onclick="quickEditHiveBox(${c.id}, 'empty', ${hiveEmpty})" style="cursor: pointer; flex: 1 1 0; min-width: 60px; max-width: 120px; background-color: #f5f5f5; border: 2px solid #9e9e9e;">
-                                            <div class="card-body p-1 p-md-2 text-center">
-                                                <i class="bi bi-square hive-box-icon" style="font-size: 1rem; color: #616161;"></i>
-                                                <div class="fw-bold mt-1 hive-box-label" style="font-size: 0.75rem; color: #616161;">Empty</div>
-                                                <div class="hive-box-number mb-0" id="boxEmpty_${c.id}" style="font-size: 1rem; color: #616161; font-weight: 600;">${hiveEmpty}</div>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    ` : `<div class="text-muted small mt-1">No primary care services documented yet.</div>`}
                                 </div>
                                 
                                 <!-- Notes display and quick edit -->
@@ -931,6 +908,11 @@ function handleSaveSite(e) {
     const contactNotesField = document.getElementById('landownerNotes');
     const contactNotes = contactNotesField ? contactNotesField.value : '';
     
+    const careServices = {};
+    CARE_SERVICE_DEFINITIONS.forEach(service => {
+        careServices[service.key] = document.getElementById(service.elementId)?.checked || false;
+    });
+    
     const site = {
         id: id ? parseInt(id) : Date.now(),
         name: document.getElementById('siteName').value,
@@ -978,6 +960,7 @@ function handleSaveSite(e) {
         accessType: document.getElementById('accessType').value,
         contactBeforeVisit: document.getElementById('contactBeforeVisit').checked,
         isQuarantine: document.getElementById('isQuarantine').checked,
+        careServices,
         // Legal & Compliance Information
         legalCompliance: {
             hdsRegistrationNumber: document.getElementById('hdsRegistrationNumber')?.value || '',
@@ -1113,6 +1096,7 @@ window.editSite = function(id) {
     populateFunctionalClassificationDropdown();
     
     document.getElementById('siteId').value = site.id;
+    const careServices = site.careServices || {};
     document.getElementById('siteName').value = site.name;
     document.getElementById('siteDescription').value = site.description || '';
     // Client Demographics (NEW v0.7)
@@ -1152,6 +1136,12 @@ window.editSite = function(id) {
     
     if (document.getElementById('siteSugar')) document.getElementById('siteSugar').value = site.sugarRequirements || '';
     if (document.getElementById('siteNotes')) document.getElementById('siteNotes').value = site.notes || '';
+    CARE_SERVICE_DEFINITIONS.forEach(service => {
+        const checkbox = document.getElementById(service.elementId);
+        if (checkbox) {
+            checkbox.checked = !!careServices[service.key];
+        }
+    });
     document.getElementById('functionalClassification').value = site.functionalClassification || site.siteType || 'production';
     document.getElementById('seasonalClassification').value = site.seasonalClassification || site.seasonal_classification || 'summer';
     document.getElementById('landownerName').value = site.landownerName || '';
