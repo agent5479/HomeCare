@@ -261,10 +261,30 @@ let firebaseListeners = {
     scheduledTasks: null,
     honeyTypes: null,
     tasks: null,
+    visits: null,
+    taskGroups: null,
     deletedTasks: null,
     seasonalRequirements: null,
     employees: null
 };
+
+function cleanupFirebaseListeners() {
+    console.log('🧹 Cleaning up Firebase listeners...');
+    Object.keys(firebaseListeners).forEach(key => {
+        const ref = firebaseListeners[key];
+        if (ref && typeof ref.off === 'function') {
+            try {
+                ref.off();
+                firebaseListeners[key] = null;
+                console.log(`✅ Removed listener: ${key}`);
+            } catch (error) {
+                console.warn(`⚠️ Error removing listener ${key}:`, error);
+            }
+        } else {
+            firebaseListeners[key] = null;
+        }
+    });
+}
 
 // Firebase operation throttling - prevent fetches faster than 300ms
 let lastFirebaseOperationTime = 0;
