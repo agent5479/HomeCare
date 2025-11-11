@@ -309,9 +309,6 @@ function _renderSitesInternal() {
                                         ${seasonalBadge}
                                         ${needsContact ? `<span class="badge bg-warning text-dark ms-2 contact-required-badge" style="font-weight: bold;" title="Contact required before visit"><i class="bi bi-telephone-fill"></i> Contact Required</span>` : ''}
                                         ${c.isQuarantine ? `<span class="badge bg-danger ms-2" style="font-weight: bold;" title="Isolation/Quarantine required"><i class="bi bi-shield-exclamation"></i> Isolation</span>` : ''}
-                                        <span class="badge ms-2" style="background-color: #ffffff; color: #000; border: 1px solid #ddd; border-radius: 4px; font-size: 1.25rem; font-weight: bold;" title="Primary care services provided">
-                                            ${serviceCount}
-                                        </span>
                                     </div>
                                 </div>
                                 
