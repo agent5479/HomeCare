@@ -225,6 +225,7 @@ function _renderSitesInternal() {
                 const notesLine = contactNotes;
                 const landownerDisplay = [contactLine, notesLine].filter(Boolean).join(', ');
                 const landownerTitle = [contactLine, notesLine].filter(Boolean).join(' — ');
+                const physicalAddress = c.physicalAddress || c.address || '';
                 
                 // Get clients at this site
                 const siteClients = (window.clients || window.individualHives || []).filter(client => client.siteId === c.id);
@@ -318,6 +319,14 @@ function _renderSitesInternal() {
                                 <div class="mb-2">
                                     ${lastVisitDisplay}
                                 </div>
+                                
+                                <!-- Physical Address -->
+                                ${physicalAddress ? `
+                                <div class="mb-2">
+                                    <strong><i class="bi bi-geo-alt-fill text-primary me-1"></i> Address:</strong>
+                                    <div class="small">${physicalAddress}</div>
+                                </div>
+                                ` : ''}
                                 
                                 <!-- Contact Information (Enhanced for employees) -->
                                 <div class="mb-2">
@@ -732,10 +741,26 @@ function showAddSiteForm() {
     }
     
     hideAllViews();
-    document.getElementById('siteFormView').classList.remove('hidden');
+    if (typeof updateActiveNav === 'function') {
+        updateActiveNav('sites');
+    }
+    if (typeof scrollToTop === 'function') {
+        scrollToTop();
+    }
+    
+    const siteFormView = document.getElementById('siteFormView');
+    if (siteFormView) {
+        siteFormView.classList.remove('hidden');
+        siteFormView.style.display = '';
+    }
+    
     document.getElementById('siteFormTitle').textContent = 'Add New Client';
     document.getElementById('siteForm').reset();
     document.getElementById('siteId').value = '';
+    const addressField = document.getElementById('siteAddress');
+    if (addressField) {
+        addressField.value = '';
+    }
     document.getElementById('anomalySection')?.classList.add('hidden');
     document.getElementById('mapPickerContainer').classList.add('hidden');
     
@@ -886,6 +911,18 @@ function handleSaveSite(e) {
         careServices[service.key] = document.getElementById(service.elementId)?.checked || false;
     });
     
+    const physicalAddressField = document.getElementById('siteAddress');
+    const physicalAddress = physicalAddressField ? physicalAddressField.value.trim() : '';
+    if (!physicalAddress) {
+        careMarshallAlert('⚠️ Physical address is required for mapping and scheduling.', 'warning');
+        physicalAddressField?.focus();
+        physicalAddressField?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+    }
+    
+    const careNotesFieldInput = document.getElementById('careNotes');
+    const regularTasksFieldInput = document.getElementById('regularTasksList');
+    
     const site = {
         id: id ? parseInt(id) : Date.now(),
         name: document.getElementById('siteName').value,
@@ -896,6 +933,8 @@ function handleSaveSite(e) {
         disabilityNotes: document.getElementById('disabilityNotes')?.value || '',
         latitude: parseFloat(document.getElementById('siteLat').value) || 0,
         longitude: parseFloat(document.getElementById('siteLng').value) || 0,
+        physicalAddress,
+        address: physicalAddress,
         hiveCount: parseInt(document.getElementById('siteHiveCount').value),
         // Hive strength breakdown from display elements
         hiveStrength: {
@@ -934,6 +973,8 @@ function handleSaveSite(e) {
         contactBeforeVisit: document.getElementById('contactBeforeVisit').checked,
         isQuarantine: document.getElementById('isQuarantine').checked,
         careServices,
+        careNotes: careNotesFieldInput ? careNotesFieldInput.value : '',
+        regularTasks: regularTasksFieldInput ? regularTasksFieldInput.value : '',
         // Legal & Compliance Information
         legalCompliance: {
             hdsRegistrationNumber: document.getElementById('hdsRegistrationNumber')?.value || '',
@@ -1062,7 +1103,19 @@ window.editSite = function(id) {
     if (!site) return;
     
     hideAllViews();
-    document.getElementById('siteFormView').classList.remove('hidden');
+    
+    if (typeof updateActiveNav === 'function') {
+        updateActiveNav('sites');
+    }
+    if (typeof scrollToTop === 'function') {
+        scrollToTop();
+    }
+    
+    const siteFormView = document.getElementById('siteFormView');
+    if (siteFormView) {
+        siteFormView.classList.remove('hidden');
+        siteFormView.style.display = '';
+    }
     document.getElementById('siteFormTitle').textContent = 'Edit: ' + site.name;
     
     // Populate functional classification dropdown BEFORE setting values
@@ -1071,6 +1124,10 @@ window.editSite = function(id) {
     document.getElementById('siteId').value = site.id;
     const careServices = site.careServices || {};
     document.getElementById('siteName').value = site.name;
+    const addressField = document.getElementById('siteAddress');
+    if (addressField) {
+        addressField.value = site.physicalAddress || site.address || site.landownerAddress || site.contactNotes || '';
+    }
     document.getElementById('siteDescription').value = site.description || '';
     // Client Demographics (NEW v0.7)
     document.getElementById('clientAge').value = site.clientAge || '';
@@ -1109,6 +1166,14 @@ window.editSite = function(id) {
     
     if (document.getElementById('siteSugar')) document.getElementById('siteSugar').value = site.sugarRequirements || '';
     if (document.getElementById('siteNotes')) document.getElementById('siteNotes').value = site.notes || '';
+    const careNotesField = document.getElementById('careNotes');
+    if (careNotesField) {
+        careNotesField.value = site.careNotes || '';
+    }
+    const regularTasksField = document.getElementById('regularTasksList');
+    if (regularTasksField) {
+        regularTasksField.value = site.regularTasks || site.regularTasksList || '';
+    }
     CARE_SERVICE_DEFINITIONS.forEach(service => {
         const checkbox = document.getElementById(service.elementId);
         if (checkbox) {
@@ -1999,6 +2064,7 @@ function initMap() {
                         </h6>
                         <p class="mb-1"><small>${site.description || 'No description'}</small></p>
                         <p class="mb-1"><strong>Type:</strong> <span style="color: ${typeInfo.color};">${typeInfo.name}</span></p>
+                                    ${site.physicalAddress || site.address ? `<p class="mb-1"><strong>Address:</strong> ${site.physicalAddress || site.address}</p>` : ''}
                         <p class="mb-1"><strong>Clients:</strong> ${site.hiveCount || 0}</p>
                         ${site.landownerName ? `<p class="mb-1"><strong>Contact:</strong> ${site.landownerName}${site.landownerPhone ? ` • ${site.landownerPhone}` : ''}</p>` : ''}
                         ${site.legalCompliance?.hdsRegistrationNumber ? `<p class="mb-1"><small><strong>HDS Reg:</strong> ${site.legalCompliance.hdsRegistrationNumber}</small></p>` : ''}
