@@ -1617,154 +1617,183 @@ function removeHarvestRecord(index) {
 
 function viewSiteDetails(id) {
     const site = window.sites.find(c => c.id === id);
-    if (!site) return;
+    if (!site) {
+        careMarshallAlert('Site not found', 'error');
+        return;
+    }
     
-    const typeInfo = SITE_TYPES[site.siteType] || SITE_TYPES['other'];
+    const classificationKey = site.functionalClassification || site.siteType || 'other';
+    const typeInfo = SITE_TYPES[classificationKey] || SITE_TYPES['other'];
+    const physicalAddress = site.physicalAddress || site.address || site.landownerAddress || '';
+    const expectedHoursValue = site.expectedServiceHours ?? site.expectedHours ?? null;
+    const expectedHours = (expectedHoursValue !== null && !Number.isNaN(Number(expectedHoursValue)))
+        ? Number(expectedHoursValue)
+        : null;
+    
+    const careServicesBadges = CARE_SERVICE_DEFINITIONS
+        .filter(service => site.careServices && site.careServices[service.key])
+        .map(service => `<span class="badge me-1 mb-1" style="background:${service.color}; color:#fff;"><i class="bi ${service.icon}"></i> ${service.label}</span>`)
+        .join('');
+    
+    const regularTasks = (site.regularTasks || site.regularTasksList || '')
+        .split(/\r?\n/)
+        .map(line => line.trim())
+        .filter(line => line.length > 0);
+    
+    const siteTasks = (window.scheduledTasks || [])
+        .filter(task => task.siteId === id && !task.completed)
+        .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
+    
+    const siteClients = (window.clients || window.individualHives || []).filter(client => client.siteId === id);
     
     const detailsHtml = `
         <div class="modal fade" id="siteDetailsModal" tabindex="-1">
-            <div class="modal-dialog modal-lg">
+            <div class="modal-dialog modal-lg modal-dialog-scrollable">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title">
-                            <i class="bi ${typeInfo.icon}" style="color: ${typeInfo.color}"></i>
-                            ${site.name}
-                        </h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        <h5 class="modal-title"><i class="bi ${typeInfo.icon}" style="color:${typeInfo.color};"></i> ${site.name}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <div class="row">
+                        <div class="row g-4">
                             <div class="col-md-6">
-                                <h6>Basic Information</h6>
-                                <p><strong>Type:</strong> <span class="badge" style="background-color: ${typeInfo.color}; color: white;">${typeInfo.name}</span></p>
-                                <p><strong>Description:</strong> ${site.description || 'No description'}</p>
-                                <p><strong>Clients:</strong> ${site.hiveCount}</p>
-                                ${site.expectedServiceHours ? `<p><strong>Expected Hours per Visit:</strong> ${site.expectedServiceHours % 1 === 0 ? site.expectedServiceHours : site.expectedServiceHours.toFixed(1)}</p>` : ''}
-                                <p><strong>GPS Coordinates:</strong> ${site.latitude.toFixed(6)}, ${site.longitude.toFixed(6)}</p>
-                                
-                                <div class="mt-2">
-                                    <button class="btn btn-sm btn-outline-primary" onclick="openInMaps(${site.id})">
-                                        <i class="bi bi-geo-alt-fill"></i> View on Maps
-                                    </button>
-                                </div>
-                                
-                                <h6 class="mt-3">Contact Information</h6>
-                                ${site.landownerName ? `<p><strong>Name:</strong> ${site.landownerName}</p>` : ''}
-                                ${site.landownerPhone ? `<p><strong>Phone:</strong> <a href="tel:${site.landownerPhone}" class="btn btn-sm btn-outline-primary"><i class="bi bi-telephone-fill"></i> ${site.landownerPhone}</a></p>` : ''}
-                                ${site.landownerEmail ? `<p><strong>Email:</strong> <a href="mailto:${site.landownerEmail}" class="btn btn-sm btn-outline-primary"><i class="bi bi-envelope-fill"></i> ${site.landownerEmail}</a></p>` : ''}
-                                ${(site.contactNotes || site.landownerAddress) ? `<p><strong>Contact Notes:</strong> ${site.contactNotes || site.landownerAddress}</p>` : ''}
-                                
-                                <!-- Clients at this site -->
-                                ${(() => {
-                                    const siteClients = (window.clients || window.individualHives || []).filter(client => client.siteId === site.id);
-                                    if (siteClients.length === 0) return '';
-                                    return `
-                                        <h6 class="mt-3">Clients (${siteClients.length})</h6>
-                                        <div style="max-height: 200px; overflow-y: auto;">
-                                            ${siteClients.slice(0, 5).map(client => {
-                                                const clientName = client.clientName || client.hiveName || `Client ${client.id}`;
-                                                const status = client.status || client.hiveStrength || 'unknown';
-                                                return `<p class="mb-1"><i class="bi bi-house-heart"></i> ${clientName} <span class="badge bg-secondary">${status}</span></p>`;
-                                            }).join('')}
-                                            ${siteClients.length > 5 ? `<p class="text-muted small">... and ${siteClients.length - 5} more clients</p>` : ''}
-                                        </div>
-                                        <button class="btn btn-sm btn-outline-info mt-2" onclick="showSiteClients(${site.id})">
-                                            <i class="bi bi-list-ul"></i> View All Clients
-                                        </button>
-                                    `;
-                                })()}
-                                
-                                <!-- Pending Tasks -->
-                                ${(() => {
-                                    const siteTasks = (window.scheduledTasks || []).filter(task => 
-                                        task.siteId === site.id && !task.completed
-                                    ).sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
-                                    if (siteTasks.length === 0) return '';
-                                    const overdueTasks = siteTasks.filter(task => new Date(task.dueDate) < new Date());
-                                    return `
-                                        <h6 class="mt-3">Pending Tasks (${siteTasks.length})</h6>
-                                        <div style="max-height: 200px; overflow-y: auto;">
-                                            ${siteTasks.slice(0, 5).map(task => {
-                                                const taskName = typeof getTaskDisplayName === 'function' ? getTaskDisplayName(null, task.taskId) : (task.taskName || 'Unknown Task');
-                                                const dueDate = new Date(task.dueDate);
-                                                const isOverdue = dueDate < new Date();
-                                                return `<p class="mb-1 ${isOverdue ? 'text-danger' : ''}">
-                                                    <i class="bi bi-calendar"></i> ${taskName}
-                                                    ${isOverdue ? '<span class="badge bg-danger">OVERDUE</span>' : ''}
-                                                    <small class="text-muted"> - ${dueDate.toLocaleDateString()}</small>
-                                                </p>`;
-                                            }).join('')}
-                                            ${siteTasks.length > 5 ? `<p class="text-muted small">... and ${siteTasks.length - 5} more tasks</p>` : ''}
-                                        </div>
-                                        <button class="btn btn-sm btn-outline-success mt-2" onclick="showSiteTasks(${site.id})">
-                                            <i class="bi bi-list-check"></i> View All Tasks
-                                        </button>
-                                    `;
-                                })()}
-                            </div>
-                            <div class="col-md-6">
-                                <h6>Site Details</h6>
-                                <p><strong>Site Type:</strong> ${SITE_TYPES[classificationKey]?.name || site.functionalClassification || site.siteType || 'Not specified'}</p>
-                                <p><strong>Access Type:</strong> ${site.accessType || 'Not specified'}</p>
+                                <h6 class="text-primary"><i class="bi bi-info-circle"></i> Location Overview</h6>
+                                <p><strong>Care Facility Type:</strong> <span class="badge" style="background:${typeInfo.color}; color:#fff;">${typeInfo.name}</span></p>
+                                ${physicalAddress ? `<p><strong>Address:</strong> ${physicalAddress}</p>` : ''}
+                                ${site.description ? `<p><strong>Description:</strong> ${site.description}</p>` : ''}
+                                ${expectedHours !== null ? `<p><strong>Expected Hours per Visit:</strong> ${expectedHours % 1 === 0 ? expectedHours : expectedHours.toFixed(1)} ${expectedHours === 1 ? 'hour' : 'hours'}</p>` : ''}
+                                <p><strong>Clients at Location:</strong> ${site.hiveCount || 0}</p>
                                 <p><strong>Contact Before Visit:</strong> ${site.contactBeforeVisit ? 'Yes' : 'No'}</p>
                                 <p><strong>Isolation/Quarantine:</strong> ${site.isQuarantine ? 'Yes' : 'No'}</p>
+                                <p><strong>Access Type:</strong> ${site.accessType || 'Not specified'}</p>
+                                <p><strong>GPS Coordinates:</strong> ${site.latitude.toFixed(6)}, ${site.longitude.toFixed(6)}</p>
+                                <button class="btn btn-sm btn-outline-primary" onclick="openInMaps(${site.id})">
+                                    <i class="bi bi-geo-alt-fill"></i> Open in Maps
+                                </button>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="text-primary"><i class="bi bi-person-lines-fill"></i> Contact & Access Notes</h6>
+                                ${site.landownerName ? `<p><strong>Primary Contact:</strong> ${site.landownerName}</p>` : '<p><strong>Primary Contact:</strong> Not provided</p>'}
+                                ${site.landownerPhone ? `<p><strong>Phone:</strong> <a href="tel:${site.landownerPhone}" class="btn btn-sm btn-outline-primary"><i class="bi bi-telephone"></i> ${site.landownerPhone}</a></p>` : ''}
+                                ${site.landownerEmail ? `<p><strong>Email:</strong> <a href="mailto:${site.landownerEmail}" class="btn btn-sm btn-outline-primary"><i class="bi bi-envelope"></i> Email</a></p>` : ''}
+                                ${(site.contactNotes || site.landownerAddress) ? `<p><strong>Access Notes:</strong> ${site.contactNotes || site.landownerAddress}</p>` : '<p class="text-muted">No access notes recorded.</p>'}
                                 
-                                <!-- Legal & Compliance Information -->
+                                <h6 class="text-primary mt-4"><i class="bi bi-clipboard2-heart"></i> Primary Care Services</h6>
+                                <div class="mt-2">${careServicesBadges || '<span class="text-muted">No services documented yet.</span>'}</div>
+                                
+                                <h6 class="text-primary mt-4"><i class="bi bi-journal-text"></i> Care Notes</h6>
+                                ${site.careNotes ? `<div class="alert alert-light border">${site.careNotes.replace(/\n/g, '<br>')}</div>` : '<p class="text-muted">No additional care notes provided.</p>'}
+                            </div>
+                        </div>
+                        
+                        <hr class="my-4">
+                        
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <h6 class="text-primary"><i class="bi bi-house-heart"></i> Individual Clients</h6>
+                                ${siteClients.length > 0 ? `
+                                    <div class="list-group">
+                                        ${siteClients.map(client => {
+                                            const clientName = client.clientName || client.hiveName || `Client ${client.id}`;
+                                            const status = client.status || client.hiveStrength || 'Not specified';
+                                            const needs = client.needs || client.notes || '';
+                                            return `
+                                                <div class="list-group-item">
+                                                    <div class="d-flex justify-content-between align-items-center">
+                                                        <span>${clientName}</span>
+                                                        <span class="badge bg-secondary">${status}</span>
+                                                    </div>
+                                                    ${needs ? `<div class="small text-muted mt-1">${needs}</div>` : ''}
+                                                </div>
+                                            `;
+                                        }).join('')}
+                                    </div>
+                                ` : '<p class="text-muted">No individual client records linked to this location.</p>'}
+                                
+                                <h6 class="text-primary mt-4"><i class="bi bi-check2-square"></i> Regular Visit Checklist</h6>
+                                <ol class="mb-0">
+                                    ${regularTasks.length > 0
+                                        ? regularTasks.map(item => `<li>${item}</li>`).join('')
+                                        : '<li class="text-muted">No recurring visit tasks recorded.</li>'}
+                                </ol>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <h6 class="text-primary"><i class="bi bi-calendar-check"></i> Scheduled Visit Tasks</h6>
+                                ${siteTasks.length > 0 ? `
+                                    <div class="list-group">
+                                        ${siteTasks.map(task => {
+                                            const taskName = typeof getTaskDisplayName === 'function'
+                                                ? getTaskDisplayName(null, task.taskId)
+                                                : (task.taskName || 'Scheduled task');
+                                            const dueDate = task.dueDate ? new Date(task.dueDate) : null;
+                                            const dueLabel = dueDate ? dueDate.toLocaleDateString() : 'No date set';
+                                            const isOverdue = dueDate ? dueDate < new Date() : false;
+                                            const priorityBadge = task.priority && task.priority !== 'normal'
+                                                ? `<span class="badge bg-${task.priority === 'urgent' ? 'danger' : 'warning'} text-dark ms-2">${task.priority.toUpperCase()}</span>`
+                                                : '';
+                                            return `
+                                                <div class="list-group-item ${isOverdue ? 'list-group-item-danger' : ''}">
+                                                    <div class="d-flex justify-content-between align-items-start">
+                                                        <div>
+                                                            <strong>${taskName}</strong>
+                                                            <div class="small text-muted">Due: ${dueLabel} ${isOverdue ? '<span class="badge bg-danger ms-1">Overdue</span>' : ''}</div>
+                                                        </div>
+                                                        ${priorityBadge}
+                                                    </div>
+                                                    ${task.notes ? `<div class="small text-muted mt-1">${task.notes}</div>` : ''}
+                                                </div>
+                                            `;
+                                        }).join('')}
+                                    </div>
+                                ` : '<p class="text-muted">No pending scheduled tasks for this client location.</p>'}
+                                
+                                <h6 class="text-primary mt-4"><i class="bi bi-shield-check"></i> Legal & Compliance</h6>
                                 ${site.legalCompliance ? `
-                                    <h6 class="mt-3"><i class="bi bi-shield-check"></i> Legal & Compliance</h6>
-                                    ${site.legalCompliance.hdsRegistrationNumber ? `<p><strong>HDS Registration:</strong> ${site.legalCompliance.hdsRegistrationNumber}</p>` : ''}
-                                    ${site.legalCompliance.registrationExpiry ? `<p><strong>Registration Expires:</strong> ${new Date(site.legalCompliance.registrationExpiry).toLocaleDateString()}</p>` : ''}
-                                    ${site.legalCompliance.insuranceProvider ? `<p><strong>Insurance:</strong> ${site.legalCompliance.insuranceProvider}${site.legalCompliance.insurancePolicyNumber ? ` (${site.legalCompliance.insurancePolicyNumber})` : ''}</p>` : ''}
-                                    ${site.legalCompliance.insuranceExpiry ? `<p><strong>Insurance Expires:</strong> ${new Date(site.legalCompliance.insuranceExpiry).toLocaleDateString()}</p>` : ''}
-                                    ${site.legalCompliance.privacyOfficer ? `<p><strong>Privacy Officer:</strong> ${site.legalCompliance.privacyOfficer}</p>` : ''}
-                                    ${site.legalCompliance.healthSafetyOfficer ? `<p><strong>H&S Officer:</strong> ${site.legalCompliance.healthSafetyOfficer}</p>` : ''}
-                                    <div class="mt-2">
+                                    <div class="small">
+                                        ${site.legalCompliance.hdsRegistrationNumber ? `<p><strong>HDS Registration:</strong> ${site.legalCompliance.hdsRegistrationNumber}</p>` : ''}
+                                        ${site.legalCompliance.registrationExpiry ? `<p><strong>Registration Expiry:</strong> ${new Date(site.legalCompliance.registrationExpiry).toLocaleDateString()}</p>` : ''}
+                                        ${site.legalCompliance.insuranceProvider ? `<p><strong>Insurance:</strong> ${site.legalCompliance.insuranceProvider}${site.legalCompliance.insurancePolicyNumber ? ` (${site.legalCompliance.insurancePolicyNumber})` : ''}</p>` : ''}
+                                        ${site.legalCompliance.insuranceExpiry ? `<p><strong>Insurance Expiry:</strong> ${new Date(site.legalCompliance.insuranceExpiry).toLocaleDateString()}</p>` : ''}
                                         ${site.legalCompliance.privacyCompliance ? `<span class="badge bg-success me-1"><i class="bi bi-check-circle"></i> Privacy Act Compliant</span>` : ''}
                                         ${site.legalCompliance.healthSafetyCompliance ? `<span class="badge bg-success me-1"><i class="bi bi-check-circle"></i> H&S Act Compliant</span>` : ''}
-                                        ${site.legalCompliance.incidentReportingEnabled ? `<span class="badge bg-info me-1"><i class="bi bi-exclamation-triangle"></i> Incident Reporting Active</span>` : ''}
+                                        ${site.legalCompliance.incidentReportingEnabled ? `<span class="badge bg-info text-dark me-1"><i class="bi bi-exclamation-triangle"></i> Incident Reporting Enabled</span>` : ''}
                                     </div>
-                                ` : ''}
-                                
-                                ${site.notes ? `
-                                    <h6 class="mt-3">Notes</h6>
-                                    <p>${site.notes}</p>
-                                ` : ''}
+                                ` : '<p class="text-muted">No compliance information recorded.</p>'}
                             </div>
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        ${isAdmin ? `<button type="button" class="btn btn-primary" onclick="editSite(${site.id}); bootstrap.Modal.getInstance(document.getElementById('siteDetailsModal')).hide();">
-                            <i class="bi bi-pencil"></i> Edit Site
-                        </button>` : ''}
-                        ${isAdmin ? `<button type="button" class="btn btn-success" onclick="scheduleTaskForSite(${site.id}); bootstrap.Modal.getInstance(document.getElementById('siteDetailsModal')).hide();">
-                            <i class="bi bi-calendar-plus"></i> Schedule Task
-                        </button>` : ''}
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <div class="modal-footer justify-content-between">
+                        <small class="text-muted">Client Location ID: ${site.id}</small>
+                        <div>
+                            ${isAdmin ? `<button class="btn btn-outline-primary" onclick="editSite(${site.id}); document.getElementById('siteDetailsModal').remove();" data-bs-dismiss="modal">
+                                <i class="bi bi-pencil"></i> Edit Client
+                            </button>` : ''}
+                            <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     `;
     
-    // Remove existing modal if any
     const existingModal = document.getElementById('siteDetailsModal');
     if (existingModal) {
         existingModal.remove();
     }
     
-    // Add modal to page
     document.body.insertAdjacentHTML('beforeend', detailsHtml);
+    const modalElement = document.getElementById('siteDetailsModal');
+    if (!modalElement) return;
     
-    // Show modal - use a small delay to ensure DOM is ready and any popups are closed
-    setTimeout(() => {
-        const modalElement = document.getElementById('siteDetailsModal');
-        if (modalElement && typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-            const modal = new bootstrap.Modal(modalElement);
-            modal.show();
-        } else {
-            console.error('Bootstrap Modal not available or modal element not found');
-        }
-    }, 150);
+    modalElement.addEventListener('hidden.bs.modal', () => {
+        modalElement.remove();
+    }, { once: true });
+    
+    if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+        const modal = new bootstrap.Modal(modalElement);
+        modal.show();
+    }
 }
 
 function scheduleTaskForSite(siteId) {
