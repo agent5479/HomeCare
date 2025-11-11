@@ -286,6 +286,54 @@ function cleanupFirebaseListeners() {
     });
 }
 
+function cleanupIncorrectEmployeeListings() {
+    if (!database || !currentTenantId) {
+        console.log('⚠️ Cannot cleanup employee listings - database or tenant unavailable');
+        return;
+    }
+
+    const employeePath = `tenants/${currentTenantId}/employees`;
+    database.ref(employeePath)
+        .once('value')
+        .then(snapshot => {
+            const employees = snapshot.val() || {};
+            const employeeKeys = Object.keys(employees);
+
+            if (employeeKeys.length === 0) {
+                console.log('ℹ️ No employees to review for cleanup');
+                return;
+            }
+
+            console.log('🔍 Checking employee listings for incorrect admin entries...');
+
+            const keysToRemove = employeeKeys.filter(key => {
+                const employee = employees[key];
+                if (!employee || !employee.username) return false;
+                const username = employee.username.toLowerCase();
+                return username === 'lars' || username === 'admin' || username === 'master';
+            });
+
+            if (keysToRemove.length === 0) {
+                console.log('✅ Employee listings clean - no admin accounts found');
+                return;
+            }
+
+            console.log(`🧹 Removing ${keysToRemove.length} incorrect employee listing(s)`);
+
+            const updates = {};
+            keysToRemove.forEach(key => {
+                updates[`${employeePath}/${key}`] = null;
+            });
+
+            return database.ref().update(updates).then(() => {
+                console.log('✅ Incorrect employee listings removed');
+            });
+        })
+        .catch(error => {
+            console.error('❌ Error during employee cleanup:', error);
+        });
+}
+
 // Firebase operation throttling - prevent fetches faster than 300ms
 let lastFirebaseOperationTime = 0;
 const FIREBASE_THROTTLE_MS = 300;
