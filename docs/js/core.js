@@ -401,7 +401,7 @@ document.addEventListener('DOMContentLoaded', function() {
         currentTenantId = savedTenantId;
         console.log('🏢 Restored tenant:', currentTenantId);
         showMainApp();
-        loadDataFromFirebase();
+        initializeDataLoading();
     } else {
         checkFirstTimeSetup();
     }
