@@ -260,13 +260,6 @@ function _renderSitesInternal() {
                 const selectedCareServices = CARE_SERVICE_DEFINITIONS.filter(service => careServicesData[service.key]);
                 const serviceCount = selectedCareServices.length;
                 
-                // Get hive strength breakdown for inline editing
-                const hiveStrong = c.hiveStrength?.strong || 0;
-                const hiveMedium = c.hiveStrength?.medium || 0;
-                const hiveWeak = c.hiveStrength?.weak || 0;
-                const hiveNUC = c.hiveStrength?.nuc || 0;
-                const hiveDead = c.hiveStrength?.dead || 0;
-                
                 // Determine classification labels (compact for summary card)
                 const seasonalDisplay = (() => {
                     const seasonalValue = c.seasonalClassification || c.seasonal_classification || '';
@@ -396,31 +389,27 @@ function _renderSitesInternal() {
                                     <strong>Description:</strong> <span class="d-inline-block text-truncate" style="max-width: 100%;">${c.description.length > 100 ? c.description.substring(0, 100) + '...' : c.description}</span>
                                 </div>` : ''}
                                 
-                                <!-- Hive Count Summary (Editable inline) -->
+                                <!-- Care Plan Snapshot -->
                                 <div class="mb-2">
-                                    <strong><i class="bi bi-heart-pulse"></i> Client Status:</strong>
-                                    <div class="d-flex flex-wrap gap-2 mt-1">
-                                        <div class="badge bg-success d-flex align-items-center px-3 py-2 hive-strength-badge" onclick="quickEditHiveStrength(${c.id}, 'Strong', ${hiveStrong})" style="cursor: pointer; font-size: 1rem; font-weight: 600; min-width: 80px; justify-content: center;">
-                                            <i class="bi bi-house-check-fill me-1"></i>
-                                            <span>Independent: <strong id="hiveStrong_${c.id}">${hiveStrong}</strong></span>
-                                        </div>
-                                        <div class="badge bg-warning text-dark d-flex align-items-center px-3 py-2 hive-strength-badge" onclick="quickEditHiveStrength(${c.id}, 'Medium', ${hiveMedium})" style="cursor: pointer; font-size: 1rem; font-weight: 600; min-width: 80px; justify-content: center;">
-                                            <i class="bi bi-house-heart me-1"></i>
-                                            <span>Assisted: <strong id="hiveMedium_${c.id}">${hiveMedium}</strong></span>
-                                        </div>
-                                        <div class="badge bg-danger d-flex align-items-center px-3 py-2 hive-strength-badge" onclick="quickEditHiveStrength(${c.id}, 'Weak', ${hiveWeak})" style="cursor: pointer; font-size: 1rem; font-weight: 600; min-width: 80px; justify-content: center;">
-                                            <i class="bi bi-heart-pulse me-1"></i>
-                                            <span>Dependent: <strong id="hiveWeak_${c.id}">${hiveWeak}</strong></span>
-                                        </div>
-                                        <div class="badge bg-info d-flex align-items-center px-3 py-2 hive-strength-badge" onclick="quickEditHiveStrength(${c.id}, 'NUC', ${hiveNUC})" style="cursor: pointer; font-size: 1rem; font-weight: 600; min-width: 80px; justify-content: center;">
-                                            <i class="bi bi-hospital me-1"></i>
-                                            <span>Rehabilitation: <strong id="hiveNUC_${c.id}">${hiveNUC}</strong></span>
-                                        </div>
-                                        <div class="badge bg-secondary d-flex align-items-center px-3 py-2 hive-strength-badge" onclick="quickEditHiveStrength(${c.id}, 'Dead', ${hiveDead})" style="cursor: pointer; font-size: 1rem; font-weight: 600; min-width: 80px; justify-content: center;">
-                                            <i class="bi bi-heart-fill me-1"></i>
-                                            <span>Hospice: <strong id="hiveDead_${c.id}">${hiveDead}</strong></span>
-                                        </div>
-                                    </div>
+                                    <strong><i class="bi bi-clipboard-check"></i> Care Plan Snapshot:</strong>
+                                    ${siteTasks.length > 0 ? `
+                                        <ul class="list-unstyled small mt-2 mb-0">
+                                            ${siteTasks.slice(0, 4).map(task => {
+                                                const taskName = typeof getTaskDisplayName === 'function'
+                                                    ? getTaskDisplayName(null, task.taskId)
+                                                    : (task.taskName || 'Scheduled task');
+                                                const dueDate = task.dueDate ? new Date(task.dueDate).toLocaleDateString() : '';
+                                                return `<li class="d-flex align-items-start">
+                                                    <i class="bi bi-dot text-primary me-1"></i>
+                                                    <span>
+                                                        <span class="fw-semibold">${taskName}</span>
+                                                        ${dueDate ? `<small class="text-muted ms-1">(${dueDate})</small>` : ''}
+                                                    </span>
+                                                </li>`;
+                                            }).join('')}
+                                        </ul>
+                                        ${siteTasks.length > 4 ? `<div class="text-muted small mt-1">+${siteTasks.length - 4} additional scheduled tasks</div>` : ''}
+                                    ` : `<div class="text-muted small mt-1">No scheduled tasks yet. Use the schedule to add recurring visits.</div>`}
                                 </div>
                                 
                                 <!-- Care Services Snapshot -->
@@ -1065,7 +1054,7 @@ function handleSaveSite(e) {
 window.editSite = function(id) {
     // Check if user has permission to edit sites
     if (!isAdmin) {
-        careMarshallAlert('Only administrators can edit site details. You can update hive strength and hive boxes from the summary cards.', 'warning');
+        careMarshallAlert('Only administrators can edit client details. Please contact an administrator if updates are required.', 'warning');
         return;
     }
     
