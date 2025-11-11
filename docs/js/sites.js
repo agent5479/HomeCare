@@ -226,6 +226,10 @@ function _renderSitesInternal() {
                 const landownerDisplay = [contactLine, notesLine].filter(Boolean).join(', ');
                 const landownerTitle = [contactLine, notesLine].filter(Boolean).join(' — ');
                 const physicalAddress = c.physicalAddress || c.address || '';
+                const expectedHoursRaw = c.expectedServiceHours ?? c.expectedHours ?? null;
+                const expectedHours = (expectedHoursRaw !== null && expectedHoursRaw !== undefined && !Number.isNaN(Number(expectedHoursRaw)))
+                    ? Number(expectedHoursRaw)
+                    : null;
                 
                 // Get clients at this site
                 const siteClients = (window.clients || window.individualHives || []).filter(client => client.siteId === c.id);
@@ -309,6 +313,9 @@ function _renderSitesInternal() {
                                         ${seasonalBadge}
                                         ${needsContact ? `<span class="badge bg-warning text-dark ms-2 contact-required-badge" style="font-weight: bold;" title="Contact required before visit"><i class="bi bi-telephone-fill"></i> Contact Required</span>` : ''}
                                         ${c.isQuarantine ? `<span class="badge bg-danger ms-2" style="font-weight: bold;" title="Isolation/Quarantine required"><i class="bi bi-shield-exclamation"></i> Isolation</span>` : ''}
+                                        <button class="btn btn-sm btn-outline-info ms-2" onclick="event.stopPropagation(); showSiteCarePlan(${c.id});" title="View care plan details">
+                                            <i class="bi bi-info-circle"></i>
+                                        </button>
                                     </div>
                                 </div>
                                 
@@ -322,6 +329,13 @@ function _renderSitesInternal() {
                                 <div class="mb-2">
                                     <strong><i class="bi bi-geo-alt-fill text-primary me-1"></i> Address:</strong>
                                     <div class="small">${physicalAddress}</div>
+                                </div>
+                                ` : ''}
+                                
+                                ${expectedHours !== null ? `
+                                <div class="mb-2">
+                                    <strong><i class="bi bi-hourglass-split text-primary me-1"></i> Expected Hours per Visit:</strong>
+                                    <span>${expectedHours % 1 === 0 ? expectedHours : expectedHours.toFixed(1)} ${expectedHours === 1 ? 'hour' : 'hours'}</span>
                                 </div>
                                 ` : ''}
                                 
@@ -903,6 +917,9 @@ function handleSaveSite(e) {
     const contactNotesField = document.getElementById('landownerNotes');
     const contactNotes = contactNotesField ? contactNotesField.value : '';
     
+    const expectedHoursField = document.getElementById('expectedServiceHours');
+    const expectedHoursValue = expectedHoursField ? parseFloat(expectedHoursField.value) : NaN;
+    
     const careServices = {};
     CARE_SERVICE_DEFINITIONS.forEach(service => {
         careServices[service.key] = document.getElementById(service.elementId)?.checked || false;
@@ -970,6 +987,7 @@ function handleSaveSite(e) {
         contactBeforeVisit: document.getElementById('contactBeforeVisit').checked,
         isQuarantine: document.getElementById('isQuarantine').checked,
         careServices,
+        expectedServiceHours: Number.isNaN(expectedHoursValue) ? null : Number(expectedHoursValue.toFixed(2)),
         careNotes: careNotesFieldInput ? careNotesFieldInput.value : '',
         regularTasks: regularTasksFieldInput ? regularTasksFieldInput.value : '',
         // Legal & Compliance Information
@@ -1124,6 +1142,10 @@ window.editSite = function(id) {
     const addressField = document.getElementById('siteAddress');
     if (addressField) {
         addressField.value = site.physicalAddress || site.address || site.landownerAddress || site.contactNotes || '';
+    }
+    const expectedHoursField = document.getElementById('expectedServiceHours');
+    if (expectedHoursField) {
+        expectedHoursField.value = site.expectedServiceHours ?? site.expectedHours ?? '';
     }
     document.getElementById('siteDescription').value = site.description || '';
     // Client Demographics (NEW v0.7)
@@ -1616,7 +1638,8 @@ function viewSiteDetails(id) {
                                 <h6>Basic Information</h6>
                                 <p><strong>Type:</strong> <span class="badge" style="background-color: ${typeInfo.color}; color: white;">${typeInfo.name}</span></p>
                                 <p><strong>Description:</strong> ${site.description || 'No description'}</p>
-                                <p><strong>Hive Count:</strong> ${site.hiveCount}</p>
+                                <p><strong>Clients:</strong> ${site.hiveCount}</p>
+                                ${site.expectedServiceHours ? `<p><strong>Expected Hours per Visit:</strong> ${site.expectedServiceHours % 1 === 0 ? site.expectedServiceHours : site.expectedServiceHours.toFixed(1)}</p>` : ''}
                                 <p><strong>GPS Coordinates:</strong> ${site.latitude.toFixed(6)}, ${site.longitude.toFixed(6)}</p>
                                 
                                 <div class="mt-2">
@@ -2060,7 +2083,8 @@ function initMap() {
                             </a>
                         </h6>
                         <p class="mb-1"><small>${site.description || 'No description'}</small></p>
-                        <p class="mb-1"><strong>Type:</strong> <span style="color: ${typeInfo.color};">${typeInfo.name}</span></p>
+                                    <p class="mb-1"><strong>Type:</strong> <span style="color: ${typeInfo.color};">${typeInfo.name}</span></p>
+                                    ${site.expectedServiceHours ? `<p class="mb-1"><strong>Expected Hours:</strong> ${site.expectedServiceHours % 1 === 0 ? site.expectedServiceHours : site.expectedServiceHours.toFixed(1)}</p>` : ''}
                                     ${site.physicalAddress || site.address ? `<p class="mb-1"><strong>Address:</strong> ${site.physicalAddress || site.address}</p>` : ''}
                         <p class="mb-1"><strong>Clients:</strong> ${site.hiveCount || 0}</p>
                         ${site.landownerName ? `<p class="mb-1"><strong>Contact:</strong> ${site.landownerName}${site.landownerPhone ? ` • ${site.landownerPhone}` : ''}</p>` : ''}
@@ -3656,6 +3680,114 @@ function showSiteTasks(siteId) {
         }
     }, 100);
 }
+
+window.showSiteCarePlan = function(siteId) {
+    const site = window.sites.find(c => c.id === siteId);
+    if (!site) {
+        careMarshallAlert('Site not found', 'error');
+        return;
+    }
+    
+    const previousModal = document.getElementById('siteCarePlanModal');
+    if (previousModal) {
+        previousModal.remove();
+    }
+    
+    const careServicesBadges = CARE_SERVICE_DEFINITIONS
+        .filter(service => site.careServices && site.careServices[service.key])
+        .map(service => `<span class="badge me-1 mb-1" style="background:${service.color}; color:#fff;"><i class="bi ${service.icon}"></i> ${service.label}</span>`)
+        .join('');
+    
+    const regularTasks = (site.regularTasks || site.regularTasksList || '')
+        .split(/\r?\n/)
+        .map(line => line.trim())
+        .filter(line => line.length > 0);
+    
+    const siteTasks = (window.scheduledTasks || [])
+        .filter(task => task.siteId === siteId && !task.completed)
+        .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
+    
+    const modalHtml = `
+        <div class="modal fade" id="siteCarePlanModal" tabindex="-1">
+            <div class="modal-dialog modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header" style="background: linear-gradient(135deg, var(--turquoise), var(--lavender-mist));">
+                        <h5 class="modal-title"><i class="bi bi-info-circle"></i> Care Plan • ${site.name}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        ${site.expectedServiceHours ? `
+                        <div class="mb-3">
+                            <strong><i class="bi bi-hourglass-split"></i> Expected Hours per Visit:</strong>
+                            <div>${site.expectedServiceHours % 1 === 0 ? site.expectedServiceHours : site.expectedServiceHours.toFixed(1)} ${site.expectedServiceHours === 1 ? 'hour' : 'hours'}</div>
+                        </div>` : ''}
+                        
+                        <div class="mb-3">
+                            <strong><i class="bi bi-clipboard2-heart"></i> Primary Care Services:</strong>
+                            <div class="mt-2">
+                                ${careServicesBadges || '<span class="text-muted">No services documented yet.</span>'}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <strong><i class="bi bi-check2-square"></i> Regular Visit Checklist:</strong>
+                            <ol class="mt-2 mb-0">
+                                ${regularTasks.length > 0
+                                    ? regularTasks.map(item => `<li>${item}</li>`).join('')
+                                    : '<li class="text-muted">Add routine visit tasks in the client form to build this checklist.</li>'}
+                            </ol>
+                        </div>
+                        
+                        <div>
+                            <strong><i class="bi bi-calendar-check"></i> Scheduled Visit Tasks:</strong>
+                            <div class="mt-2">
+                                ${siteTasks.length > 0
+                                    ? `<ul class="list-unstyled mb-0">
+                                        ${siteTasks.map(task => {
+                                            const taskName = typeof getTaskDisplayName === 'function'
+                                                ? getTaskDisplayName(null, task.taskId)
+                                                : (task.taskName || 'Scheduled task');
+                                            const dueDate = task.dueDate ? new Date(task.dueDate) : null;
+                                            const dueLabel = dueDate ? dueDate.toLocaleDateString() : 'No date';
+                                            const priorityBadge = task.priority && task.priority !== 'normal'
+                                                ? `<span class="badge bg-${task.priority === 'urgent' ? 'danger' : 'warning'} text-dark ms-1">${task.priority.toUpperCase()}</span>`
+                                                : '';
+                                            return `<li class="mb-2">
+                                                <i class="bi bi-dot text-primary"></i>
+                                                <span class="fw-semibold">${taskName}</span>
+                                                <small class="text-muted ms-1">(${dueLabel})</small>
+                                                ${priorityBadge}
+                                            </li>`;
+                                        }).join('')}
+                                    </ul>`
+                                    : '<div class="text-muted">No scheduled visit tasks yet.</div>'}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        ${isAdmin ? `<button type="button" class="btn btn-outline-primary" onclick="editSite(${siteId}); document.getElementById('siteCarePlanModal').remove();" data-bs-dismiss="modal">
+                            <i class="bi bi-pencil"></i> Edit Client
+                        </button>` : ''}
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    const modalElement = document.getElementById('siteCarePlanModal');
+    if (!modalElement) return;
+    
+    modalElement.addEventListener('hidden.bs.modal', () => {
+        modalElement.remove();
+    }, { once: true });
+    
+    if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+        const modal = new bootstrap.Modal(modalElement);
+        modal.show();
+    }
+};
 
 /**
  * Scroll to a specific site card in the sites view
