@@ -32,6 +32,7 @@ export function loadAdminAccounts(): Record<string, AdminAccount> {
     }
   };
 
+  addAccount('Admin', import.meta.env.VITE_ADMIN_PASSWORD, 'master_admin');
   addAccount(import.meta.env.VITE_JESS_USERNAME, import.meta.env.VITE_JESS_PASSWORD, 'master_admin');
   addAccount(import.meta.env.VITE_GBTECH_USERNAME, import.meta.env.VITE_GBTECH_PASSWORD, 'master_admin');
   addAccount(import.meta.env.VITE_LARS_USERNAME, import.meta.env.VITE_LARS_PASSWORD, 'admin');

@@ -14,6 +14,7 @@ FIREBASE_DATABASE_URL=https://your_project.firebaseio.com
 FIREBASE_MESSAGING_SENDER_ID=your_sender_id
 FIREBASE_PROJECT_ID=your_project_id
 FIREBASE_STORAGE_BUCKET=your_project.appspot.com
+ADMIN_PASSWORD=your_admin_password
 GBTECH_PASSWORD=your_gbtech_password
 GBTECH_USERNAME=your_gbtech_username
 LARS_PASSWORD=your_lars_password
