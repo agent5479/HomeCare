@@ -11,6 +11,7 @@ export default defineConfig({
       registerType: 'autoUpdate',
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+        globIgnores: ['**/env-config.js'],
         navigateFallback: 'index.html',
         runtimeCaching: [],
       },

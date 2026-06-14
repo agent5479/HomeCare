@@ -1,5 +1,6 @@
 import bcrypt from 'bcryptjs';
 import type { AdminAccount } from '@/types';
+import { getEnv } from './env';
 
 function hashPassword(password: string): string {
   return bcrypt.hashSync(password, 10);
@@ -15,7 +16,7 @@ export function secureHash(password: string): string {
 
 export function loadAdminAccounts(): Record<string, AdminAccount> {
   const accounts: Record<string, AdminAccount> = {};
-  const defaultTenantId = import.meta.env.VITE_DEFAULT_TENANT_ID || 'default';
+  const defaultTenantId = getEnv('DEFAULT_TENANT_ID') || 'default';
 
   const addAccount = (
     username: string | undefined,
@@ -32,23 +33,23 @@ export function loadAdminAccounts(): Record<string, AdminAccount> {
     }
   };
 
-  addAccount('Admin', import.meta.env.VITE_ADMIN_PASSWORD, 'master_admin');
-  addAccount(import.meta.env.VITE_JESS_USERNAME, import.meta.env.VITE_JESS_PASSWORD, 'master_admin');
-  addAccount(import.meta.env.VITE_GBTECH_USERNAME, import.meta.env.VITE_GBTECH_PASSWORD, 'master_admin');
-  addAccount(import.meta.env.VITE_LARS_USERNAME, import.meta.env.VITE_LARS_PASSWORD, 'admin');
+  addAccount('Admin', getEnv('ADMIN_PASSWORD'), 'master_admin');
+  addAccount(getEnv('JESS_USERNAME'), getEnv('JESS_PASSWORD'), 'master_admin');
+  addAccount(getEnv('GBTECH_USERNAME'), getEnv('GBTECH_PASSWORD'), 'master_admin');
+  addAccount(getEnv('LARS_USERNAME'), getEnv('LARS_PASSWORD'), 'admin');
 
   return accounts;
 }
 
 export function getFirebaseConfig() {
   return {
-    apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-    authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-    databaseURL: import.meta.env.VITE_FIREBASE_DATABASE_URL,
-    projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-    storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-    messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-    appId: import.meta.env.VITE_FIREBASE_APP_ID,
+    apiKey: getEnv('FIREBASE_API_KEY'),
+    authDomain: getEnv('FIREBASE_AUTH_DOMAIN'),
+    databaseURL: getEnv('FIREBASE_DATABASE_URL'),
+    projectId: getEnv('FIREBASE_PROJECT_ID'),
+    storageBucket: getEnv('FIREBASE_STORAGE_BUCKET'),
+    messagingSenderId: getEnv('FIREBASE_MESSAGING_SENDER_ID'),
+    appId: getEnv('FIREBASE_APP_ID'),
   };
 }
 

@@ -42,6 +42,7 @@ app/.env
 app/.env.local
 app/.env.production
 docs/js/env-config.js
+docs/env-config.js
 
 # Node
 app/node_modules/
