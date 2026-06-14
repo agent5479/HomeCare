@@ -29,30 +29,39 @@ jobs:
       working-directory: app
       run: npm ci
 
-    - name: Create production environment file
-      working-directory: app
+    - name: Verify Firebase secrets are configured
+      if: github.ref == 'refs/heads/main'
+      env:
+        FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
+        FIREBASE_DATABASE_URL: ${{ secrets.FIREBASE_DATABASE_URL }}
+        FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
       run: |
-        cat > .env.production << EOF
-        VITE_FIREBASE_API_KEY=${{ secrets.FIREBASE_API_KEY }}
-        VITE_FIREBASE_AUTH_DOMAIN=${{ secrets.FIREBASE_AUTH_DOMAIN }}
-        VITE_FIREBASE_DATABASE_URL=${{ secrets.FIREBASE_DATABASE_URL }}
-        VITE_FIREBASE_PROJECT_ID=${{ secrets.FIREBASE_PROJECT_ID }}
-        VITE_FIREBASE_STORAGE_BUCKET=${{ secrets.FIREBASE_STORAGE_BUCKET }}
-        VITE_FIREBASE_MESSAGING_SENDER_ID=${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}
-        VITE_FIREBASE_APP_ID=${{ secrets.FIREBASE_APP_ID }}
-        VITE_JESS_USERNAME=${{ secrets.JESS_USERNAME }}
-        VITE_JESS_PASSWORD=${{ secrets.JESS_PASSWORD }}
-        VITE_GBTECH_USERNAME=${{ secrets.GBTECH_USERNAME }}
-        VITE_GBTECH_PASSWORD=${{ secrets.GBTECH_PASSWORD }}
-        VITE_LARS_USERNAME=${{ secrets.LARS_USERNAME }}
-        VITE_LARS_PASSWORD=${{ secrets.LARS_PASSWORD }}
-        VITE_DEFAULT_TENANT_ID=${{ secrets.DEFAULT_TENANT_ID }}
-        VITE_GOOGLE_MAPS_API_KEY=${{ secrets.GOOGLE_MAPS_API_KEY }}
-        VITE_OPENWEATHER_API_KEY=${{ secrets.OPENWEATHER_API_KEY }}
-        EOF
+        missing=0
+        if [ -z "$FIREBASE_API_KEY" ]; then echo "::error::Missing secret FIREBASE_API_KEY"; missing=1; fi
+        if [ -z "$FIREBASE_DATABASE_URL" ]; then echo "::error::Missing secret FIREBASE_DATABASE_URL"; missing=1; fi
+        if [ -z "$FIREBASE_PROJECT_ID" ]; then echo "::error::Missing secret FIREBASE_PROJECT_ID"; missing=1; fi
+        if [ "$missing" -eq 1 ]; then exit 1; fi
+        echo "Required Firebase secrets are present"
 
     - name: Build React app
       working-directory: app
+      env:
+        VITE_FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
+        VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.FIREBASE_AUTH_DOMAIN }}
+        VITE_FIREBASE_DATABASE_URL: ${{ secrets.FIREBASE_DATABASE_URL }}
+        VITE_FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
+        VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.FIREBASE_STORAGE_BUCKET }}
+        VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}
+        VITE_FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
+        VITE_JESS_USERNAME: ${{ secrets.JESS_USERNAME }}
+        VITE_JESS_PASSWORD: ${{ secrets.JESS_PASSWORD }}
+        VITE_GBTECH_USERNAME: ${{ secrets.GBTECH_USERNAME }}
+        VITE_GBTECH_PASSWORD: ${{ secrets.GBTECH_PASSWORD }}
+        VITE_LARS_USERNAME: ${{ secrets.LARS_USERNAME }}
+        VITE_LARS_PASSWORD: ${{ secrets.LARS_PASSWORD }}
+        VITE_DEFAULT_TENANT_ID: ${{ secrets.DEFAULT_TENANT_ID }}
+        VITE_GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
+        VITE_OPENWEATHER_API_KEY: ${{ secrets.OPENWEATHER_API_KEY }}
       run: npm run build
         
     - name: Setup Pages
