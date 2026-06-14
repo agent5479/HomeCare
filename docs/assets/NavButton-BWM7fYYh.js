@@ -1,0 +1,1 @@
+import{g as e,v as t}from"./vendor-BBq4cHJV.js";var n=e();function r({variant:e=`primary`,size:r,className:i=``,children:a,...o}){let s=r?` btn-${r}`:``,c=(e.startsWith(`outline-`),`btn-${e}`);return(0,n.jsx)(t,{...o,className:`btn ${c}${s} ${i}`.trim(),children:a})}export{r as t};

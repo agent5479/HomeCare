@@ -1,0 +1,25 @@
+:root {
+  --light-blue: #E3F2FD;
+  --primary-blue: #1976D2;
+  --secondary-blue: #42A5F5;
+  --white: #FFFFFF;
+  --black: #2D2D2D;
+  --text-secondary: #4a5568;
+  --pale-lavender: #E6E6FA;
+  --lavender-mist: #DCD0FF;
+  --turquoise: #40E0D0;
+  --soft-turquoise: #AFEEEE;
+  --warm-coral: #FF9999;
+  --peach-cream: #FFEFD5;
+  --cream: #FFF8F0;
+  --mint-cream: #F0FFF8;
+  --shadow: 0 8px 32px rgba(230, 230, 250, 0.3);
+  --radius: 12px;
+  --transition: all .22s cubic-bezier(.4,0,.2,1);
+}
+
+body {
+  background: var(--cream);
+  font-family: 'Inter', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  color: var(--black);
+}

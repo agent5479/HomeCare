@@ -69,21 +69,18 @@ tenants/
 ```
 
 ### Key Files
-- **Main App**: `docs/beemarshall-full.html`
-- **Reports**: `docs/reports.html`
-- **Core Logic**: `docs/js/core.js`
-- **Dashboard**: `docs/js/dashboard.js`
-- **Sites Management**: `docs/js/sites.js`
-- **Task Management**: `docs/js/tasks.js`
-- **Configuration**: `docs/js/config.js`
-- **Environment**: `docs/js/env-config.js` (auto-generated)
+- **React App Source**: `app/`
+- **Production Build**: `docs/` (GitHub Pages)
+- **Legacy Archive**: `archive/legacy-react-migration/`
 
 ## 🚀 Deployment Process
 
 ### Automatic Deployment
 1. Push changes to `main` branch
 2. GitHub Actions automatically:
-   - Injects secrets into `env-config.js`
+   - Installs npm dependencies in `app/`
+   - Injects secrets into `app/.env.production`
+   - Builds React app to `docs/`
    - Deploys to GitHub Pages
    - Updates live site at `https://agent5479.github.io/HomeCare/`
 
