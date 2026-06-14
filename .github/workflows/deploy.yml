@@ -100,6 +100,14 @@ jobs:
           echo "::error::FIREBASE_DATABASE_URL is empty in env-config.js"
           exit 1
         fi
+        if ! grep -q 'ENV_FIREBASE_API_KEY' ../docs/index.html; then
+          echo "::error::Firebase config not injected into index.html"
+          exit 1
+        fi
+        if [ ! -f ../docs/env-config.js ]; then
+          echo "::error::env-config.js was not created"
+          exit 1
+        fi
         echo "Runtime config injected successfully"
         
     - name: Setup Pages
